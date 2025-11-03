@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fixed Driver Bata</title>
+
+<link href="{% static 'vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+
+<style>
+    .main_content {
+        margin-top: 75px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    form {
+        width: 450px;
+        padding: 25px;
+        border: 2px solid rgb(43, 114, 227);
+        border-radius: 10px;
+        background: antiquewhite; /* Keep bg color */
+        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    form h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        font-weight: bold;
+        color: #2b72e3;
+        text-transform: uppercase;
+    }
+
+    label {
+        font-weight: bold;
+        margin-bottom: 6px;
+        display: block;
+        color: #333;
+    }
+
+    select, input[type="date"] {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1px solid #999;
+        border-radius: 5px;
+        font-size: 14px;
+        margin-bottom: 18px;
+        transition: 0.3s ease;
+    }
+
+    select:focus, input[type="date"]:focus {
+        border-color: #2b72e3;
+        box-shadow: 0 0 5px rgba(43, 114, 227, 0.5);
+        outline: none;
+    }
+
+    .btn {
+        margin-top: 10px;
+        display: inline-block;
+        padding: 10px 18px;
+        border-radius: 5px;
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+        transition: 0.3s ease;
+    }
+
+    .btn:hover {
+        opacity: 0.9;
+        transform: scale(1.02);
+    }
+
+    .back-btn {
+        background-color: #007bff;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border: none;
+    }
+
+    .btn-group {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 15px;
+    }
+</style>
+
+<div class="main_content">
+    <form method="post">
+        <h2>Fixed Driver Bata</h2>
+        {% csrf_token %}
+
+        <!-- Driver Dropdown -->
+        <label for="driver">Driver:</label>
+        <select name="driver" id="driver" required>
+            <option value="">Select Driver</option>
+            {% for driver in drivers %}
+                <option value="{{ driver }}">{{ driver }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- Date From -->
+        <label for="date_from">Date From:</label>
+        <input type="date" name="date_from" id="date_from" required>
+
+        <!-- Date To -->
+        <label for="date_to">Date To:</label>
+        <input type="date" name="date_to" id="date_to" required>
+
+        <!-- Buttons -->
+        <div class="btn-group">
+            <a href="{% url 'main:index' %}" class="btn back-btn">Back</a>
+            <button type="submit" class="btn btn-success">OK</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let today = new Date().toISOString().split('T')[0];  
+        document.getElementById("date_from").value = today;
+        document.getElementById("date_to").value = today;
+    });
+</script>
+
+{% endblock %}

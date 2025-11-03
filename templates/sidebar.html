@@ -1,0 +1,305 @@
+{% load static %}
+{% block content %}
+    <link href="{% static 'css/sidebar.css' %}" rel="stylesheet" media="all">
+
+{% if request.user.is_authenticated %}
+
+ <!-- Hamburger button -->
+<button class="hamburger" id="hamburger">
+    <i class="fas fa-bars"></i>
+</button>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+    <!-- Header -->
+    <div class="sidebar-header">
+        <img src="" alt="Logo">
+        <span class="brand"> Hello {{ request.user.username }}</span>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sidebar-nav">
+        <ul>
+            <li>
+                <a href="{% url 'main:index' %}">
+                    <i class="fas fa-desktop"></i><span>Home</span>
+                </a>
+            </li>
+
+            <li class="has-sub">
+                <a href="#">
+                    <i class="fas fa-cogs"></i><span>Masters</span>
+                    <i class="arrow fas fa-chevron-right"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="{% url 'main:acc_master' %}">Account Master</a></li>
+                    <li><a href="{% url 'main:brand_create' %}">Brand</a></li>
+                    <li><a href="{% url 'main:vehicle_add' %}">Model</a></li>
+                    <li><a href="{% url 'main:vehicle_type_create' %}">Vehicle Type</a></li>
+                    <li><a href="{% url 'main:vehicle_master_add' %}">Vehicle Master</a></li>
+                    <li><a href="{% url 'main:employee_create' %}">Employee</a></li>
+                    <li><a href="{% url 'main:rate_master' %}">Rate Master</a></li>
+                    <li><a href="{% url 'main:location_master' %}">Location Master</a></li>
+                    <li><a href="{% url 'main:add_unit' %}">Unit Master</a></li>
+                    <li><a href="{% url 'main:add_tax' %}">Tax Master</a></li>
+                    <li><a href="{% url 'main:new_group' %}">Group Master</a></li>
+                    <li><a href="{% url 'main:item_add' %}">Item Master</a></li>
+                    <li><a href="{% url 'main:new_godown' %}">Godown Master</a></li>
+                    <li><a href="{% url 'main:vendor_master' %}">Vendor Master</a></li>
+
+                </ul>
+            </li>
+
+            <li class="has-sub">
+                <a href="#">
+                    <i class="fas fa-truck"></i> </i><span>Trip Sheet</span>
+                    <i class="arrow fas fa-chevron-right"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="{% url 'main:trip_create' %}">Entry</a></li>
+                    <li><a href="{% url 'main:trip_list' %}">Modify</a></li>
+                    <li><a href="{% url 'main:trip_search_delete' %}">Delete</a></li>
+                             <li class="has-sub">
+            <a href="#">
+                <i class="fas fa-book"></i><span>Reports</span>
+                <i class="arrow fas fa-chevron-right"></i>
+            </a>
+            <ul class="submenu">
+                                <li class="nav-item"> <a class="nav-link" href="{% url 'main:trip_sheet_date_wise' %}"> Date wise </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{% url 'main:trip_sheet_driver_wise' %}"> Driver wise  </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{% url 'main:trip_sheet_vehicle_wise' %}"> Vehicle wise </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{% url 'main:trip_sheet_customer_wise' %}"> Customer wise  </a></li>
+
+
+                                <!-- <li class="nav-item"> <a class="nav-link" href="{% url 'main:account_contra_entry' %}"> Trial </a></li> -->
+                                
+
+            </ul>
+        </li>
+ 
+                </ul>
+            </li>
+
+            <li class="has-sub">
+                <a href="#">
+                    <i class="fas fa-file-alt"></i><span>Billing Entry</span>
+                    <i class="arrow fas fa-chevron-right"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="{% url 'main:bill_details' %}">Bill Entry</a></li>
+                    <li><a href="{% url 'main:bill_search' %}">Modify Bill</a></li>
+                    <li><a href="{% url 'main:bill_delete_search' %}">Delete Bill</a></li>
+                    <li><a href="{% url 'main:bill_report_search' %}">Report</a></li>
+                </ul>
+            </li>
+<li class="has-sub">
+    <a href="#">
+        <i class="fas fa-calculator"></i><span>Accounts</span>
+        <i class="arrow fas fa-chevron-right"></i>
+    </a>
+    <ul class="submenu">
+        <!-- <li><a href="{% url 'main:trip_search_delete' %}">Delete</a></li> -->
+
+        <!-- Inner Dropdown -->
+        <li class="has-sub">
+            <a href="#">
+                <i class="fas fa-desktop"></i><span>Debit Note</span>
+                <i class="arrow fas fa-chevron-right"></i>
+            </a>
+            <ul class="submenu">
+                                <li class="nav-item"> <a class="nav-link" href="{% url 'main:account_debit_note' %}">Entry</a></li>
+                <li class="nav-item"> <a class="nav-link" href="{% url 'main:search_debit_note' %}">Modify Debit
+                    Note</a></li>
+
+            </ul>
+        </li>
+
+        <li class="has-sub">
+            <a href="#">
+                <i class="fas fa-desktop"></i><span>Credit Note</span>
+                <i class="arrow fas fa-chevron-right"></i>
+            </a>
+            <ul class="submenu">
+                                <li class="nav-item"><a class="nav-link" href="{% url 'main:account_credit_note' %}">Entry</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'main:search_credit_note' %}">Modify Credit
+                    Note</a></li>
+            </ul>
+        </li>
+                <li class="has-sub">
+            <a href="#">
+                <i class="fas fa-desktop"></i><span>Receipt Voucher</span>
+                <i class="arrow fas fa-chevron-right"></i>
+            </a>
+            <ul class="submenu">
+                <li class="nav-item"> <a class="nav-link" href="{% url 'main:receipt' %}">Entry</a></li>
+                <li class="nav-item"> <a class="nav-link" href="{% url 'main:receipt_modify' %}">Modify Receipt
+                    Voucher</a></li>
+            </ul>
+        </li>
+
+        <li class="has-sub">
+            <a href="#">
+                <i class="fas fa-desktop"></i><span>Payment Voucher</span>
+                <i class="arrow fas fa-chevron-right"></i>
+            </a>
+            <ul class="submenu">
+                                <li class="nav-item"> <a class="nav-link" href="{% url 'main:payment' %}">Entry</a></li>
+                <li class="nav-item"> <a class="nav-link" href="{% url 'main:payment_modify' %}">Modify Payment
+                    Voucher</a></li>
+            </ul>
+        </li>
+
+                <li class="has-sub">
+            <a href="#">
+                <i class="fas fa-desktop"></i><span>Journal Entry</span>
+                <i class="arrow fas fa-chevron-right"></i>
+            </a>
+            <ul class="submenu">
+                      	<li class="nav-item"> <a class="nav-link" href="{% url 'main:account_journal_entry' %}">Entry</a></li>
+			<li class="nav-item"> <a class="nav-link" href="{% url 'main:search_journal_entry' %}">Modify Journal
+                    Entry</a></li>
+            </ul>
+        </li>
+
+        <li class="has-sub">
+            <a href="#">
+                <i class="fas fa-desktop"></i><span>Contra Entry</span>
+                <i class="arrow fas fa-chevron-right"></i>
+            </a>
+            <ul class="submenu">
+                                <li class="nav-item"> <a class="nav-link" href="{% url 'main:account_contra_entry' %}"> Entry </a></li>
+                <li class="nav-item"> <a class="nav-link" href="{% url 'main:search_contra_entry' %}">Modify Contra
+                    Entry</a></li>
+            </ul>
+        </li>
+
+
+                <li class="has-sub">
+            <a href="#">
+                <i class="fas fa-desktop"></i><span>Outstanding Analysis</span>
+                <i class="arrow fas fa-chevron-right"></i>
+            </a>
+            <ul class="submenu">
+                                <li class="nav-item"> <a class="nav-link" href="{% url 'main:amount_receivable_search_outstanding_analysis' %}"> Amount Receivable </a></li>
+                <li class="nav-item"> <a class="nav-link" href="{% url 'main:amount_payable_search_outstanding_analysis' %}">Amount payable</a></li>
+            </ul>
+        </li>
+
+                <li class="has-sub">
+            <a href="#">
+                <i class="fas fa-book"></i><span>Accounts Reports</span>
+                <i class="arrow fas fa-chevron-right"></i>
+            </a>
+            <ul class="submenu">
+                                <li class="nav-item"> <a class="nav-link" href="{% url 'main:ledger_search' %}"> Ledger </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{% url 'main:cashbook_search' %}"> Cash Book </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{% url 'main:bankbook_search' %}"> Bank Book </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{% url 'main:daybook_search' %}"> Day Book </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="{% url 'main:trial_balance' %}"> Trial Balance</a></li>
+                                <!-- <li class="nav-item"> <a class="nav-link" href="{% url 'main:account_contra_entry' %}"> Trial </a></li> -->
+                                
+
+            </ul>
+        </li>
+
+
+    </ul>
+</li>
+
+
+
+            <li class="has-sub">
+                <a href="#">
+                    <i class="fas fa-cogs"></i><span>Driver Bata</span>
+                    <i class="arrow fas fa-chevron-right"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="{% url 'main:driver_bata' %}">Driver Bata</a></li>
+                </ul>
+            </li>
+
+
+
+<li class="has-sub">
+    <a href="#">
+        <i class="fas fa-industry"></i><span>Company</span>
+        <i class="arrow fas fa-chevron-right"></i>
+    </a>
+    <ul class="submenu">
+        <li><a href="{% url 'main:company_details_master' %}">Company Master</a></li> 
+         <li><a href="{% url 'main:voucher_configuration' %}">Voucher Configuration</a></li>
+
+    </ul>
+</li>
+
+        </ul>
+    </nav>
+
+    <!-- Profile Footer -->
+    <!-- <div class="sidebar-footer"> -->
+        <div class="user">
+            <!-- <img src="{% static 'images/icon/user.png' %}" alt="User">
+            <span class="username">{{ request.user.username }}</span> -->
+        </div>
+        <div class="footer-actions">
+            <!-- <button id="modeSwitch"><i class="fas fa-adjust"></i></button> -->
+            <!-- <a href="{% url 'main:driver_logout' %}" class="logout"> -->
+                <!-- <i class="fas fa-sign-out-alt"></i> -->
+            </a>
+        </div>
+    </div>
+</aside>
+{% endif %}
+
+<!-- CSS -->
+
+
+<!-- JS -->
+<!-- <script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Accordion submenu
+  document.querySelectorAll(".has-sub > a").forEach(link => {
+    link.addEventListener("click", e => {
+      e.preventDefault();
+      const parent = link.parentElement;
+      document.querySelectorAll(".has-sub").forEach(li => {
+        if (li !== parent) li.classList.remove("active");
+      });
+      parent.classList.toggle("active");
+    });
+  });
+
+  // Dark mode switch
+  document.getElementById("modeSwitch").addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+  });
+});
+</script> -->
+    
+<script>
+document.querySelectorAll(".has-sub > a").forEach(link => {
+    link.addEventListener("click", function(e) {
+        e.preventDefault();
+
+        let parentLi = this.parentElement;
+
+        // toggle only this submenu
+        parentLi.classList.toggle("open");
+    });
+});
+
+
+</script>    
+
+   <!-- script for hamberger menu -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const hamburger = document.getElementById("hamburger");
+  const sidebar = document.getElementById("sidebar");
+
+  hamburger.addEventListener("click", () => {
+    sidebar.classList.toggle("active");
+  });
+});
+</script>
+
+{% endblock %}

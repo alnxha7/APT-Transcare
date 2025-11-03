@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brand Deleted</title>
+
+<!-- Bootstrap CSS-->
+<link href="{% static 'vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+<link href="{% static 'css/theme.css' %}" rel="stylesheet" media="all">
+
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        /* background: linear-gradient(135deg, #e8f5e9, #f1f8e9); */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .success-box {
+        background: antiquewhite;
+        padding: 50px 40px;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        text-align: center;
+        max-width: 450px;
+        animation: fadeIn 0.8s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(40px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .success-icon {
+        width: 90px;
+        height: 90px;
+        background: #4caf50;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 45px;
+        margin: 0 auto 20px;
+        box-shadow: 0 0 15px rgba(76, 175, 80, 0.4);
+        animation: pop 0.6s ease-in-out;
+    }
+
+    @keyframes pop {
+        0% { transform: scale(0.8); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    h2 {
+        color: #2e7d32;
+        font-weight: 600;
+        font-size: 22px;
+        margin-bottom: 10px;
+    }
+
+    p {
+        color: #555;
+        font-size: 15px;
+        margin-bottom: 30px;
+    }
+
+    .btn-back {
+        background-color: #2e7d32;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 500;
+        text-transform: uppercase;
+        transition: all 0.3s ease;
+    }
+
+    .btn-back:hover {
+        background-color: #1b5e20;
+        transform: translateY(-2px);
+        color: white;
+        text-decoration: none;
+    }
+
+    .logo p {
+        color: white;
+    }
+</style>
+
+<div class="success-box">
+    <div class="success-icon">
+        <i class="fa fa-check"></i>
+    </div>
+    <h2>Brand Deleted Successfully</h2>
+    <p>The selected brand has been permanently removed from the system.</p>
+    <a href="{% url 'main:brand_list' %}" class="btn-back">
+        <i class="fa fa-arrow-left"></i> Back to List
+    </a>
+</div>
+
+<!-- JS -->
+<script src="{% static 'vendor/jquery-3.2.1.min.js' %}"></script>
+<script src="{% static 'vendor/bootstrap-4.1/bootstrap.min.js' %}"></script>
+{% endblock %}

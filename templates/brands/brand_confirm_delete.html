@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Delete Brand</title>
+
+<!-- Bootstrap CSS -->
+<link href="{% static 'vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+<link href="{% static 'css/theme.css' %}" rel="stylesheet" media="all">
+
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #e3f2fd, #f9f9f9);
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .delete-container {
+        background: antiquewhite;
+        width: 450px;
+        border-radius: 12px;
+        box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.15);
+        padding: 40px 35px;
+        text-align: center;
+        animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .delete-container h2 {
+        color: #d32f2f;
+        font-weight: 600;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .delete-container p {
+        font-size: 15px;
+        color: #444;
+        margin-bottom: 30px;
+    }
+
+    .highlight {
+        color: #1565c0;
+        font-weight: 600;
+    }
+
+    .btn-container {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .btn-custom {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 120px;
+    }
+
+    .btn-delete {
+        background-color: #e53935;
+        color: white;
+    } 
+
+    .btn-delete:hover {
+        background-color: #c62828;
+        transform: translateY(-2px);
+    }
+
+    .btn-cancel {
+        background-color: #1976d2;
+        color: white;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+        line-height: 1.6;
+    }
+
+    .btn-cancel:hover {
+        background-color: #0d47a1;
+        transform: translateY(-2px);
+        color: #fff;
+    }
+
+    .icon-box {
+        background: #fce4ec;
+        border-radius: 50%;
+        width: 80px;
+        height: 80px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto 20px;
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(233, 30, 99, 0.5); }
+        70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(233, 30, 99, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(233, 30, 99, 0); }
+    }
+
+    .icon-box i {
+        color: #e91e63;
+        font-size: 36px;
+    }
+</style>
+
+<div class="delete-container">
+    <div class="icon-box">
+        <i class="fa fa-exclamation-triangle"></i>
+    </div>
+    <h2>Delete Brand</h2>
+    <p>Are you sure you want to delete the brand <span class="highlight">"{{ brand.brand_name }}"</span>?</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="btn-container">
+            <button type="submit" class="btn-custom btn-delete">
+                <i class="fa fa-trash"></i> Delete
+            </button>
+            <a href="{% url 'main:brand_list' %}" class="btn-custom btn-cancel">
+                <i class="fa fa-times"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- JS -->
+<script src="{% static 'vendor/jquery-3.2.1.min.js' %}"></script>
+<script src="{% static 'vendor/bootstrap-4.1/bootstrap.min.js' %}"></script>
+{% endblock %}
