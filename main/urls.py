@@ -187,6 +187,10 @@ urlpatterns = [
     path("driver_bata/", views.driver_bata, name="driver_bata"),
 
 
+    path("lorry_receipt/", views.lorry_receipt, name="lorry_receipt"),
+    path('get_serial_number_lr/', views.get_serial_number_lr, name='get_serial_number_lr'),
+
+
     # accounts - debit-note
     path("accounts/debit-note/",AccountDebitNoteView.as_view(),name="account_debit_note"),
     path('debit-note/delete/<int:pk1>/<int:pk2>/', DeleteDebitNoteView.as_view(), name='delete_debit_note'),

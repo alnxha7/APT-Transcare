@@ -367,6 +367,7 @@ class VoucherConfiguration(models.Model):
         ('Journal Entry', 'Journal Entry'),
         ('Trip sheet', 'Trip sheet'),
         ('Sales', 'Sales'),
+        ('Lorry Receipt', 'Lorry Receipt'),
         ('Service Voucher', 'Service Voucher'),
     ]
     category = models.CharField(max_length=255, choices=CATEGORY_CHOICES)

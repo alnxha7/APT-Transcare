@@ -2311,7 +2311,10 @@ def autocomplete_customers(request):
                  'value': x.head, 
                  'account_code': x.account_code, 
                  'address': x.address1,
+                 'address2': x.address2,
+                 'address3': x.address3,
                  'gstno': x.gstno,
+                 'mobile': x.mobile,
                  'customer_tax': x.tax if x.tax else 0,
                  } for x in results]
         return JsonResponse(data, safe=False)
@@ -7604,3 +7607,27 @@ def driver_bata(request):
                                                                              "fixed_km": employee.fixed_km, "additional_charge": employee.additional_charge})
 
     return render(request, "driver_bata/search.html", {'drivers': drivers})
+
+
+
+
+# -------------------------------------------------------------- LORRY RECEIPT --------------------------------------------------------------
+
+def lorry_receipt(request):
+    vouchers = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch'), 
+                                                   category='Lorry Receipt')
+    customers = Table_Accountsmaster.objects.filter(group='SUNDRY DEBTORS', company__company_id=request.session.get('co_id'),
+                                                    branch__branch_name=request.session.get('branch'))
+    context = {
+        'vouchers': vouchers,
+        'customers': customers
+    }
+    return render(request, "lorry_receipt/lorry_receipt.html", context)
+
+def get_serial_number_lr(request):
+    series_id = request.GET.get('series_id')
+    try:
+        voucher = VoucherConfiguration.objects.get(id=series_id, category='Lorry Receipt')
+        return JsonResponse({'serial_no': voucher.serial_no})
+    except VoucherConfiguration.DoesNotExist:
+        return JsonResponse({'error': 'Invalid series selected'}, status=400)
