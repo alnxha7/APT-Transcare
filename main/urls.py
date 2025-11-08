@@ -162,21 +162,14 @@ urlpatterns = [
     path('get-customers/', views.get_customers, name='get_customers'),
     path('trip-sheets-customer-loading-date/',views.trip_sheets_customer_loading_date, name='trip_sheets_customer_loading_date'),
 
-
-
-
     path("rate_master/", views.rate_master, name="rate_master"),
     path("rate_list/", views.rate_list, name="rate_list"),
     path("rate_delete/<int:rate_id>/", views.rate_delete, name="rate_delete"),
-
-
-
 
     path("location_master/", views.location_master, name="location_master"),
     path("location_list/", views.location_list, name="location_list"),
     path("delete_location/<int:location_id>/", views.delete_location, name="location_delete"),
     path("location_edit/<int:location_id>/", views.location_edit, name="location_edit"),
-
 
     path("vendor_master/", views.vendor_master, name="vendor_master"),
     path("vendor_list/", views.vendor_list, name="vendor_list"),
@@ -189,6 +182,9 @@ urlpatterns = [
 
     path("lorry_receipt/", views.lorry_receipt, name="lorry_receipt"),
     path('get_serial_number_lr/', views.get_serial_number_lr, name='get_serial_number_lr'),
+    path('ajax/item-search/', views.item_search, name='item_search'),
+    path("lr_search/", views.lr_search, name="lr_search"),
+    path("lr_edit/<int:lr_id>/", views.lr_edit, name="lr_edit"),
 
 
     # accounts - debit-note

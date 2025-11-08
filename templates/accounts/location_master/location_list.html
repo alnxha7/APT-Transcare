@@ -378,11 +378,7 @@
                 <thead>
                     <tr>
                         <th style="text-align: center;">Sl.no</th>
-                        <th style="text-align: center;">Customer</th>
-                        <th style="text-align: center;">Loading Point</th>
-                        <th style="text-align: center;">Unloading Point</th>
-                        <th style="text-align: center;">Rate</th>
-                        <th style="text-align: center;">Vehicle Type</th>
+                        <th style="text-align: center;">Location</th>
                         <th style="text-align: center;">Delete</th>
                         <th style="text-align: center;">Edit</th>
                     </tr>
@@ -392,11 +388,7 @@
                         {% for location in locations %}
                                 <tr>
                                     <td style="text-align: center;">{{ forloop.counter }}</td>
-                                    <td style="text-align: center;">{{ location.customer }}</td>
-                                    <td style="text-align: center;">{{ location.loading_point }}</td>
-                                    <td style="text-align: center;">{{ location.unloading_point }}</td>
-                                    <td style="text-align: center;">{{ location.rate }}</td>
-                                    <td style="text-align: center;">{{ location.vehicle_type.vehicle_name }}</td>
+                                    <td style="text-align: center;">{{ location.location }}</td>
                                     <td><button type="button" class="delete-btn" data-id="{{ location.id }}">
                                             <i class="fa-sharp fa-solid fa-trash fa-shake fa-sm"></i>
                                         </button>

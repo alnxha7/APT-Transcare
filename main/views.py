@@ -7424,54 +7424,37 @@ def item_update(request, pk):
 from .models import LocationMaster
 
 def location_master(request):
-    vehicles = Vehicle_type.objects.filter(co_id=request.session.get('co_id'))
-    customers = Table_Accountsmaster.objects.filter(group='SUNDRY DEBTORS', user__company__company_id=request.session.get('co_id'))
     if request.method == "POST":
-        customer = request.POST.get('customer')
-        loading_point = request.POST.get('loading_point')
-        unloading_point = request.POST.get('unloading_point')
-        rate = request.POST.get('rate')
-        vehicle_type_id = request.POST.get('vehicle_type')
-        vehicle_type = Vehicle_type.objects.get(id=vehicle_type_id)
+        location = request.POST.get('location')
 
         exists = LocationMaster.objects.filter(
-            customer=customer,
-            loading_point=loading_point,
-            unloading_point=unloading_point,
-            rate=rate,
-            vehicle_type=vehicle_type
+            company=Table_Companydetailsmaster.objects.get(company_id=request.session.get('co_id')),
+            branch=Branch_master.objects.get(branch_name=request.session.get('branch')),
+            location=location
         ).exists()
         if exists:
             return render(request, 'accounts/location_master/location_master.html', {
-                'vehicles': vehicles,
                 'error': 'Location with the same details already exists.'
             })
 
         try:
             LocationMaster.objects.create(
                 company=Table_Companydetailsmaster.objects.get(company_id=request.session.get('co_id')),
-                customer=customer,
-                loading_point=loading_point,
-                unloading_point=unloading_point,
-                rate=rate,
-                vehicle_type=vehicle_type
+                branch=Branch_master.objects.get(branch_name=request.session.get('branch')),
+                location=location
             )
             return render(request, 'accounts/location_master/location_master.html', {
-                'vehicles': vehicles,
-                'customers': customers,
                 'success': 'Location created successfully.'
             })
         except Exception as e:
             return render(request, 'accounts/location_master/location_master.html', {
-                'vehicles': vehicles,
-                'customers': customers,
                 'error': str(e)
             })
 
-    return render(request, 'accounts/location_master/location_master.html', {'vehicles': vehicles, 'customers': customers})
+    return render(request, 'accounts/location_master/location_master.html')
 
 def location_list(request):
-    locations = LocationMaster.objects.filter(company__company_id=request.session.get('co_id'))
+    locations = LocationMaster.objects.filter(company__company_id=request.session.get('co_id'), branch=Branch_master.objects.get(branch_name=request.session.get('branch')),)
     return render(request, 'accounts/location_master/location_list.html', {'locations': locations})
 
 def delete_location(request, location_id):
@@ -7484,46 +7467,29 @@ def delete_location(request, location_id):
 
 def location_edit(request, location_id):
     location = LocationMaster.objects.get(id=location_id)
-    vehicles = Vehicle_type.objects.filter(co_id=request.session.get('co_id'))
-    customers = Table_Accountsmaster.objects.filter(group='SUNDRY DEBTORS', user__company__company_id=request.session.get('co_id'))
     if request.method == "POST":
-        customer = request.POST.get('customer')
-        loading_point = request.POST.get('loading_point')
-        unloading_point = request.POST.get('unloading_point')
-        rate = request.POST.get('rate')
-        vehicle_type_id = request.POST.get('vehicle_type')
-        vehicle_type = Vehicle_type.objects.get(id=vehicle_type_id)
+        loc = request.POST.get('location')
 
         exists = LocationMaster.objects.filter(
-            customer=customer,
-            loading_point=loading_point,
-            unloading_point=unloading_point,
-            rate=rate,
-            vehicle_type=vehicle_type
+            company=Table_Companydetailsmaster.objects.get(company_id=request.session.get('co_id')),
+            branch=Branch_master.objects.get(branch_name=request.session.get('branch')),
+            location=loc
         ).exists()
         if exists:
             return render(request, 'accounts/location_master/location_edit.html', {
-                'vehicles': vehicles,
-                'customers': customers,
                 'location': location,
-                'error': 'Location with the same details already exists.'
+                'error': 'Location with the same name already exists.'
             })
 
-        location.customer = customer
-        location.loading_point = loading_point
-        location.unloading_point = unloading_point
-        location.rate = rate
-        location.vehicle_type = vehicle_type
+        location.location = loc
         location.save()
 
         return render(request, 'accounts/location_master/location_edit.html', {
             'location': location,
-            'customers': customers,
-            'vehicles': vehicles,
             'success': 'Location updated successfully.'
         })
 
-    return render(request, 'accounts/location_master/location_edit.html', {'location': location, 'vehicles': vehicles, 'customers': customers})
+    return render(request, 'accounts/location_master/location_edit.html', {'location': location})
 
 # ------------------------------------ VENDOR MASTER ----------------------------------
 
@@ -7613,14 +7579,98 @@ def driver_bata(request):
 
 # -------------------------------------------------------------- LORRY RECEIPT --------------------------------------------------------------
 
+from .models import LorryReceiptMaster, LorryReceiptItems
+
 def lorry_receipt(request):
     vouchers = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch'), 
                                                    category='Lorry Receipt')
     customers = Table_Accountsmaster.objects.filter(group='SUNDRY DEBTORS', company__company_id=request.session.get('co_id'),
                                                     branch__branch_name=request.session.get('branch'))
+    locations = LocationMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch'))
+
+    if request.method == 'POST':
+        try:
+            action = request.POST.get('action')
+            series_id = request.POST.get('series')
+            voucher_config = VoucherConfiguration.objects.get(id=series_id, category='Lorry Receipt')
+            serial_no = voucher_config.serial_no
+
+            lorry_receipt = LorryReceiptMaster.objects.create(
+                company=Table_Companydetailsmaster.objects.get(company_id=request.session.get('co_id')),
+                branch=Branch_master.objects.get(branch_name=request.session.get('branch')),
+                fy_code=request.session.get('fycode'),
+                
+                series=voucher_config,
+                lr_no=serial_no,
+                lr_date=request.POST.get('bill_date'),
+
+                consigner_name=request.POST.get('consigner_name'),
+                consigner_code=request.POST.get('consigner_code'),
+                consigner_account=Table_Accountsmaster.objects.get(company__company_id=request.session.get('co_id'),
+                                                    branch__branch_name=request.session.get('branch'), 
+                                                    account_code=request.POST.get('consigner_code')),
+
+                consignee_name=request.POST.get('consignee_name'),
+                consignee_code=request.POST.get('consignee_code'),
+                consignee_account=Table_Accountsmaster.objects.get(company__company_id=request.session.get('co_id'),
+                                                    branch__branch_name=request.session.get('branch'), 
+                                                    account_code=request.POST.get('consignee_code')),
+
+                payment=request.POST.get('payment_method'),
+                invoice_no=request.POST.get('invoice_no'),
+                invoice_date=request.POST.get('invoice_date'),
+                vehicle_no=request.POST.get('vehicle_no'),
+
+                load_from=request.POST.get('load_from'),
+                load_to=request.POST.get('load_to'),
+                total_charges=request.POST.get('total_charges'),
+                grand_total=request.POST.get('grand_total'),
+            )
+            for item_code, item, weight, rate, freight, pkg in zip(
+                request.POST.getlist('item_code[]'),
+                request.POST.getlist('commodity[]'),
+                request.POST.getlist('weight[]'),
+                request.POST.getlist('rate[]'),
+                request.POST.getlist('freight[]'),
+                request.POST.getlist('pkg[]'),  # or 'pkg[]' if renamed
+            ):
+                if item_code.strip():  # skip empty rows
+                    LorryReceiptItems.objects.create(
+                        master=lorry_receipt,
+                        item_code=item_code,
+                        item=item,
+                        weight=float(weight) if weight else 0,
+                        rate=float(rate) if rate else 0,
+                        freight=float(freight) if freight else 0,
+                        pkg=pkg,
+                    )
+
+            voucher_config.serial_no += 1
+            voucher_config.save()
+
+            context = {
+                'vouchers': vouchers,
+                'customers': customers,
+                'locations': locations,
+                'print': True if action == 'print' else False,
+                'success': 'Lorry Receipt created successfully.',
+                'lr': lorry_receipt,
+                'lr_items': LorryReceiptItems.objects.filter(master=lorry_receipt),
+            }
+            return render(request, "lorry_receipt/lorry_receipt.html", context)
+        except Exception as e:
+            print(e)
+            context = {
+                'vouchers': vouchers,
+                'customers': customers,
+                'locations': locations,
+                'error': str(e),
+            }
+            return render(request, "lorry_receipt/lorry_receipt.html", context)
     context = {
         'vouchers': vouchers,
-        'customers': customers
+        'customers': customers,
+        'locations': locations
     }
     return render(request, "lorry_receipt/lorry_receipt.html", context)
 
@@ -7631,3 +7681,96 @@ def get_serial_number_lr(request):
         return JsonResponse({'serial_no': voucher.serial_no})
     except VoucherConfiguration.DoesNotExist:
         return JsonResponse({'error': 'Invalid series selected'}, status=400)
+
+def item_search(request):
+    query = request.GET.get('q', '')
+    items = Item_master.objects.filter(name__icontains=query) | Item_master.objects.filter(item_code__icontains=query)
+    data = [
+        {
+            "item_code": item.item_code,
+            "name": item.name,
+        }
+        for item in items
+    ]
+    return JsonResponse(data, safe=False)
+
+def lr_search(request):
+    series = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'), 
+                                                 branch__branch_name=request.session.get('branch'),
+                                                 category='Lorry Receipt')
+    if request.method == 'POST':
+        series_id = request.POST.get('series')
+        bill_no = request.POST.get('entry_number')
+
+        try:
+            seriess = VoucherConfiguration.objects.filter(id=series_id).first()
+            lr = LorryReceiptMaster.objects.get(lr_no=bill_no, series=seriess)
+            return redirect("main:lr_edit", lr_id=lr.id)
+        except Exception as e:
+            print(e)
+            series = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'), 
+                                                 branch__branch_name=request.session.get('branch'),
+                                                 category='Lorry Receipt')
+            return render(request, "lorry_receipt/lr_search.html", {'error': 'No LR found for your LR number and series', 'series': series})
+    return render(request, 'lorry_receipt/lr_search.html', {'series': series})
+
+@csrf_exempt
+def lr_edit(request, lr_id):
+    lr = LorryReceiptMaster.objects.get(id=lr_id)
+    lr_items = LorryReceiptItems.objects.filter(master=lr)
+    vouchers = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch'), 
+                                                   category='Lorry Receipt')
+    if request.method == 'POST':
+        try:
+            lr.payment = request.POST.get('payment_method')
+            lr.load_from = request.POST.get('load_from')
+            lr.load_to = request.POST.get('load_to')
+            lr.total_charges = request.POST.get('total_charges')
+            lr.grand_total = request.POST.get('grand_total')
+            lr.save()
+            lr_items.delete()
+            for item_code, item, weight, rate, freight, pkg in zip(
+                request.POST.getlist('item_code[]'),
+                request.POST.getlist('commodity[]'),
+                request.POST.getlist('weight[]'),
+                request.POST.getlist('rate[]'),
+                request.POST.getlist('freight[]'),
+                request.POST.getlist('pkg[]'),  # or 'pkg[]' if renamed
+            ):
+                if item_code.strip():  # skip empty rows
+                    LorryReceiptItems.objects.create(
+                        master=lr,
+                        item_code=item_code,
+                        item=item,
+                        weight=float(weight) if weight else 0,
+                        rate=float(rate) if rate else 0,
+                        freight=float(freight) if freight else 0,
+                        pkg=pkg,
+                    )
+            context = {
+                'vouchers': vouchers,
+                'locations': LocationMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch')),
+                'lr': lr,
+                'lr_items': LorryReceiptItems.objects.filter(master=lr),
+                'print': True if request.POST.get('action') == 'print' else False,
+                'success': 'Lorry Receipt Edited successfully.',
+            }
+            return render(request, "lorry_receipt/lorry_receipt.html", context)
+
+        except Exception as e:
+            print(e)
+            context = {
+                'vouchers': vouchers,
+                'lr': lr,
+                'lr_items': lr_items,
+                'locations': LocationMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch')),
+                'error': str(e),
+            }
+            return render(request, "lorry_receipt/lorry_receipt.html", context)
+    context = {
+        'vouchers': vouchers,
+        'lr': lr,
+        'lr_items': lr_items,
+        'locations': LocationMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch'))
+    }
+    return render(request, "lorry_receipt/lorry_receipt.html", context)

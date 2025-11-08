@@ -109,60 +109,12 @@ left:0
     {% csrf_token %}
 
     <div class="row mb-3">
-    <div class="col-md-4 text-end">
-        <label for="customer">Customer:</label>
-    </div>
-    <div class="col-md-5">
-        <select name="customer" id="customer" required style="width: 160%; height: 22px;">
-            <option value="">-- Select Customer --</option>
-            {% for customer in customers %}
-                <option value="{{ customer.head }}">{{ customer.head }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    </div>
-
-
-
-    <div class="row mb-3">
         <div class="col-md-4 text-end">
-            <label for="loading_point" class="form-label">Loading Point:</label>
+            <label for="location" class="form-label">Location: </label>
         </div>
         <div class="col-md-5">
-            <input type="text" name="loading_point" id="loading_point" class="form-control" required>
+            <input type="text" name="location" id="location" class="form-control" required>
         </div>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col-md-4 text-end">
-            <label for="unloading_point" class="form-label">Unloading Point:</label>
-        </div>
-        <div class="col-md-5">
-            <input type="text" name="unloading_point" id="unloading_point" class="form-control" required>
-        </div>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col-md-4 text-end">
-            <label for="rate" class="form-label">Rate:</label>
-        </div>
-        <div class="col-md-5">
-            <input type="number" name="rate" id="rate" step="0.01" class="form-control" required>
-        </div>
-    </div>
-
-    <div class="row mb-3">
-    <div class="col-md-4 text-end">
-        <label for="vehicle_type">Vehicle Type:</label>
-    </div>
-    <div class="col-md-5">
-        <select name="vehicle_type" id="vehicle_type" required style="width: 160%; height: 22px;">
-            <option value="">-- Select Vehicle Type --</option>
-            {% for vehicle in vehicles %}
-                <option value="{{ vehicle.id }}">{{ vehicle.vehicle_name }}</option>
-            {% endfor %}
-        </select>
-    </div>
     </div>
 
     <div class="row">

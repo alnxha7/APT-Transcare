@@ -755,11 +755,7 @@ from django.conf import settings  # for AUTH_USER_MODEL
 class LocationMaster(models.Model):
     company = models.ForeignKey(Table_Companydetailsmaster, on_delete=models.CASCADE)
     branch = models.ForeignKey(Branch_master, on_delete=models.CASCADE, null=True, blank=True)
-    customer = models.CharField(max_length=200, null=True, blank=True)
-    loading_point = models.CharField(max_length=200)
-    unloading_point = models.CharField(max_length=200)
-    rate = models.FloatField(null=True, blank=True)
-    vehicle_type = models.ForeignKey(Vehicle_type, on_delete=models.CASCADE, null=True, blank=True)
+    location = models.CharField(max_length=200, null=True, blank=True)
 
 
 # ------------------------------- VENDOR MASTER ----------------------------
@@ -769,3 +765,37 @@ class VendorMaster(models.Model):
     branch = models.ForeignKey(Branch_master, on_delete=models.CASCADE, null=True, blank=True)
     fuel_station = models.CharField(max_length=200)
 
+class LorryReceiptMaster(models.Model):
+    company = models.ForeignKey(Table_Companydetailsmaster, on_delete=models.CASCADE, null=True, blank=True)
+    branch = models.ForeignKey(Branch_master, on_delete=models.CASCADE, null=True, blank=True)
+    fy_code = models.CharField(max_length=15, default='2025-2026')
+    series = models.ForeignKey(VoucherConfiguration,on_delete=models.CASCADE)
+    lr_no = models.PositiveIntegerField()
+    lr_date = models.DateField()
+
+    consigner_name = models.CharField(max_length=200)
+    consigner_code = models.IntegerField()
+    consigner_account = models.ForeignKey(Table_Accountsmaster,on_delete=models.CASCADE, related_name='consigner_accounts')
+
+    consignee_name = models.CharField(max_length=200)
+    consignee_code = models.IntegerField()
+    consignee_account = models.ForeignKey(Table_Accountsmaster,on_delete=models.CASCADE, related_name='consignee_accounts')
+
+    payment = models.CharField(max_length=50)
+    invoice_no = models.CharField(max_length=100)
+    invoice_date = models.DateField()
+    vehicle_no = models.CharField(max_length=80)
+
+    load_from = models.CharField(max_length=100)
+    load_to = models.CharField(max_length=100)
+    total_charges = models.FloatField()
+    grand_total = models.FloatField()
+
+class LorryReceiptItems(models.Model):
+    master = models.ForeignKey(LorryReceiptMaster, on_delete=models.CASCADE)
+    item_code = models.CharField(max_length=255)
+    item = models.CharField(max_length=255)
+    weight = models.FloatField()
+    rate = models.FloatField()
+    freight = models.FloatField()
+    pkg = models.CharField(max_length=255)
