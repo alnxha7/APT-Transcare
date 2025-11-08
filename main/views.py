@@ -7774,3 +7774,32 @@ def lr_edit(request, lr_id):
         'locations': LocationMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch'))
     }
     return render(request, "lorry_receipt/lorry_receipt.html", context)
+
+def lr_delete_search(request):
+    series = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'),
+                                                 branch__branch_name=request.session.get('branch'),
+                                                 category='Lorry Receipt')
+    if request.method == 'POST':
+        series_id = request.POST.get('series')
+        bill_no = request.POST.get('entry_number')
+
+        try:
+            seriess = VoucherConfiguration.objects.filter(id=series_id).first()
+            lr = LorryReceiptMaster.objects.get(lr_no=bill_no, series=seriess)
+            return redirect(f"/lr_edit/{lr.id}?action=delete")
+        except Exception as e:
+            print(e)
+            series = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'), 
+                                                 branch__branch_name=request.session.get('branch'),
+                                                 category='Lorry Receipt')
+            return render(request, "lorry_receipt/lr_search.html", {'error': 'No LR found for your LR number and series', 'series': series})
+    return render(request, "lorry_receipt/lr_delete.html", {'series': series})
+
+def lr_delete(request, lr_id):
+    try:
+        lr = LorryReceiptMaster.objects.get(id=lr_id)
+        lr.delete()
+        return render(request, 'lorry_receipt/lr_delete.html', {'success': 'LR Deleted Successfully'})
+    except Exception as e:
+        print(e)
+        return render(request, 'lorry_receipt/lr_delete.html', {'error': str(e)})

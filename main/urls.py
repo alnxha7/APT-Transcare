@@ -185,6 +185,8 @@ urlpatterns = [
     path('ajax/item-search/', views.item_search, name='item_search'),
     path("lr_search/", views.lr_search, name="lr_search"),
     path("lr_edit/<int:lr_id>/", views.lr_edit, name="lr_edit"),
+    path("lr_delete_search/", views.lr_delete_search, name="lr_delete_search"),
+    path("lr_delete/<int:lr_id>/", views.lr_delete, name="lr_delete"),
 
 
     # accounts - debit-note

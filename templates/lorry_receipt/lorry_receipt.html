@@ -625,9 +625,14 @@
 
 <!-- 🔹 Buttons Section -->
 <div class="text-end" style="margin-top:30px;">
+{% if request.GET.action == 'delete' %}
+    <a href="{% url 'main:index' %}" class="btn btn-primary btn-sm">Cancel</a>
+    <button type="button" class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+{% else %} 
   <a href="{% url 'main:index' %}" class="btn btn-danger btn-sm">Cancel</a>
   <button type="submit" class="btn btn-primary btn-sm print-button" name="action" value="print">Print</button>
   <button type="submit" class="btn btn-success btn-sm" name="action" value="save">Save</button>
+{% endif %}
 </div>
 </form>
 
@@ -777,13 +782,13 @@
       <div style="font-weight:bold; text-align:center; text-decoration:underline; margin-bottom:4px;">
         TERMS & CONDITIONS
       </div>
-        <li>1. This is a non-negotiable note.
+        <p>1. This is a non-negotiable note.
         All consignments accepted for dispatch are carried entirely at owners risk.
         The company is not responsible for leakage of liquid contents booked.
         Any requirement of Proof of Delivery (POD) should be intimated within 3 months from the date of booking.
         We carry under RCM Method (Reverse Charge Mechanism) Act. (Regretted as Goods Transporting Agency).
         Our liability on loss / damage / delay of this consignment is limited to Rs. 100/- only.
-        Subject to Kattappana Jurisdiction.</li>
+        Subject to Kattappana Jurisdiction.</p>
     </div>
 
     <!-- Middle Section -->
@@ -1125,4 +1130,23 @@ function printInvoice() {
     printWindow.close();
 }
 </script>
+{% if lr.id %}
+<script>
+    function confirmDelete() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This action cannot be undone.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "{% url 'main:lr_delete' lr_id=lr.id %}";
+            }
+        });
+    }
+</script>
+{% endif %}
 {% endblock %}

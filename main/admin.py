@@ -154,3 +154,27 @@ class TableVoucherAdmin(admin.ModelAdmin):
     list_filter = ('Series', 'Vdate', 'VType', 'CStatus')
 
 admin.site.register(Table_Voucher, TableVoucherAdmin)
+
+
+from .models import LorryReceiptMaster, LorryReceiptItems
+
+
+@admin.register(LorryReceiptMaster)
+class LorryReceiptMasterAdmin(admin.ModelAdmin):
+    list_display = (
+        'id', 'lr_no', 'lr_date', 'company', 'branch',
+        'consigner_name', 'consignee_name', 'vehicle_no',
+        'total_charges', 'grand_total'
+    )
+    list_filter = ('company', 'branch', 'lr_date')
+    search_fields = ('lr_no', 'consigner_name', 'consignee_name', 'vehicle_no')
+    date_hierarchy = 'lr_date'
+
+
+@admin.register(LorryReceiptItems)
+class LorryReceiptItemsAdmin(admin.ModelAdmin):
+    list_display = (
+        'id', 'master', 'item_code', 'item', 'weight', 'rate', 'freight', 'pkg'
+    )
+    list_filter = ('master',)
+    search_fields = ('item_code', 'item', 'pkg')
