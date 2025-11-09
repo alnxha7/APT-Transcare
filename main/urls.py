@@ -176,6 +176,11 @@ urlpatterns = [
     path("edit_vendor/<int:vendor_id>/", views.edit_vendor, name="edit_vendor"),
     path("delete_vendor/<int:vendor_id>/", views.delete_vendor, name="delete_vendor"),
 
+    path("area_master/", views.area_master, name="area_master"),
+    path("area_list/", views.area_list, name="area_list"),
+    path("area_edit/<int:area_id>/", views.area_edit, name="area_edit"),
+    path("area_delete/<int:area_id>/", views.area_delete, name="area_delete"),
+
 
     path("driver_bata/", views.driver_bata, name="driver_bata"),
 
@@ -187,6 +192,8 @@ urlpatterns = [
     path("lr_edit/<int:lr_id>/", views.lr_edit, name="lr_edit"),
     path("lr_delete_search/", views.lr_delete_search, name="lr_delete_search"),
     path("lr_delete/<int:lr_id>/", views.lr_delete, name="lr_delete"),
+    path("lr_report_search/", views.lr_report_search, name="lr_report_search"),
+    path("lr_report/", views.lr_report, name="lr_report"),
 
 
     # accounts - debit-note

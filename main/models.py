@@ -765,6 +765,11 @@ class VendorMaster(models.Model):
     branch = models.ForeignKey(Branch_master, on_delete=models.CASCADE, null=True, blank=True)
     fuel_station = models.CharField(max_length=200)
 
+class AreaMaster(models.Model):
+    company = models.ForeignKey(Table_Companydetailsmaster, on_delete=models.CASCADE)
+    branch = models.ForeignKey(Branch_master, on_delete=models.CASCADE, null=True, blank=True)
+    area = models.CharField(max_length=200)
+
 class LorryReceiptMaster(models.Model):
     company = models.ForeignKey(Table_Companydetailsmaster, on_delete=models.CASCADE, null=True, blank=True)
     branch = models.ForeignKey(Branch_master, on_delete=models.CASCADE, null=True, blank=True)
@@ -788,6 +793,7 @@ class LorryReceiptMaster(models.Model):
 
     load_from = models.CharField(max_length=100)
     load_to = models.CharField(max_length=100)
+    area = models.CharField(max_length=200, null=True, blank=True)
     total_charges = models.FloatField()
     grand_total = models.FloatField()
 

@@ -571,7 +571,7 @@
         <div class="row mt-4"></div>
 
 <div class="bottom-section"
-     style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-top:15px;">
+     style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;">
 
   <!-- 🧱 Column 1: Load From / Load To -->
   <div class="column" style="flex:1;min-width:250px;">
@@ -587,7 +587,7 @@
       </select>
     </div>
 
-    <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center" style="margin-bottom: 8px;">
       <label for="load_to" style="width:90px;">Load To</label>
       <select name="load_to" id="load_to"
               class="form-control"
@@ -595,6 +595,18 @@
         <option value="">Select</option>
         {% for loc in locations %}
           <option value="{{ loc.location }}" {% if loc.location == lr.load_to %}selected{% endif %}>{{ loc.location }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="d-flex align-items-center">
+      <label for="area" style="width:90px;">Area</label>
+      <select name="area" id="area"
+              class="form-control"
+              style="width:230px;height:25px;padding:0 4px;" required>
+        <option value="">Select</option>
+        {% for ar in areas %}
+          <option value="{{ ar.area }}" {% if ar.area == lr.area %}selected{% endif %}>{{ ar.area }}</option>
         {% endfor %}
       </select>
     </div>
@@ -872,6 +884,22 @@
         }
         else {
             window.location.href = "{% url 'main:lorry_receipt' %}"
+        }
+    });
+</script>
+{% elif success and lr.id %}
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'LR Saved Successfully',
+        confirmButtonText: 'OK',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = "{% url 'main:lr_search' %}"
+        }
+        else {
+            window.location.href = "{% url 'main:lr_search' %}"
         }
     });
 </script>

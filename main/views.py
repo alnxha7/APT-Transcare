@@ -7575,6 +7575,73 @@ def driver_bata(request):
     return render(request, "driver_bata/search.html", {'drivers': drivers})
 
 
+from .models import AreaMaster
+def area_master(request):
+    if request.method == "POST":
+        area = request.POST.get('area')
+
+        exists = AreaMaster.objects.filter(
+            company=Table_Companydetailsmaster.objects.get(company_id=request.session.get('co_id')),
+            branch=Branch_master.objects.get(branch_name=request.session.get('branch')),
+            area=area
+        ).exists()
+        if exists:
+            return render(request, 'accounts/area_master/area_master.html', {
+                'error': 'Area with the same details already exists.'
+            })
+
+        try:
+            AreaMaster.objects.create(
+                company=Table_Companydetailsmaster.objects.get(company_id=request.session.get('co_id')),
+                branch=Branch_master.objects.get(branch_name=request.session.get('branch')),
+                area=area
+            )
+            return render(request, 'accounts/area_master/area_master.html', {
+                'success': 'Area created successfully.'
+            })
+        except Exception as e:
+            return render(request, 'accounts/area_master/area_master.html', {
+                'error': str(e)
+            })
+    return render(request, "accounts/area_master/area_master.html")
+
+def area_list(request):
+    locations = AreaMaster.objects.filter(company__company_id=request.session.get('co_id'), branch=Branch_master.objects.get(branch_name=request.session.get('branch')),)
+    return render(request, 'accounts/area_master/area_list.html', {'areas': locations})
+
+def area_edit(request, area_id):
+    location = AreaMaster.objects.get(id=area_id)
+    if request.method == "POST":
+        area = request.POST.get('area')
+
+        exists = AreaMaster.objects.filter(
+            company=Table_Companydetailsmaster.objects.get(company_id=request.session.get('co_id')),
+            branch=Branch_master.objects.get(branch_name=request.session.get('branch')),
+            area=area
+        ).exists()
+        if exists:
+            return render(request, 'accounts/area_master/area_master.html', {
+                'area': location.area,
+                'error': 'Area with the same name already exists.'
+            })
+
+        location.area = area
+        location.save()
+
+        return render(request, 'accounts/area_master/area_master.html', {
+            'area': location.area,
+            'success': 'Area updated successfully.'
+        })
+
+    return render(request, 'accounts/area_master/area_master.html', {'area': location.area})
+
+def area_delete(request, area_id):
+    try:
+        area = AreaMaster.objects.get(id=area_id)
+        area.delete()
+        return redirect('main:area_list')
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
 
 
 # -------------------------------------------------------------- LORRY RECEIPT --------------------------------------------------------------
@@ -7587,6 +7654,7 @@ def lorry_receipt(request):
     customers = Table_Accountsmaster.objects.filter(group='SUNDRY DEBTORS', company__company_id=request.session.get('co_id'),
                                                     branch__branch_name=request.session.get('branch'))
     locations = LocationMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch'))
+    areas = AreaMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch'))
 
     if request.method == 'POST':
         try:
@@ -7623,6 +7691,7 @@ def lorry_receipt(request):
 
                 load_from=request.POST.get('load_from'),
                 load_to=request.POST.get('load_to'),
+                area=request.POST.get('area'),
                 total_charges=request.POST.get('total_charges'),
                 grand_total=request.POST.get('grand_total'),
             )
@@ -7652,6 +7721,7 @@ def lorry_receipt(request):
                 'vouchers': vouchers,
                 'customers': customers,
                 'locations': locations,
+                'areas': areas,
                 'print': True if action == 'print' else False,
                 'success': 'Lorry Receipt created successfully.',
                 'lr': lorry_receipt,
@@ -7664,13 +7734,15 @@ def lorry_receipt(request):
                 'vouchers': vouchers,
                 'customers': customers,
                 'locations': locations,
+                'areas': areas,
                 'error': str(e),
             }
             return render(request, "lorry_receipt/lorry_receipt.html", context)
     context = {
         'vouchers': vouchers,
         'customers': customers,
-        'locations': locations
+        'locations': locations,
+        'areas': areas,
     }
     return render(request, "lorry_receipt/lorry_receipt.html", context)
 
@@ -7725,6 +7797,7 @@ def lr_edit(request, lr_id):
             lr.payment = request.POST.get('payment_method')
             lr.load_from = request.POST.get('load_from')
             lr.load_to = request.POST.get('load_to')
+            lr.area = request.POST.get('area')
             lr.total_charges = request.POST.get('total_charges')
             lr.grand_total = request.POST.get('grand_total')
             lr.save()
@@ -7750,6 +7823,7 @@ def lr_edit(request, lr_id):
             context = {
                 'vouchers': vouchers,
                 'locations': LocationMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch')),
+                'areas': AreaMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch')),
                 'lr': lr,
                 'lr_items': LorryReceiptItems.objects.filter(master=lr),
                 'print': True if request.POST.get('action') == 'print' else False,
@@ -7764,6 +7838,7 @@ def lr_edit(request, lr_id):
                 'lr': lr,
                 'lr_items': lr_items,
                 'locations': LocationMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch')),
+                'areas': AreaMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch')),
                 'error': str(e),
             }
             return render(request, "lorry_receipt/lorry_receipt.html", context)
@@ -7771,7 +7846,8 @@ def lr_edit(request, lr_id):
         'vouchers': vouchers,
         'lr': lr,
         'lr_items': lr_items,
-        'locations': LocationMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch'))
+        'locations': LocationMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch')),
+        'areas': AreaMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch')),
     }
     return render(request, "lorry_receipt/lorry_receipt.html", context)
 
@@ -7803,3 +7879,60 @@ def lr_delete(request, lr_id):
     except Exception as e:
         print(e)
         return render(request, 'lorry_receipt/lr_delete.html', {'error': str(e)})
+
+def lr_report_search(request):
+    areas = AreaMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch'))
+    if request.method == 'POST':
+        area = request.POST.get('area')
+        date_from = request.POST.get('date_from')
+        date_to = request.POST.get('date_to')
+
+        # Only redirect if at least one field is filled
+        if area or (date_from and date_to):
+            params = {}
+            if area:
+                params['area'] = area
+            if date_from:
+                params['date_from'] = date_from
+            if date_to:
+                params['date_to'] = date_to
+
+            return redirect(f"{reverse('main:lr_report')}?{urlencode(params)}")
+
+        else:
+            return render(request, 'reports/lorry_receipt/lr_search.html', {
+                'areas': areas,
+                'error': 'Please input any field'
+            })
+    return render(request, 'reports/lorry_receipt/lr_search.html', {'areas': areas})
+
+def lr_report(request):
+    co_id = request.session.get('co_id')
+    branch = request.session.get('branch')
+    area = request.GET.get('area')
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+
+    lrs = LorryReceiptItems.objects.all()
+    company = Table_Companydetailsmaster.objects.get(company_id=co_id)
+
+    if area and date_from and date_to:
+        lrs = lrs.filter(master__company__company_id=co_id, master__branch__branch_name=branch, master__area=area, master__lr_date__range=[date_from, date_to])
+        print(lrs)
+    elif area:
+        lrs = lrs.filter(master__area=area)
+    elif date_from and date_to:
+        lrs = lrs.filter(master__lr_date__range=[date_from, date_to])
+
+    grand_value = 0
+    for lr in lrs:
+        grand_value += lr.freight
+
+    context = {
+        'lrs': lrs, 
+        'company':company, 
+        'area': area, 
+        'grand_value': grand_value, 
+    }
+
+    return render(request, 'reports/lorry_receipt/lr_report.html', context)
