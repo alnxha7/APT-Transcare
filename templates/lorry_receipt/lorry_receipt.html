@@ -783,12 +783,12 @@
         TERMS & CONDITIONS
       </div>
         <p>1. This is a non-negotiable note.
-        All consignments accepted for dispatch are carried entirely at owners risk.
-        The company is not responsible for leakage of liquid contents booked.
-        Any requirement of Proof of Delivery (POD) should be intimated within 3 months from the date of booking.
-        We carry under RCM Method (Reverse Charge Mechanism) Act. (Regretted as Goods Transporting Agency).
-        Our liability on loss / damage / delay of this consignment is limited to Rs. 100/- only.
-        Subject to Kattappana Jurisdiction.</p>
+        2. All consignments accepted for dispatch are carried entirely at owners risk.
+        3. The company is not responsible for leakage of liquid contents booked.
+        4. Any requirement of Proof of Delivery (POD) should be intimated within 3 months from the date of booking.
+        5. We carry under RCM Method (Reverse Charge Mechanism) Act. (Regretted as Goods Transporting Agency).
+        6. Our liability on loss / damage / delay of this consignment is limited to Rs. 100/- only.
+        7. Subject to Kattappana Jurisdiction.</p>
     </div>
 
     <!-- Middle Section -->
@@ -868,6 +868,10 @@
     }).then((result) => {
         if (result.isConfirmed) {
             printInvoice();  
+            window.location.href = "{% url 'main:lorry_receipt' %}"
+        }
+        else {
+            window.location.href = "{% url 'main:lorry_receipt' %}"
         }
     });
 </script>
@@ -878,6 +882,13 @@
         title: 'Success',
         text: 'LR Saved Successfully',
         confirmButtonText: 'OK',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = "{% url 'main:lorry_receipt' %}"
+        }
+        else {
+            window.location.href = "{% url 'main:lorry_receipt' %}"
+        }
     });
 </script>
 {% elif error %}
