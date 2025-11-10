@@ -787,8 +787,6 @@ class LorryReceiptMaster(models.Model):
     consignee_account = models.ForeignKey(Table_Accountsmaster,on_delete=models.CASCADE, related_name='consignee_accounts')
 
     payment = models.CharField(max_length=50)
-    invoice_no = models.CharField(max_length=100)
-    invoice_date = models.DateField()
     vehicle_no = models.CharField(max_length=80)
 
     load_from = models.CharField(max_length=100)
@@ -801,7 +799,9 @@ class LorryReceiptItems(models.Model):
     master = models.ForeignKey(LorryReceiptMaster, on_delete=models.CASCADE)
     item_code = models.CharField(max_length=255)
     item = models.CharField(max_length=255)
+    inv_no = models.CharField(max_length=255)
     weight = models.FloatField()
     rate = models.FloatField()
+    inv_amount = models.FloatField()
     freight = models.FloatField()
     pkg = models.CharField(max_length=255)

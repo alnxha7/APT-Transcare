@@ -113,7 +113,7 @@ left:0
             <label for="area" class="form-label">Area: </label>
         </div>
         <div class="col-md-5">
-            <input type="text" name="area" id="area" class="form-control" value="{{ area }}" required>
+            <input type="text" name="area" id="area" class="form-control" value="{{ area }}" oninput="this.value = this.value.toUpperCase();" required>
         </div>
     </div>
 

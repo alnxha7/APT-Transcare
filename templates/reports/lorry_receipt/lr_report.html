@@ -342,9 +342,10 @@
                         <th style="text-align: left;">LR No</th>
                         <th style="text-align: left;">From</th>
                         <th style="text-align: left;">To</th>
+                        <th style="text-align: left;">Route</th>
                         <th style="text-align: left;">Payment</th>
                         <th style="text-align: left;">Inv No</th>
-                        <th style="text-align: left;">Inv Date</th>
+                        <th style="text-align: left;">Inv Amt</th>
                         <th style="text-align: left;">Vehicle No</th>
                         <th style="text-align: left;">Item</th>
                         <th style="text-align: left;">Weight</th>
@@ -363,9 +364,10 @@
                                     <td style="text-align: center;">{{ lr.master.lr_no }}</td>
                                     <td style="text-align: left;">{{ lr.master.load_from }}</td>
                                     <td style="text-align: left;"> {{ lr.master.load_to }} </td>
+                                    <td style="text-align: left;"> {{ lr.master.area }} </td>
                                     <td style="text-align: center;">{{ lr.master.payment }}</td>
-                                    <td style="text-align: center;">{{ lr.master.invoice_no }}</td>
-                                    <td style="text-align: center;">{{ lr.master.invoice_date }}</td>
+                                    <td style="text-align: center;">{{ lr.inv_no }}</td>
+                                    <td style="text-align: center;">{{ lr.inv_amount }}</td>
                                     <td style="text-align: center;">{{ lr.master.vehicle_no }}</td>
                                     <td style="text-align: left;">{{ lr.item }}</td>
                                     <td style="text-align: center;">{{ lr.weight }}</td>
@@ -375,7 +377,7 @@
                                 </tr>
                         {% endfor %}
                         <tr style="font-weight: bold; background-color: #f0f0f0;">
-                            <td colspan="13" style="text-align: right;">Grand Total: </td>
+                            <td colspan="14" style="text-align: right;">Grand Total: </td>
                             <td style="text-align: center;">{{ grand_value }}</td>
                         </tr>
                     {% else %}
@@ -445,14 +447,14 @@
                         <th>LR No</th>
                         <th>From</th>
                         <th>To</th>
+                        <th>Route</th>
                         <th>Payment</th>
                         <th>Inv No</th>
-                        <th>Inv Date</th>
+                        <th>Inv Amt</th>
                         <th>Vehicle No</th>
                         <th>Item</th>
                         <th>Weight</th>
                         <th>Rate</th>
-                        <th>Pkg</th>
                         <th>Freight</th>
                     </tr>
                 </thead>
@@ -464,14 +466,14 @@
                             <td style="text-align: center;">{{ lr.master.lr_no }}</td>
                             <td style="text-align: left;">{{ lr.master.load_from }}</td>
                             <td style="text-align: left;">{{ lr.master.load_to }}</td>
+                            <td style="text-align: left;">{{ lr.master.area }}</td>
                             <td style="text-align: center;">{{ lr.master.payment }}</td>
-                            <td style="text-align: center;">{{ lr.master.invoice_no }}</td>
-                            <td style="text-align: center;">{{ lr.master.invoice_date }}</td>
+                            <td style="text-align: center;">{{ lr.inv_no }}</td>
+                            <td style="text-align: center;">{{ lr.inv_amount }}</td>
                             <td style="text-align: center;">{{ lr.master.vehicle_no }}</td>
                             <td style="text-align: left;">{{ lr.item }}</td>
                             <td style="text-align: center;">{{ lr.weight }}</td>
                             <td style="text-align: center;">{{ lr.rate }}</td>
-                            <td style="text-align: center;">{{ lr.pkg }}</td>
                             <td style="text-align: center;">{{ lr.freight }}</td>
                         </tr>
                     {% endfor %}

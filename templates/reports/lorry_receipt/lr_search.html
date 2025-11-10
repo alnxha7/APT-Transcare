@@ -4,20 +4,19 @@
 
 <div class="main_content">
     <div class="trip-form-container">
-        <h2>Search Bill</h2>
+        <h2>RUNSHEET</h2>
         <form method="post">
             {% csrf_token %}
 
-            <!-- area -->
-            <div class="form-group">
-                <label for="area">Area</label>
-                <select name="area" id="area" class="form-control">
-                    <option value="">Select Area</option>
-                    {% for area in areas %}
-                        <option value="{{ area.area }}">{{ area.area }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+            <!-- Area (Searchable Multi-Select with Checkboxes) -->
+<div class="form-group">
+    <label for="area">Area</label>
+    <select name="area" id="area" class="form-control" multiple="multiple">
+        {% for area in areas %}
+            <option value="{{ area.area }}">{{ area.area }}</option>
+        {% endfor %}
+    </select>
+</div>
 
             <!-- Date From -->
             <div class="form-group">
@@ -123,6 +122,32 @@
     @media only screen and (max-width: 600px) {
         .trip-form-container { padding: 25px 20px; width: 90%; }
     }
+    .checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 20px;
+    background-color: #fafafa;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.form-check {
+    display: flex;
+    align-items: center;
+}
+
+.form-check-input {
+    margin-right: 6px;
+    transform: scale(1.2);
+}
+.select2-results__option {
+    padding-left: 28px !important;
+}
+.select2-results__option--highlighted[aria-selected] {
+    background-color: #e6f3ff !important;
+    color: #333 !important;
+}
 </style>
 
 <!-- JS -->
@@ -132,10 +157,22 @@
 <script>
     $(document).ready(function() {
         $('#area').select2({
-            placeholder: "Select Area",
+            placeholder: "Select Area(s)",
             allowClear: true,
-            width: '100%'
+            width: '100%',
+            closeOnSelect: false, // keeps dropdown open while selecting
+            templateResult: formatOption, // adds checkbox-like visuals
+            templateSelection: formatSelection
         });
+
+        function formatOption(option) {
+            if (!option.id) return option.text;
+            return $('<span><input type="checkbox" style="margin-right:8px;">' + option.text + '</span>');
+        }
+
+        function formatSelection(option) {
+            return option.text;
+        }
     });
 </script>
 

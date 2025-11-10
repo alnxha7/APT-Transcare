@@ -418,8 +418,8 @@ def vehicle_master_add(request):
     brands=Brand.objects.filter(co_id=co_id,branch_id=branch)
     vehicles=Vehicle.objects.filter(co_id=co_id,branch_id=branch).values('model_name').distinct()
     vehicle_types=Vehicle_type.objects.filter(co_id=co_id,branch_id=branch)
-    drivers = Employee_master.objects.filter(designation="Driver",co_id=co_id,branch_id=branch)
-    accounts = Table_Accountsmaster.objects.filter(company__company_id=co_id, group="SUNDRY DEBTORS").order_by('head')
+    drivers = Employee_master.objects.filter(designation="DRIVER",co_id=co_id,branch_id=branch)
+    accounts = Table_Companydetailsmaster.objects.get(company_id=request.session.get('co_id'))
 
     if request.method == "POST":
         rc_owner_name = request.POST.get('rc_owner_name').strip().upper()
@@ -498,13 +498,6 @@ def vehicle_master_add(request):
 
         messages.success(request, "Vehicle master added successfully")
         return redirect('main:vehicle_master_add')
-        # except Exception as e:
-        #     return HttpResponse(f"Error: {e}")
-    # brands=Brand.objects.filter(co_id=co_id,branch_id=branch)
-    # vehicles=Vehicle.objects.filter(co_id=co_id,branch_id=branch).values('model_name').distinct()
-    # vehicle_types=Vehicle_type.objects.filter(co_id=co_id,branch_id=branch)
-    # drivers = Employee_master.objects.filter(designation="Driver",co_id=co_id,branch_id=branch)
-    # users=User.objects.filter(is_superuser=False)
 
     return render(request, 'vehicle_master/vehicle_master_form.html',{'brands':brands,'vehicles':vehicles,'vehicle_types':vehicle_types,'drivers':drivers, 'accounts':accounts})
 
@@ -538,7 +531,7 @@ def vehicle_master_update(request, pk):
     vehicles = Vehicle.objects.filter(co_id=co_id,branch_id=branch)
     vehicle_types = Vehicle_type.objects.filter(co_id=co_id,branch_id=branch)
     drivers = Employee_master.objects.filter(designation="Driver",co_id=co_id,branch_id=branch)
-    accounts = Table_Accountsmaster.objects.filter(company__company_id=co_id, group="SUNDRY DEBTORS").order_by('head')
+    accounts = Table_Companydetailsmaster.objects.get(company_id=request.session.get('co_id'))
 
     if request.method == "POST":
         rc_owner_name = request.POST.get('rc_owner_name').strip().upper()
@@ -600,14 +593,7 @@ def vehicle_master_update(request, pk):
         vehicle.save()
 
         messages.success(request, "Vehicle master updated successfully")
-        # return redirect('main:vehicle_master_update', pk=pk)
         return render(request,'vehicle_master/vehicle_master_edit.html',{'vehicle':vehicle})
-
-    # brands = Brand.objects.filter(co_id=co_id,branch_id=branch)
-    # vehicles = Vehicle.objects.filter(co_id=co_id,branch_id=branch)
-    # vehicle_types = Vehicle_type.objects.filter(co_id=co_id,branch_id=branch)
-    # drivers = Employee_master.objects.filter(designation="Driver",co_id=co_id,branch_id=branch)
-    # users = User.objects.filter(is_superuser=False)
 
     return render(request, 'vehicle_master/vehicle_master_form.html', {
         'vehicle': vehicle,
@@ -7655,6 +7641,7 @@ def lorry_receipt(request):
                                                     branch__branch_name=request.session.get('branch'))
     locations = LocationMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch'))
     areas = AreaMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch'))
+    vehicles = Vehicle_master.objects.filter(co_id=request.session.get('co_id'), branch_id=request.session.get('branch'))
 
     if request.method == 'POST':
         try:
@@ -7685,8 +7672,6 @@ def lorry_receipt(request):
                                                     account_code=request.POST.get('consignee_code')),
 
                 payment=request.POST.get('payment_method'),
-                invoice_no=request.POST.get('invoice_no'),
-                invoice_date=request.POST.get('invoice_date'),
                 vehicle_no=request.POST.get('vehicle_no'),
 
                 load_from=request.POST.get('load_from'),
@@ -7695,11 +7680,13 @@ def lorry_receipt(request):
                 total_charges=request.POST.get('total_charges'),
                 grand_total=request.POST.get('grand_total'),
             )
-            for item_code, item, weight, rate, freight, pkg in zip(
+            for item_code, item, weight, rate, inv_no, inv_amount, freight, pkg in zip(
                 request.POST.getlist('item_code[]'),
                 request.POST.getlist('commodity[]'),
                 request.POST.getlist('weight[]'),
                 request.POST.getlist('rate[]'),
+                request.POST.getlist('inv_no[]'),
+                request.POST.getlist('inv_amount[]'),
                 request.POST.getlist('freight[]'),
                 request.POST.getlist('pkg[]'),  # or 'pkg[]' if renamed
             ):
@@ -7708,6 +7695,8 @@ def lorry_receipt(request):
                         master=lorry_receipt,
                         item_code=item_code,
                         item=item,
+                        inv_no=inv_no,
+                        inv_amount=inv_amount,
                         weight=float(weight) if weight else 0,
                         rate=float(rate) if rate else 0,
                         freight=float(freight) if freight else 0,
@@ -7721,6 +7710,7 @@ def lorry_receipt(request):
                 'vouchers': vouchers,
                 'customers': customers,
                 'locations': locations,
+                'vehicles': vehicles,
                 'areas': areas,
                 'print': True if action == 'print' else False,
                 'success': 'Lorry Receipt created successfully.',
@@ -7734,6 +7724,7 @@ def lorry_receipt(request):
                 'vouchers': vouchers,
                 'customers': customers,
                 'locations': locations,
+                'vehicles': vehicles,
                 'areas': areas,
                 'error': str(e),
             }
@@ -7742,6 +7733,7 @@ def lorry_receipt(request):
         'vouchers': vouchers,
         'customers': customers,
         'locations': locations,
+        'vehicles': vehicles,
         'areas': areas,
     }
     return render(request, "lorry_receipt/lorry_receipt.html", context)
@@ -7795,6 +7787,7 @@ def lr_edit(request, lr_id):
     if request.method == 'POST':
         try:
             lr.payment = request.POST.get('payment_method')
+            lr.vehicle_no = request.POST.get('vehicle_no')
             lr.load_from = request.POST.get('load_from')
             lr.load_to = request.POST.get('load_to')
             lr.area = request.POST.get('area')
@@ -7802,11 +7795,13 @@ def lr_edit(request, lr_id):
             lr.grand_total = request.POST.get('grand_total')
             lr.save()
             lr_items.delete()
-            for item_code, item, weight, rate, freight, pkg in zip(
+            for item_code, item, weight, rate, inv_no, inv_amount, freight, pkg in zip(
                 request.POST.getlist('item_code[]'),
                 request.POST.getlist('commodity[]'),
                 request.POST.getlist('weight[]'),
                 request.POST.getlist('rate[]'),
+                request.POST.getlist('inv_no[]'),
+                request.POST.getlist('inv_amount[]'),
                 request.POST.getlist('freight[]'),
                 request.POST.getlist('pkg[]'),  # or 'pkg[]' if renamed
             ):
@@ -7815,6 +7810,8 @@ def lr_edit(request, lr_id):
                         master=lr,
                         item_code=item_code,
                         item=item,
+                        inv_no=inv_no,
+                        inv_amount=inv_amount,
                         weight=float(weight) if weight else 0,
                         rate=float(rate) if rate else 0,
                         freight=float(freight) if freight else 0,
@@ -7824,6 +7821,7 @@ def lr_edit(request, lr_id):
                 'vouchers': vouchers,
                 'locations': LocationMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch')),
                 'areas': AreaMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch')),
+                'vehicles': Vehicle_master.objects.filter(co_id=request.session.get('co_id'), branch_id=request.session.get('branch')),
                 'lr': lr,
                 'lr_items': LorryReceiptItems.objects.filter(master=lr),
                 'print': True if request.POST.get('action') == 'print' else False,
@@ -7839,6 +7837,7 @@ def lr_edit(request, lr_id):
                 'lr_items': lr_items,
                 'locations': LocationMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch')),
                 'areas': AreaMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch')),
+                'vehicles': Vehicle_master.objects.filter(co_id=request.session.get('co_id'), branch_id=request.session.get('branch')),
                 'error': str(e),
             }
             return render(request, "lorry_receipt/lorry_receipt.html", context)
@@ -7848,6 +7847,7 @@ def lr_edit(request, lr_id):
         'lr_items': lr_items,
         'locations': LocationMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch')),
         'areas': AreaMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch')),
+        'vehicles': Vehicle_master.objects.filter(co_id=request.session.get('co_id'), branch_id=request.session.get('branch')),
     }
     return render(request, "lorry_receipt/lorry_receipt.html", context)
 
@@ -7883,21 +7883,21 @@ def lr_delete(request, lr_id):
 def lr_report_search(request):
     areas = AreaMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch'))
     if request.method == 'POST':
-        area = request.POST.get('area')
+        area_list = request.POST.getlist('area')
         date_from = request.POST.get('date_from')
         date_to = request.POST.get('date_to')
 
         # Only redirect if at least one field is filled
-        if area or (date_from and date_to):
+        if area_list or (date_from and date_to):
             params = {}
-            if area:
-                params['area'] = area
+            if area_list:
+                params['area'] = area_list
             if date_from:
                 params['date_from'] = date_from
             if date_to:
                 params['date_to'] = date_to
 
-            return redirect(f"{reverse('main:lr_report')}?{urlencode(params)}")
+            return redirect(f"{reverse('main:lr_report')}?{urlencode(params, doseq=True)}")
 
         else:
             return render(request, 'reports/lorry_receipt/lr_search.html', {
@@ -7909,18 +7909,19 @@ def lr_report_search(request):
 def lr_report(request):
     co_id = request.session.get('co_id')
     branch = request.session.get('branch')
-    area = request.GET.get('area')
+    areas = request.GET.getlist('area')
     date_from = request.GET.get('date_from')
     date_to = request.GET.get('date_to')
 
-    lrs = LorryReceiptItems.objects.all()
+    lrs = LorryReceiptItems.objects.filter(master__company__company_id=co_id, master__branch__branch_name=branch)
     company = Table_Companydetailsmaster.objects.get(company_id=co_id)
 
-    if area and date_from and date_to:
-        lrs = lrs.filter(master__company__company_id=co_id, master__branch__branch_name=branch, master__area=area, master__lr_date__range=[date_from, date_to])
-        print(lrs)
-    elif area:
-        lrs = lrs.filter(master__area=area)
+    if areas and date_from and date_to:
+        lrs = lrs.filter(master__area__in=areas, master__lr_date__range=[date_from, date_to])
+
+    elif areas:
+        lrs = lrs.filter(master__area__in=areas)
+
     elif date_from and date_to:
         lrs = lrs.filter(master__lr_date__range=[date_from, date_to])
 
@@ -7931,7 +7932,7 @@ def lr_report(request):
     context = {
         'lrs': lrs, 
         'company':company, 
-        'area': area, 
+        'areas': areas, 
         'grand_value': grand_value, 
     }
 

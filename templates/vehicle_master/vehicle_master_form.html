@@ -188,10 +188,7 @@ input:focus, select:focus {
     <label class="rc_owner_name">Select RC Owner</label>
     <!--<input type="text" name="rc_owner_name" value="{{ vehicle.rc_owner_name|default:'' }}" required>-->
  <select name="rc_owner_name" id="rc_owner_name" required>
-    <option value="">-- Select RC Owner --</option>
-    {% for acc in accounts %}
-        <option value="{{ acc.head }}">{{ acc.head }}</option>
-    {% endfor %}
+        <option value="{{ accounts.companyname }}">{{ accounts.companyname }}</option>
 </select>
 </div>
     <div class="col-6">
