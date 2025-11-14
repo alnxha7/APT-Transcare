@@ -416,54 +416,37 @@ def vehicle_master_add(request):
     branch = request.session.get('branch')
 
     brands=Brand.objects.filter(co_id=co_id,branch_id=branch)
-    vehicles=Vehicle.objects.filter(co_id=co_id,branch_id=branch).values('model_name').distinct()
+    vehicles = Vehicle.objects.filter(co_id=co_id,branch_id=branch)
     vehicle_types=Vehicle_type.objects.filter(co_id=co_id,branch_id=branch)
     drivers = Employee_master.objects.filter(designation="DRIVER",co_id=co_id,branch_id=branch)
     accounts = Table_Companydetailsmaster.objects.get(company_id=request.session.get('co_id'))
 
     if request.method == "POST":
         rc_owner_name = request.POST.get('rc_owner_name').strip().upper()
-        mobile = request.POST.get('mobile')
+        mobile = request.POST.get('mobile') or None
         brand_id = request.POST.get('brand_id')
         vehicle_id = request.POST.get('vehicle_id')
         vehicle_type_id = request.POST.get('vehicle_type')
         fuel = request.POST.get('fuel')
         registration_number = request.POST.get('registration_number').strip().upper()
-        make_year = request.POST.get('make_year')
+        make_year = request.POST.get('make_year') or None
         chase_number = request.POST.get('chase_number').strip().upper()
         engine_number = request.POST.get('engine_number').strip().upper()
         insurance_renewal = request.POST.get('insurance_renewal')
         pollution_renewal = request.POST.get('pollution_renewal')
         driver_id = request.POST.get('driver_id')
 
-        print("vehicle_id :",vehicle_id)
-
-        # Check if registration_number already exists
         if Vehicle_master.objects.filter(registration_number=registration_number,co_id=co_id,branch_id=branch).exists():
             messages.error(request, "Error: Registration number already exists!")
             return redirect('main:vehicle_master_add')
 
-        # Check if chase_number already exists
-        if Vehicle_master.objects.filter(chase_number=chase_number,co_id=co_id,branch_id=branch).exists():
-            messages.error(request, "Error: Chase number already exists!")
-            return redirect('main:vehicle_master_add')
-
-        # Check if engine_number already exists
-        if Vehicle_master.objects.filter(engine_number=engine_number,co_id=co_id,branch_id=branch).exists():
-            messages.error(request, "Error: Engine number already exists!")
-            return redirect('main:vehicle_master_add')
-
-        # Convert brand, vehicle, and vehicle_type to objects
         brand = Brand.objects.filter(id=brand_id).first()
-        vehicle = Vehicle.objects.filter(model_name=vehicle_id).first()
-        # This will correctly retrieve the Vehicle object that matches the selected model_name.
+        vehicle = Vehicle.objects.filter(id=vehicle_id).first()
 
         vehicle_type = Vehicle_type.objects.filter(id=vehicle_type_id).first()
-        # driver_instance = User.objects.filter(username=driver_username).first()
         driver_instance = Employee_master.objects.filter(id=driver_id).first()if driver_id else None
         print("driver")
 
-        # Handle empty date fields properly
         def parse_date(date_str):
             return datetime.strptime(date_str, "%Y-%m-%d").date() if date_str else None
 
@@ -471,13 +454,11 @@ def vehicle_master_add(request):
         insurance_renewal = parse_date(insurance_renewal)
         pollution_renewal = parse_date(pollution_renewal)
 
-        # Generate the next brand_custom_id for this co_id + branch_id
         max_id = Vehicle_master.objects.filter(co_id=co_id, branch_id=branch).aggregate(Max('rc_owner_id'))[
                      'rc_owner_id__max'] or 0
         next_custom_id = max_id + 1
 
-        # Save data manually
-        vehicle =Vehicle_master.objects.create(
+        Vehicle_master.objects.create(
             rc_owner_id=next_custom_id,
             rc_owner_name=rc_owner_name,
             mobile=mobile,

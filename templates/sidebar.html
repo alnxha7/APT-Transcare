@@ -12,7 +12,6 @@
 <aside class="sidebar" id="sidebar">
     <!-- Header -->
     <div class="sidebar-header">
-        <img src="" alt="Logo">
         <span class="brand"> Hello {{ request.user.username }}</span>
     </div>
 
@@ -45,7 +44,7 @@
                     <li><a href="{% url 'main:item_add' %}">Item Master</a></li>
                     <li><a href="{% url 'main:new_godown' %}">Godown Master</a></li>
                     <li><a href="{% url 'main:vendor_master' %}">Vendor Master</a></li>
-                    <li><a href="{% url 'main:area_master' %}">Area Master</a></li>
+                    <li><a href="{% url 'main:area_master' %}">Route Master</a></li>
 
                 </ul>
             </li>

@@ -193,7 +193,7 @@ input:focus, select:focus {
 </div>
     <div class="col-6">
     <label>Mobile</label>
-    <input type="text" name="mobile" value="{{ vehicle.mobile|default:'' }}" required>
+    <input type="text" name="mobile" value="{{ vehicle.mobile|default:'' }}">
     </div>
         <div class="col-6">
 
@@ -212,12 +212,10 @@ input:focus, select:focus {
 <div class="col-6">
     <label>Vehicle</label>
      <select name="vehicle_id">
-<!--        <option value="">-- Select Vehicle --</option>-->
-
-            {% for v in vehicles %}
-            <option value="{{ v.id }}" {% if vehicle and vehicle.vehicle_id.id == v.id %}selected{% endif %}>
-                {{ v.model_name }}
-            </option>
+        {% for v in vehicles %}
+        <option value="{{ v.id }}" {% if vehicle and vehicle.vehicle_id.id == v.id %}selected{% endif %}>
+            {{ v.model_name }}
+        </option>
         {% endfor %}
 
     </select>

@@ -295,7 +295,7 @@ input:focus, select:focus {
 <form method="post">
     {% csrf_token %}
     <div class="col-12">
-    <label>Vehicle Name:</label>
+    <label>Vehicle Type:</label>
     <input type="text" name="vehicle_name" value="{{ vehicle.vehicle_name|default_if_none:'' }}" required><br>
     </div>
     <div class="col-6">
