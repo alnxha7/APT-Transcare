@@ -7108,57 +7108,49 @@ from .models import RateMaster, RateChild
 
 def rate_master(request):
     customers = Table_Accountsmaster.objects.filter(group='SUNDRY DEBTORS', user__company__company_id=request.session.get('co_id'))
-    vehicles = Vehicle_type.objects.filter(co_id=request.session.get('co_id'))
-
     if request.method == 'POST':
         company = Table_Companydetailsmaster.objects.get(company_id=request.session.get('co_id'))
+        branch = Branch_master.objects.get(branch_name=request.session.get('branch'))
         customer_name = request.POST.get('customer_name')
-        vehicles_list = request.POST.getlist('vehicle[]')
+        district_list = request.POST.getlist('district[]')
         rates_list = request.POST.getlist('rate[]')
-        types_list = request.POST.getlist('type[]')
-        fixed_km_list = request.POST.getlist('fixed_km[]')
-        fixed_rate_list = request.POST.getlist('fixed_rate[]')
-        additional_charge_list = request.POST.getlist('additional_charge[]')
 
-        for vehicle, rate, type, km, fixed_rate, additional_charge in zip(vehicles_list, rates_list, types_list, fixed_km_list, fixed_rate_list, additional_charge_list):
-            if not vehicle: 
+        for district, rate in zip(district_list, rates_list):
+            if not district: 
                 continue
 
             exists = RateChild.objects.filter(
                 master__company=company,
+                master__branch=branch,
                 master__customer_name=customer_name,
-                vehicle=vehicle, 
-                type=type
+                district=district, 
             ).exists()
 
             if exists:
                 context = {
                     'customers': customers,
-                    'vehicles': vehicles,
-                    'error': 'Rates already exist for this vehicle and customer.',
+                    'error': 'Rates already exist for this district and customer.',
                 }
                 return render(request, 'accounts/rate_master/rate_master.html', context)
                 
 
             if not exists:
-                master = RateMaster.objects.create(company=company, customer_name=customer_name)
-                RateChild.objects.create(master=master, vehicle=vehicle, rate=rate or None, type=type, km=km or None, fixed_rate=fixed_rate or None, additional_charge=additional_charge or None)
+                master = RateMaster.objects.create(company=company, branch=branch, customer_name=customer_name)
+                RateChild.objects.create(master=master, district=district, rate=rate)
 
         context = {
             'customers': customers,
-            'vehicles': vehicles,
             'success': 'Rates saved successfully ?',
         }
         return render(request, 'accounts/rate_master/rate_master.html', context)
 
     return render(request, 'accounts/rate_master/rate_master.html', {
         'customers': customers,
-        'vehicles': vehicles
     })
 
 
 def rate_list(request):
-    rates = RateChild.objects.filter(master__company__company_id=request.session.get('co_id'))
+    rates = RateChild.objects.filter(master__company__company_id=request.session.get('co_id'), master__branch__branch_name=request.session.get('branch'))
     return render(request, 'accounts/rate_master/rate_list.html', {'rates': rates})
 
 def rate_delete(request, rate_id):
@@ -7170,7 +7162,6 @@ def rate_delete(request, rate_id):
         return JsonResponse({'success': False, 'error': str(e)})
 
 
-#--------------------------------------- Item -------------------------------------------------
 #--------------------------------------- Item -------------------------------------------------
 from .models import Item_master, Stock
 from django.shortcuts import render

@@ -82,12 +82,13 @@
         margin-top: 100px;
         width: 80%;
     }
-@media (max-width: 768px) {
-.container_box {
-margin-left: 0px;
-}
 
-}
+    @media (max-width: 768px) {
+        .container_box {
+            margin-left: 0px;
+        }
+
+    }
 
     h2 {
         text-align: center;
@@ -280,6 +281,7 @@ margin-left: 0px;
     .third-column {
         padding-left: 10px;
     }
+
     .column input {
         width: 100%;
         font-size: 12px;
@@ -313,128 +315,156 @@ margin-left: 0px;
         max-width: 150px;
         font-size: 13px;
     }
+
     /* Compact table rows */
-#billingTable td,
-#billingTable th {
-    padding: 2px 4px !important;  /* very small padding */
-    font-size: 11px;              /* smaller text */
-    line-height: 1.2;             /* tighter row height */
-}
+    #billingTable td,
+    #billingTable th {
+        padding: 2px 4px !important;
+        /* very small padding */
+        font-size: 11px;
+        /* smaller text */
+        line-height: 1.2;
+        /* tighter row height */
+    }
 
-.table_data {
-    font-size: 12px;
-    padding: 2px 4px;
-    text-align: center;
-    width: 70px;      /* ?? this is forcing small width */
-    max-width: 80px;  /* ?? also restricting growth */
-    box-sizing: border-box;
-}
+    .table_data {
+        font-size: 12px;
+        padding: 2px 4px;
+        text-align: center;
+        width: 70px;
+        /* ?? this is forcing small width */
+        max-width: 80px;
+        /* ?? also restricting growth */
+        box-sizing: border-box;
+    }
 
-#billingTable td input.table_data,
-#billingTable td select.table_data {
-    width: 100%;         /* fill td */
-    max-width: none;     /* remove artificial cap */
-    box-sizing: border-box;
-    font-size: 11px;
-    padding: 2px 3px;
-    height: 20px;
-    text-align: center;
-    border: none;
-}
+    #billingTable td input.table_data,
+    #billingTable td select.table_data {
+        width: 100%;
+        /* fill td */
+        max-width: none;
+        /* remove artificial cap */
+        box-sizing: border-box;
+        font-size: 11px;
+        padding: 2px 3px;
+        height: 20px;
+        text-align: center;
+        border: none;
+    }
 
-/* Delete button style */
-.delete-btn {
-    background: transparent;
-    border: none;
-    color: rgb(255, 0, 0);
-    font-size: 11px;
-    border-radius: 3px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
+    /* Delete button style */
+    .delete-btn {
+        background: transparent;
+        border: none;
+        color: rgb(255, 0, 0);
+        font-size: 11px;
+        border-radius: 3px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-/* Adjust icon inside button */
-.delete-btn i {
-    font-size: 12px;
-    margin: 0;
-    padding: 0;
-}
-#billingTable {
-    table-layout: fixed;   /* ?? ensures all columns keep fixed width */
-    width: 100%;
-}
-
-/* Define proportional widths for each column */
-#billingTable th:nth-child(1),
-#billingTable td:nth-child(1) {
-    width: 40px;  /* Sl.no */
-}
-#billingTable th:nth-child(2),
-#billingTable td:nth-child(2) {
-    width: 140px; /* Vehicle */
-}
-#billingTable th:nth-child(3),
-#billingTable td:nth-child(3) {
-    width: 90px;  /* Type */
-}
-#billingTable th:nth-child(4),
-#billingTable td:nth-child(4) {
-    width: 100px; /* Rate (Km) */
-}
-#billingTable th:nth-child(5),
-#billingTable td:nth-child(5) {
-    width: 100px; /* Km (if Fixed) */
-}
-#billingTable th:nth-child(6),
-#billingTable td:nth-child(6) {
-    width: 120px; /* Rate for Fixed(Km) */
-}
-#billingTable th:nth-child(7),
-#billingTable td:nth-child(7) {
-    width: 120px; /* Additional Charges */
-}
-#billingTable th:nth-child(8),
-#billingTable td:nth-child(8) {
-    width: 60px;  /* Actions */
-}
-
-/* Let inputs always fill their cell */
-#billingTable td input.table_data,
-#billingTable td select.table_data {
-    width: 100%;
-    box-sizing: border-box;
-    font-size: 11px;
-    padding: 2px 3px;
-    height: 22px;
-    text-align: center;
-    border: none;
-}
-
-/* Instead of shrinking columns when hidden, just hide input visually */
-.hidden-field {
-    visibility: hidden;   /* invisible but space remains */
-    position: absolute;   /* avoids affecting row height */
-}
-
-/* Default (desktop) - keep your design as it is */
-.table-container {
-    width: 100%;
-}
-
-/* Mobile view - make table scrollable */
-@media (max-width: 768px) {
-    .table-container {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
+    /* Adjust icon inside button */
+    .delete-btn i {
+        font-size: 12px;
+        margin: 0;
+        padding: 0;
     }
 
     #billingTable {
-        min-width: 700px;   /* set minimum width so scroll activates */
+        table-layout: fixed;
+        /* ?? ensures all columns keep fixed width */
+        width: 60%;
     }
-}
 
+    /* Define proportional widths for each column */
+    #billingTable th:nth-child(1),
+    #billingTable td:nth-child(1) {
+        width: 40px;
+        /* Sl.no */
+    }
+
+    #billingTable th:nth-child(2),
+    #billingTable td:nth-child(2) {
+        width: 140px;
+        /* Vehicle */
+    }
+
+    #billingTable th:nth-child(3),
+    #billingTable td:nth-child(3) {
+        width: 90px;
+        /* Type */
+    }
+
+    #billingTable th:nth-child(4),
+    #billingTable td:nth-child(4) {
+        width: 100px;
+        /* Rate (Km) */
+    }
+
+    #billingTable th:nth-child(5),
+    #billingTable td:nth-child(5) {
+        width: 100px;
+        /* Km (if Fixed) */
+    }
+
+    #billingTable th:nth-child(6),
+    #billingTable td:nth-child(6) {
+        width: 120px;
+        /* Rate for Fixed(Km) */
+    }
+
+    #billingTable th:nth-child(7),
+    #billingTable td:nth-child(7) {
+        width: 120px;
+        /* Additional Charges */
+    }
+
+    #billingTable th:nth-child(8),
+    #billingTable td:nth-child(8) {
+        width: 60px;
+        /* Actions */
+    }
+
+    /* Let inputs always fill their cell */
+    #billingTable td input.table_data,
+    #billingTable td select.table_data {
+        width: 100%;
+        box-sizing: border-box;
+        font-size: 11px;
+        padding: 2px 3px;
+        height: 22px;
+        text-align: center;
+        border: none;
+    }
+
+    /* Instead of shrinking columns when hidden, just hide input visually */
+    .hidden-field {
+        visibility: hidden;
+        /* invisible but space remains */
+        position: absolute;
+        /* avoids affecting row height */
+    }
+
+    /* Default (desktop) - keep your design as it is */
+    .table-container {
+        width: 100%;
+    }
+
+    /* Mobile view - make table scrollable */
+    @media (max-width: 768px) {
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            /* smooth scrolling on iOS */
+        }
+
+        #billingTable {
+            min-width: 700px;
+            /* set minimum width so scroll activates */
+        }
+    }
 </style>
 
 <div class="container_box">
@@ -455,7 +485,7 @@ margin-left: 0px;
                                 style="width: 230px; height: 30px;" required autocomplete="off">
                                 <option value="">--- select customer ---</option>
                                 {% for customer in customers %}
-                                    <option value="{{ customer.head }}">{{ customer.head }}</option>
+                                <option value="{{ customer.head }}">{{ customer.head }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -466,45 +496,35 @@ margin-left: 0px;
                     <table id="billingTable">
                         <thead>
                             <tr>
-                                <th style="width: 40px;">Sl.no</th>
-                                <th>Vehicle</th>
-                                <th>Type</th>
-                                <th style="width: 100px;">Rate (Km)</th>
-                                <th style="width: 100px;">Km (if Fixed)</th>
-                                <th>Rate for Fixed(Km)</th>
-                                <th style="width: 120px;">Additional Charges</th>
-                                <th>Actions</th>
+                                <th style="width: 4px;">Sl.no</th>
+                                <th style="width: 35px;">District</th>
+                                <th style="width: 35px;">Rate</th>
+                                <th style="width: 8px;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td></td>
+                                <td>1</td>
                                 <td>
-                                    <select class="table_data" name="vehicle[]" required>
-                                        <option value="">--- select vehicle ---</option>
-                                        {% for vehicle in vehicles %}
-                                            <option value="{{ vehicle.vehicle_name }}">{{ vehicle.vehicle_name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </td>
-                                <td>
-                                    <select class="table_data type-select" name="type[]" required>
-                                        <option value="Km Wise">Km Wise</option>
-                                        <option value="Fixed">Fixed</option>
-                                        <option value="Monthly">Monthly</option>
+                                    <select class="table_data type-select" name="district[]" required>
+                                        <option value="THIRUVANANTHAPURAM">THIRUVANANTHAPURAM</option>
+                                        <option value="KOLLAM">KOLLAM</option>
+                                        <option value="PATHANAMTHITTA">PATHANAMTHITTA</option>
+                                        <option value="ALAPPUZHA">ALAPPUZHA</option>
+                                        <option value="KOTTAYAM">KOTTAYAM</option>
+                                        <option value="IDUKKI">IDUKKI</option>
+                                        <option value="ERNAKULAM">ERNAKULAM</option>
+                                        <option value="THRISSUR">THRISSUR</option>
+                                        <option value="PALAKKAD">PALAKKAD</option>
+                                        <option value="MALAPPURAM">MALAPPURAM</option>
+                                        <option value="KOZHIKODE">KOZHIKODE</option>
+                                        <option value="WAYANAD">WAYANAD</option>
+                                        <option value="KANNUR">KANNUR</option>
+                                        <option value="KASARAGOD">KASARAGOD</option>
                                     </select>
                                 </td>
                                 <td>
                                     <input type="number" class="table_data" name="rate[]" step="0.01" required>
-                                </td>
-                                <td>
-                                    <input type="number" class="table_data km-input" name="fixed_km[]" step="1" style="display:none;">
-                                </td>
-                                <td>
-                                    <input type="number" class="table_data fixed-rate-input" name="fixed_rate[]" step="0.01" style="display:none;">
-                                </td>
-                                <td>
-                                    <input type="number" class="table_data add-charge-input" name="additional_charge[]" step="0.01" style="display:none;">
                                 </td>
                                 <td>
                                     <button type="button" class="delete-btn">
@@ -514,15 +534,16 @@ margin-left: 0px;
                             </tr>
                         </tbody>
                     </table>
-            </div>
-            <!-- Buttons -->
-            <div class="">
-                <div class="col-sm-12 text-end">
-                    <a href="{% url 'main:index' %}" id="" class="btn btn-danger btn-sm">Cancel</a>
-                    <a href="{% url 'main:rate_list' %}" id="" class="btn btn-primary btn-sm">List</a>
-                    <button type="submit" id="" class="btn btn-success btn-sm" name="action" value="save">Save</button>
                 </div>
-            </div>
+                <!-- Buttons -->
+                <div class="">
+                    <div class="col-sm-12 text-end">
+                        <a href="{% url 'main:index' %}" id="" class="btn btn-danger btn-sm">Cancel</a>
+                        <a href="{% url 'main:rate_list' %}" id="" class="btn btn-primary btn-sm">List</a>
+                        <button type="submit" id="" class="btn btn-success btn-sm" name="action"
+                            value="save">Save</button>
+                    </div>
+                </div>
         </form>
 
 
@@ -574,101 +595,42 @@ margin-left: 0px;
 {% endif %}
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const tableBody = document.querySelector('#billingTable tbody');
-    if (!tableBody) return;
+    document.addEventListener("DOMContentLoaded", function () {
+        const tableBody = document.querySelector('#billingTable tbody');
+        if (!tableBody) return;
 
-    // ? Update Sl.no
-    function updateSerialNumbers() {
-        const rows = tableBody.querySelectorAll('tr');
-        rows.forEach((row, index) => {
-            row.querySelector('td:first-child').textContent = index + 1;
-        });
-    }
-
-    // ? Show/Hide Km & Additional Charges
-    function toggleFields(row) {
-        const typeSelect = row.querySelector(".type-select");
-        const kmInput = row.querySelector(".km-input");
-        const rateInput = row.querySelector('input[name="rate[]"]');
-        const addChargeInput = row.querySelector(".add-charge-input");
-        const fixedRate = row.querySelector(".fixed-rate-input");
-
-        if (typeSelect.value === "Fixed") {
-            kmInput.style.display = "none";
-            addChargeInput.style.display = "none";
-            fixedRate.style.display = "block";
-
-            rateInput.value = "none";
-            rateInput.style.display = "none";
-            rateInput.required = false;
-
-            kmInput.required = false;
-            addChargeInput.required = false;
-            fixedRate.required = true;
-        } else if (typeSelect.value === "Km Wise") {
-            kmInput.style.display = "none";
-            kmInput.value = "";
-
-            addChargeInput.style.display = "none";
-            addChargeInput.value = "";
-
-            fixedRate.style.display = "none";
-            fixedRate.value = "";
-
-            rateInput.style.display = "block";
-
-            kmInput.required = false;
-            addChargeInput.required = false;
-            fixedRate.required = false; 
-        } else if (typeSelect.value === "Monthly") {
-            kmInput.style.display = "block";
-            kmInput.value = "";
-
-            fixedRate.style.display = "block";
-            fixedRate.value = "";
-
-            addChargeInput.style.display = "block";
-            rateInput.style.display = "none";
-            rateInput.value = "";
-
-            kmInput.required = true;
-            rateInput.required = false;
-            fixedRate.required = true; 
-            addChargeInput.required = true;
+        // ? Update Sl.no
+        function updateSerialNumbers() {
+            const rows = tableBody.querySelectorAll('tr');
+            rows.forEach((row, index) => {
+                row.querySelector('td:first-child').textContent = index + 1;
+            });
         }
-    }
 
-    function addNewRow() {
-        const newRow = document.createElement('tr');
-        newRow.innerHTML = `
-            <td></td>
+        function addNewRow() {
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+             <td></td>
             <td>
-                <select class="table_data" name="vehicle[]" required>
-                    <option value="">--- select vehicle ---</option>
-                    {% for vehicle in vehicles %}
-                        <option value="{{ vehicle.vehicle_name }}">{{ vehicle.vehicle_name }}</option>
-                    {% endfor %}
-                </select>
-            </td>
-            <td>
-                <select class="table_data type-select" name="type[]" required>
-                    <option value="Km Wise">Km Wise</option>
-                    <option value="Fixed">Fixed</option>
-                    <option value="Monthly">Monthly</option>
+                <select class="table_data type-select" name="district[]" required>
+                    <option value="THIRUVANANTHAPURAM">THIRUVANANTHAPURAM</option>
+                    <option value="KOLLAM">KOLLAM</option>
+                    <option value="PATHANAMTHITTA">PATHANAMTHITTA</option>
+                    <option value="ALAPPUZHA">ALAPPUZHA</option>
+                    <option value="KOTTAYAM">KOTTAYAM</option>
+                    <option value="IDUKKI">IDUKKI</option>
+                    <option value="ERNAKULAM">ERNAKULAM</option>
+                    <option value="THRISSUR">THRISSUR</option>
+                    <option value="PALAKKAD">PALAKKAD</option>
+                    <option value="MALAPPURAM">MALAPPURAM</option>
+                    <option value="KOZHIKODE">KOZHIKODE</option>
+                    <option value="WAYANAD">WAYANAD</option>
+                    <option value="KANNUR">KANNUR</option>
+                    <option value="KASARAGOD">KASARAGOD</option>
                 </select>
             </td>
             <td>
                 <input type="number" class="table_data" name="rate[]" step="0.01" required>
-            </td>
-            <td>
-                <input type="number" class="table_data km-input" name="fixed_km[]" step="1" style="display:none;">
-            </td>
-            <td>
-                <input type="number" class="table_data fixed-rate-input" name="fixed_rate[]" step="0.01" style="display:none;">
-            </td>
-            <td>
-                <input type="number" class="table_data add-charge-input" name="additional_charge[]" step="0.01" style="display:none;">
             </td>
             <td>
                 <button type="button" class="delete-btn">
@@ -676,57 +638,56 @@ document.addEventListener("DOMContentLoaded", function () {
                 </button>
             </td>
         `;
-        tableBody.appendChild(newRow);
-        bindRowEvents(newRow);
-        updateSerialNumbers();
-    }
-
-    // ? Handle Enter key (adds row)
-    function handleKeyDown(event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            addNewRow();
+            tableBody.appendChild(newRow);
+            bindRowEvents(newRow);
+            updateSerialNumbers();
         }
-    }
 
-    // ? Bind row events
-    function bindRowEvents(row) {
-        const deleteBtn = row.querySelector(".delete-btn");
-        deleteBtn.addEventListener("click", function () {
-            if (tableBody.rows.length > 1) {
-                row.remove();
-                updateSerialNumbers();
-            } else {
-                Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: "At Least One Row Must Remain!",
-                });
+        // ? Handle Enter key (adds row)
+        function handleKeyDown(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                addNewRow();
             }
-        });
+        }
 
-        const typeSelect = row.querySelector(".type-select");
-        typeSelect.addEventListener("change", function () {
+        // ? Bind row events
+        function bindRowEvents(row) {
+            const deleteBtn = row.querySelector(".delete-btn");
+            deleteBtn.addEventListener("click", function () {
+                if (tableBody.rows.length > 1) {
+                    row.remove();
+                    updateSerialNumbers();
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: "At Least One Row Must Remain!",
+                    });
+                }
+            });
+
+            const typeSelect = row.querySelector(".type-select");
+            typeSelect.addEventListener("change", function () {
+                toggleFields(row);
+            });
+
+            const rateInput = row.querySelector('input[name="rate[]"]');
+            const tableBody = document.querySelector('#billingTable tbody');
+            if (rateInput) {
+                rateInput.addEventListener("keydown", handleKeyDown);
+                tableBody.addEventListener("dblclick", addNewRow);
+            }
+        }
+
+        // ? Initialize
+        tableBody.querySelectorAll("tr").forEach(row => {
+            bindRowEvents(row);
             toggleFields(row);
         });
 
-        const rateInput = row.querySelector('input[name="rate[]"]');
-        const tableBody = document.querySelector('#billingTable tbody');
-        if (rateInput) {
-            rateInput.addEventListener("keydown", handleKeyDown);
-            rateInput.addEventListener("dblclick", addNewRow);
-            tableBody.addEventListener("dblclick", addNewRow);
-        }
-    }
-
-    // ? Initialize
-    tableBody.querySelectorAll("tr").forEach(row => {
-        bindRowEvents(row);
-        toggleFields(row);
+        updateSerialNumbers();
     });
-
-    updateSerialNumbers();
-});
 </script>
 
 

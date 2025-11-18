@@ -364,12 +364,8 @@
                     <tr>
                         <th style="text-align: center;">Sl.no</th>
                         <th style="text-align: left;">Customer Name</th>
-                        <th style="text-align: left; width: 115px;">Vehicle</th>
+                        <th style="text-align: left; width: 200px;">District</th>
                         <th style="text-align: center;">Rate</th>
-                        <th style="text-align: left;">Type</th>
-                        <th style="text-align: center;">KM</th>
-                        <th style="text-align: center;">Fixed Rate</th>
-                        <th style="text-align: center;">Additional Charge</th>
                         <th style="text-align: center;">Actions</th>
                     </tr>
                 </thead>
@@ -379,12 +375,8 @@
                                 <tr>
                                     <td style="text-align: center;">{{ forloop.counter }}</td>
                                     <td style="text-align: left;">{{ rate.master.customer_name }}</td>
-                                    <td style="text-align: left;">{{ rate.vehicle }}</td>
+                                    <td style="text-align: left;">{{ rate.district }}</td>
                                     <td style="text-align: center;">{{ rate.rate }}</td>
-                                    <td style="text-align: left;">{{ rate.type }}</td>
-                                    <td style="text-align: center;">{{ rate.km }}</td>
-                                    <td style="text-align: center;">{{ rate.fixed_rate }}</td>
-                                    <td style="text-align: center;">{{ rate.additional_charge }}</td>
                                     <td><button type="button" class="delete-btn" data-id="{{ rate.id }}">
                                             <i class="fa-sharp fa-solid fa-trash fa-shake fa-sm"></i>
                                         </button>
@@ -433,7 +425,7 @@
                     confirmButtonText: 'Yes, delete it!'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        fetch(`/demo.com/rate_delete/${rateId}/`, {
+                        fetch(`/rate_delete/${rateId}/`, {
                             method: 'POST',
                             headers: {
                                 'X-CSRFToken': '{{ csrf_token }}' // ? important for Django

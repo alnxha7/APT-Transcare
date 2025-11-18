@@ -693,13 +693,10 @@ class RateMaster(models.Model):
 
 class RateChild(models.Model):
     master = models.ForeignKey(RateMaster, on_delete=models.CASCADE)
-    vehicle = models.CharField(max_length=200)
+    district = models.CharField(max_length=200)
     rate = models.FloatField(null=True, blank=True)
-    type = models.CharField(max_length=25)
-    km = models.FloatField(null=True, blank=True)
-    fixed_rate = models.FloatField(null=True, blank=True)
-    additional_charge = models.FloatField(null=True, blank=True)
-
+    
+    
 class Item_master(models.Model):
     item_code=models.IntegerField(null=True, blank=True)
     name = models.CharField(max_length=100)
