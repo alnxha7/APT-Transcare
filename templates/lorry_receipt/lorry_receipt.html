@@ -418,14 +418,14 @@
     {% csrf_token %}
     <div class="container">
         <div class="top-section">
-    <!-- 1️⃣ Consigner Column -->
+    <!-- 1?? Consigner Column -->
     <div class="column">
         <!-- Row 1: Series + Bill No -->
         <div class="form-row double" style="width: 154%;">
             <div class="field-pair">
                 <label>Series</label>
                 <select name="series" id="series" class="form-control" required style="padding: 3px 6px; font-size: 13px; height: 30px;" {% if lr.series %} disabled {% endif %}>
-                        <option value="">Select Vehicle</option>
+                        <option value="">Select Series</option>
                         {% for voucher in vouchers %}
                             <option value="{{ voucher.id }}" {% if lr.series.id == voucher.id %} selected {% endif %}>{{ voucher.series }}</option>
                         {% endfor %}
@@ -454,7 +454,7 @@
             </div>
         </div>
 
-        <!-- Row 3–5: Address 1–3 -->
+        <!-- Row 3-5: Address 1-3 -->
         <div class="form-row"><label>Address 1</label><input type="text" id="consigner_address1" name="consigner_address1" class="form-control" value="{{ lr.consigner_account.address1 }}"></div>
         <div class="form-row"><label>Address 2</label><input type="text" id="consigner_address2" name="consigner_address2" class="form-control" value="{{ lr.consigner_account.address2 }}"></div>
         <div class="form-row"><label>Address 3</label><input type="text" id="consigner_address3" name="consigner_address3" class="form-control" value="{{ lr.consigner_account.address3 }}"></div>
@@ -462,7 +462,7 @@
         <div class="form-row"><label>Phone</label><input type="text" id="consigner_phone" name="consigner_phone" class="form-control" value="{{ lr.consigner_account.mobile }}"></div>
     </div>
 
-    <!-- 2️⃣ Middle Column -->
+    <!-- 2?? Middle Column -->
     <div class="column" style="position: relative; top: 75px;">
         <div class="form-row">
             <label>Payment</label>
@@ -505,7 +505,7 @@
         </div>
     </div>
 
-    <!-- 3️⃣ Consignee Column -->
+    <!-- 3?? Consignee Column -->
     <div class="column">
         <!-- Row 1: Code + Name -->
         <div class="form-row double" style="transform: translateX(-170px); width: 154%;">
@@ -519,7 +519,7 @@
             </div>
         </div>
 
-        <!-- Row 2–4: Address 1–3 -->
+        <!-- Row 2-4: Address 1-3 -->
         <div class="form-row"><label>Address 1</label><input type="text" name="consignee_address1" id="consignee_address1" class="form-control" value="{{ lr.consignee_account.address1 }}"></div>
         <div class="form-row"><label>Address 2</label><input type="text" name="consignee_address2" id="consignee_address2" class="form-control" value="{{ lr.consignee_account.address2 }}"></div>
         <div class="form-row"><label>Address 3</label><input type="text" name="consignee_address3" id="consignee_address3" class="form-control" value="{{ lr.consignee_account.address3 }}"></div>
@@ -594,7 +594,7 @@
 <div class="bottom-section"
      style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;">
 
-  <!-- 🧱 Column 1: Load From / Load To -->
+  <!-- ?? Column 1: Load From / Load To -->
   <div class="column" style="flex:1;min-width:250px;">
     <div class="d-flex align-items-center" style="margin-bottom:8px;">
       <label for="load_from" style="width:90px;">Load From</label>
@@ -656,7 +656,7 @@
 
 </div>
 
-<!-- 🔹 Buttons Section -->
+<!-- ?? Buttons Section -->
 <div class="text-end" style="margin-top:30px;">
 {% if request.GET.action == 'delete' %}
     <a href="{% url 'main:index' %}" class="btn btn-primary btn-sm">Cancel</a>
@@ -835,7 +835,7 @@
       </p>
 
       <div style="text-align:right; margin-top:25px; font-weight:bold;">
-        Consigner’s Signature
+        Consigner's Signature
       </div>
     </div>
 
@@ -1022,9 +1022,9 @@ $(document).ready(function() {
     }
 $(document).ready(function() {
 
-    // 🔹 Function to calculate total freight and update totals
+    // ?? Function to calculate total freight and update totals
 
-    // 🔹 Function to add new row
+    // ?? Function to add new row
     function addNewRow() {
     const table = $("#tripTable tbody");
     const rowCount = table.find("tr").length + 1;
@@ -1038,7 +1038,7 @@ $(document).ready(function() {
             <td><input type="number" name="inv_amount[]" class="inv_amount form-control"></td>
             <td><input type="number" name="weight[]" class="weight form-control"></td>
 
-            <!-- 👇 auto-apply rate when creating row -->
+            <!-- ?? auto-apply rate when creating row -->
             <td><input type="number" name="rate[]" class="rate form-control" value="${globalRate}"></td>
 
             <td><input type="number" name="freight[]" class="freight form-control" readonly></td>
@@ -1063,14 +1063,14 @@ $(document).ready(function() {
 }
 
 
-    // 🔹 Update serial numbers after add/remove
+    // ?? Update serial numbers after add/remove
     function updateSerialNumbers() {
         $("#tripTable tbody tr").each(function(index) {
             $(this).find(".slno").text(index + 1);
         });
     }
 
-    // 🔹 Recalculate freight and totals on rate/weight input
+    // ?? Recalculate freight and totals on rate/weight input
     $(document).on("input", ".rate, .weight", function() {
         const row = $(this).closest("tr");
         const rate = parseFloat(row.find(".rate").val()) || 0;
@@ -1078,10 +1078,10 @@ $(document).ready(function() {
         const freight = rate * weight;
         row.find(".freight").val(freight.toFixed(2));
 
-        updateTotals(); // 👈 Update total every time a value changes
+        updateTotals(); // ?? Update total every time a value changes
     });
 
-    // 🔹 Delete a row
+    // ?? Delete a row
     $(document).on("click", ".delete-row", function() {
         const rowCount = $("#tripTable tbody tr").length;
         if (rowCount <= 1) {
@@ -1095,10 +1095,10 @@ $(document).ready(function() {
         }
         $(this).closest("tr").remove();
         updateSerialNumbers();
-        updateTotals(); // 👈 Update totals after deleting a row
+        updateTotals(); // ?? Update totals after deleting a row
     });
 
-    // 🔹 Add row on Enter key in rate/freight fields
+    // ?? Add row on Enter key in rate/freight fields
     $(document).on("keydown", ".rate, .freight", function(e) {
         if (e.key === "Enter") {
             e.preventDefault();
@@ -1106,7 +1106,7 @@ $(document).ready(function() {
         }
     });
 
-    // 🔹 Add new row on table double-click
+    // ?? Add new row on table double-click
     $("#tripTable").on("dblclick", function() {
         addNewRow();
     });
@@ -1257,7 +1257,7 @@ function triggerRateFetch() {
 
         $("#ajax_rate").val(globalRate);
 
-        // 🔹 NEW: Update entire table if district changes
+        // ?? NEW: Update entire table if district changes
         updateAllRowsWithNewRate();
     });
 }
