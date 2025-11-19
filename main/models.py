@@ -784,7 +784,7 @@ class LorryReceiptMaster(models.Model):
     consignee_account = models.ForeignKey(Table_Accountsmaster,on_delete=models.CASCADE, related_name='consignee_accounts')
 
     payment = models.CharField(max_length=50)
-    vehicle_no = models.CharField(max_length=80)
+    vehicle_no = models.CharField(max_length=80, null=True, blank=True)
     district = models.CharField(max_length=150)
 
     load_from = models.CharField(max_length=100)

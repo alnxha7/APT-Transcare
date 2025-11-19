@@ -7644,7 +7644,7 @@ def lorry_receipt(request):
                                                     account_code=request.POST.get('consignee_code')),
 
                 payment=request.POST.get('payment_method'),
-                vehicle_no=request.POST.get('vehicle_no'),
+                vehicle_no=request.POST.get('vehicle_no') or None,
                 district=request.POST.get('district'),
 
                 load_from=request.POST.get('load_from'),
@@ -7801,7 +7801,7 @@ def lr_edit(request, lr_id):
     if request.method == 'POST':
         try:
             lr.payment = request.POST.get('payment_method')
-            lr.vehicle_no = request.POST.get('vehicle_no')
+            lr.vehicle_no = request.POST.get('vehicle_no') or None
             lr.district = request.POST.get('district')
             lr.load_from = request.POST.get('load_from')
             lr.load_to = request.POST.get('load_to')
