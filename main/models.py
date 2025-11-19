@@ -803,3 +803,4 @@ class LorryReceiptItems(models.Model):
     inv_amount = models.FloatField()
     freight = models.FloatField()
     pkg = models.CharField(max_length=255)
+    checked = models.BooleanField(default=False)

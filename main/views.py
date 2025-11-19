@@ -7901,27 +7901,98 @@ def lr_report_search(request):
         area_list = request.POST.getlist('area')
         date_from = request.POST.get('date_from')
         date_to = request.POST.get('date_to')
+        action = request.POST.get('action')
 
-        # Only redirect if at least one field is filled
-        if area_list or (date_from and date_to):
-            params = {}
-            if area_list:
-                params['area'] = area_list
-            if date_from:
-                params['date_from'] = date_from
-            if date_to:
-                params['date_to'] = date_to
+        if action == 'report':
+            print('Generating report...')
+            if area_list or (date_from and date_to):
+                params = {}
+                if area_list:
+                    params['area'] = area_list
+                if date_from:
+                    params['date_from'] = date_from
+                if date_to:
+                    params['date_to'] = date_to
 
-            return redirect(f"{reverse('main:lr_report')}?{urlencode(params, doseq=True)}")
+                return redirect(f"{reverse('main:view_report')}?{urlencode(params, doseq=True)}")
 
+            else:
+                return render(request, 'reports/lorry_receipt/lr_search.html', {
+                    'areas': areas,
+                    'error': 'Please input any field'
+                })
         else:
-            return render(request, 'reports/lorry_receipt/lr_search.html', {
-                'areas': areas,
-                'error': 'Please input any field'
-            })
+            if area_list or (date_from and date_to):
+                params = {}
+                if area_list:
+                    params['area'] = area_list
+                if date_from:
+                    params['date_from'] = date_from
+                if date_to:
+                    params['date_to'] = date_to
+
+                return redirect(f"{reverse('main:lr_report')}?{urlencode(params, doseq=True)}")
+
+            else:
+                return render(request, 'reports/lorry_receipt/lr_search.html', {
+                    'areas': areas,
+                    'error': 'Please input any field'
+                })
     return render(request, 'reports/lorry_receipt/lr_search.html', {'areas': areas})
 
 def lr_report(request):
+    co_id = request.session.get('co_id')
+    branch = request.session.get('branch')
+    areas = request.GET.getlist('area')
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+
+    vehicles = Vehicle_master.objects.filter(co_id=co_id, branch_id=branch)
+    drivers = Employee_master.objects.filter(co_id=co_id, branch_id=branch)
+    locations = LocationMaster.objects.filter(company__company_id=co_id, branch__branch_name=branch)
+
+    # Load LRs with master (faster + complete data)
+    lrs = LorryReceiptItems.objects.filter(
+        master__company__company_id=co_id,
+        master__branch__branch_name=branch,
+        checked=False
+    ).select_related("master")
+
+    company = Table_Companydetailsmaster.objects.get(company_id=co_id)
+
+    # Filters
+    if areas and date_from and date_to:
+        lrs = lrs.filter(master__area__in=areas, master__lr_date__range=[date_from, date_to])
+    elif areas:
+        lrs = lrs.filter(master__area__in=areas)
+    elif date_from and date_to:
+        lrs = lrs.filter(master__lr_date__range=[date_from, date_to])
+
+    # Always get latest checked values
+    for lr in lrs:
+        lr.refresh_from_db(fields=['checked'])
+
+    # PRINT ONLY CHECKED LRs
+    if request.GET.get("print"):
+        lrs = lrs.filter(checked=True)
+
+    # Grand total
+    grand_value = sum(lr.freight for lr in lrs)
+
+    context = {
+        'lrs': lrs,
+        'company': company,
+        'areas': areas,
+        'vehicles': vehicles,
+        'drivers': drivers,
+        'locations': locations,
+        'grand_value': grand_value,
+    }
+
+    return render(request, 'reports/lorry_receipt/lr_report.html', context)
+
+
+def view_report(request):
     co_id = request.session.get('co_id')
     branch = request.session.get('branch')
     areas = request.GET.getlist('area')
@@ -7950,5 +8021,19 @@ def lr_report(request):
         'areas': areas, 
         'grand_value': grand_value, 
     }
+    return render(request, 'reports/lorry_receipt/view_report.html', context)
 
-    return render(request, 'reports/lorry_receipt/lr_report.html', context)
+
+import json
+@csrf_exempt
+def update_lr_check_status(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        lr_id = data.get("lr_id")
+        checked = data.get("checked")
+
+        lr = LorryReceiptItems.objects.get(id=lr_id)
+        lr.checked = checked
+        lr.save()
+
+        return JsonResponse({"status": "ok"})

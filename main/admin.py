@@ -192,7 +192,7 @@ class LorryReceiptMasterAdmin(admin.ModelAdmin):
 @admin.register(LorryReceiptItems)
 class LorryReceiptItemsAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'master', 'item_code', 'item', 'weight', 'rate', 'freight', 'pkg'
+        'id', 'master', 'checked', 'item_code', 'item', 'weight', 'rate', 'freight', 'pkg'
     )
     list_filter = ('master',)
     search_fields = ('item_code', 'item', 'pkg')

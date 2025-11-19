@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DESPATCH</title>
+    <title>LR Report</title>
 <!-- Fontfaces CSS-->
     <link href="{% static 'css/font-face.css' %}" rel="stylesheet" media="all">
     <link href="{% static 'vendor/font-awesome-4.7/css/font-awesome.min.css' %}" rel="stylesheet" media="all">
@@ -44,8 +44,7 @@
     }
         .form-control {
         padding: 2px 8px;
-        font-size: 13px;
-        height: 24px !important;
+        font-size: 14px;
     }
     .mb-3, .mb-2 {
         margin-bottom: 8px !important;
@@ -72,7 +71,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             border: 2px solid rgb(43, 114, 227);
             margin-left:20px;
-            margin-top: 25px;
+            margin-top:100px;
         }
 
 
@@ -332,82 +331,14 @@
     cursor: pointer;
 }
 
-
     </style>
         
         <div class="container_box">
        
         <div class="container">
 
-<h2>DESPATCH</h2>
+<h2>LR Report</h2>
     <div class="container">
-        <!-- ---------------- TOP FILTER SECTION ---------------- -->
-<form method="GET" action="" id="filterForm">
-    <div class="row" style="margin-bottom:15px;">
-
-        <!-- Date -->
-        <div class="col-md-2">
-            <label for="date" style="font-size:13px;">Date</label>
-            <input type="date" name="date" id="date"
-                   class="form-control"
-                   value="{% now 'Y-m-d' %}">
-        </div>
-
-        <!-- Vehicle No -->
-        <div class="col-md-2">
-            <label style="font-size:13px;">Vehicle No</label>
-            <select name="vehicle_no" class="form-control">
-                {% for v in vehicles %}
-                    <option value="{{ v.registration_number }}"
-                    {% if request.GET.vehicle_no == v.registration_number %}selected{% endif %}>
-                        {{ v.registration_number }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <!-- Driver Name (reduced size) -->
-        <div class="col-md-2">
-            <label style="font-size:13px;">Driver Name</label>
-            <select name="driver_name" class="form-control">
-                {% for d in drivers %}
-                    <option value="{{ d.employee_name }}"
-                    {% if request.GET.driver_name == d.employee_name %}selected{% endif %}>
-                        {{ d.employee_name }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <!-- From (increased size) -->
-        <div class="col-md-3">
-            <label style="font-size:13px;">From</label>
-            <select name="from" class="form-control">
-                {% for loc in locations %}
-                    <option value="{{ loc.location }}"
-                    {% if request.GET.from == loc.location %}selected{% endif %}>
-                        {{ loc.location }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <!-- To (increased size) -->
-        <div class="col-md-3">
-            <label style="font-size:13px;">To</label>
-            <select name="to" class="form-control">
-                {% for loc in locations %}
-                    <option value="{{ loc.location }}"
-                    {% if request.GET.to == loc.location %}selected{% endif %}>
-                        {{ loc.location }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-
-    </div>
-</form>
-
         <!-- 🔹 Table Section -->
         <div class="table-container">
             <p>LR Report Details</p>
@@ -473,7 +404,6 @@
     <div class="bottom-section">
         <div class="col-sm-12 text-end">
             <a href="{% url 'main:lr_report_search' %}" id="" class="btn btn-danger btn-sm">Exit</a>
-            <button type="button" id="print-button" class="btn btn-secondary btn-sm print-button">Print</button>
         </div>
     </div>
 
@@ -483,121 +413,6 @@
 
  </div>
 </div>
-
-
-
-
-<!-- ---------------------      INVOICE (PRINT VIEW)     ------------------------------>
-
-<div id="invoice-div" class="print-only">
-
-    <div style="width: 90%; margin: auto; font-family: Arial, sans-serif;">
-
-        <!-- Company Header -->
-        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;">
-            <div style="display: flex; align-items: center;">
-                <img src="{% static 'images/icon/bullet_logo.png' %}" alt="Company Logo" style="height: 70px; margin-right: 15px;">
-                <div>
-                    <h2 style="margin: 0; font-size: 22px;">{{ company.companyname }}</h2>
-                    <p style="margin: 2px 0; font-size: 13px;">
-                        {{ company.address1 }} {{ company.address2 }}<br>
-                        {{ company.address3 }} - {{ company.pinCode }}<br>
-                        GSTIN: {{ company.gst }}
-                    </p>
-                </div>
-            </div>
-            <div style="text-align: right;">
-                <h3 style="margin: 0; font-size: 18px;">LR REPORT</h3>
-            </div>
-        </div>
-
-        <div id="print-filters" style="font-size:14px; margin-bottom:15px;">
-            <!-- JS will fill this -->
-        </div>
-
-        <!-- Table Section -->
-        <div style="margin-top: 10px;">
-            <table style="width: 100%; border-collapse: collapse; font-size: 11px;" border="1">
-                <thead style="background-color: #f2f2f2;">
-                    <tr>
-                        <th>Sl.no</th>
-                        <th>LR Date</th>
-                        <th>LR No</th>
-                        <th>From</th>
-                        <th>To</th>
-                        <th>Route</th>
-                        <th>Payment</th>
-                        <th>Inv No</th>
-                        <th>Inv Amt</th>
-                        <th>Item</th>
-                        <th>Weight</th>
-                        <th>Rate</th>
-                        <th>Freight</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for lr in lrs %}
-                    {% if lr.checked %}
-                        <tr>
-                            <td style="text-align: center;">{{ forloop.counter }}</td>
-                            <td style="text-align: center;">{{ lr.master.lr_date }}</td>
-                            <td style="text-align: center;">{{ lr.master.lr_no }}</td>
-                            <td style="text-align: left;">{{ lr.master.load_from }}</td>
-                            <td style="text-align: left;">{{ lr.master.load_to }}</td>
-                            <td style="text-align: left;">{{ lr.master.area }}</td>
-                            <td style="text-align: center;">{{ lr.master.payment }}</td>
-                            <td style="text-align: center;">{{ lr.inv_no }}</td>
-                            <td style="text-align: center;">{{ lr.inv_amount }}</td>
-                            <td style="text-align: left;">{{ lr.item }}</td>
-                            <td style="text-align: center;">{{ lr.weight }}</td>
-                            <td style="text-align: center;">{{ lr.rate }}</td>
-                            <td style="text-align: center;">{{ lr.freight }}</td>
-                        </tr>
-                    {% endif %}
-                    {% endfor %}
-                    <tr style="font-weight: bold; background-color: #e6e6e6;">
-                        <td colspan="12" style="text-align: right;">Grand Total:</td>
-                        <td style="text-align: right;">{{ grand_value }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Footer -->
-        <div style="margin-top: 40px; display: flex; justify-content: space-between; font-size: 13px;">
-            <div>
-                <strong>Prepared By:</strong> _______________________
-            </div>
-            <div style="text-align: right;">
-                <strong>Authorized Signatory</strong><br>
-                _______________________
-            </div>
-        </div>
-
-    </div>
-</div>
-
-
-<script>
-document.querySelectorAll(".lr-check").forEach(cb => {
-    cb.addEventListener("change", function () {
-        fetch("/update-lr-check-status/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": "{{ csrf_token }}"
-            },
-            body: JSON.stringify({
-                lr_id: this.dataset.id,
-                checked: this.checked
-            })
-        })
-        .then(res => res.json())
-        .then(data => console.log("Saved:", data));
-    });
-});
-</script>
-
 
 
 <script src="{% static 'vendor/jquery-3.2.1.min.js' %}"></script>
@@ -623,104 +438,26 @@ document.querySelectorAll(".lr-check").forEach(cb => {
 
 <!-- Main JS-->
 <script src="{% static 'js/main.js' %}"></script>
-<!-- 🖨️ PRINT SCRIPT -->
+
+
 <script>
-document.getElementById("print-button").addEventListener("click", function () {
-
-    // 🔹 READ updated checkboxes from the table
-    let updatedRows = "";
-    let grandTotal = 0;
-    let counter = 1;
-
-    document.querySelectorAll("tr[data-lr-id]").forEach(row => {
-        let cb = row.querySelector(".lr-check");
-
-        if (cb && cb.checked) {
-            let cells = row.querySelectorAll("td");
-
-            updatedRows += `
-                <tr>
-                    <td>${counter++}</td>
-                    <td>${cells[1].innerText}</td>
-                    <td>${cells[2].innerText}</td>
-                    <td>${cells[3].innerText}</td>
-                    <td>${cells[4].innerText}</td>
-                    <td>${cells[5].innerText}</td>
-                    <td>${cells[6].innerText}</td>
-                    <td>${cells[7].innerText}</td>
-                    <td>${cells[8].innerText}</td>
-                    <td>${cells[9].innerText}</td>
-                    <td>${cells[10].innerText}</td>
-                    <td>${cells[11].innerText}</td>
-                    <td>${cells[13].innerText}</td>
-                </tr>
-            `;
-
-            grandTotal += parseFloat(cells[13].innerText) || 0;
-        }
+document.querySelectorAll(".lr-check").forEach(cb => {
+    cb.addEventListener("change", function () {
+        fetch("/update-lr-check-status/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({
+                lr_id: this.dataset.id,
+                checked: this.checked
+            })
+        })
+        .then(res => res.json())
+        .then(data => console.log("Saved:", data));
     });
-
-    let dateVal = formatDate(document.getElementById("date").value);
-    let vehicleVal = document.querySelector("select[name='vehicle_no']").value || "";
-    let driverVal = document.querySelector("select[name='driver_name']").value || "";
-    let fromVal = document.querySelector("select[name='from']").value || "";
-    let toVal = document.querySelector("select[name='to']").value || "";
-
-    // 🔹 Build filter display HTML
-    let filterHTML = `
-        <div style="font-size:14px; margin-bottom:10px;">
-            <p><strong>Date:</strong> ${dateVal || "-"}</p>
-            <p><strong>Vehicle:</strong> ${vehicleVal || "-"}</p>
-            <p><strong>Driver:</strong> ${driverVal || "-"} </p>
-            <p><strong>From:</strong> ${fromVal || "-"}</p>
-            <p><strong>To:</strong> ${toVal || "-"}</p>
-        </div>
-    `;
-
-    // 🔹 Build updated print HTML
-    let printHTML = `
-        <html>
-        <head>
-            <title>LR Report</title>
-            <style>
-                table, th, td {
-                    border: 1px solid black;
-                    border-collapse: collapse;
-                    font-size: 11px;
-                }
-                th, td { padding: 4px; }
-                th { background-color: #f2f2f2; }
-            </style>
-        </head>
-        <body>
-            ${document.getElementById("invoice-div").innerHTML.replace(
-                document.getElementById("print-filters").outerHTML,
-                filterHTML
-            ).replace(
-                /<tbody>[\s\S]*<\/tbody>/,
-                `<tbody>${updatedRows}
-                    <tr style="font-weight:bold;background:#e6e6e6;">
-                        <td colspan="12" style="text-align:right;">Grand Total:</td>
-                        <td>${grandTotal.toFixed(2)}</td>
-                    </tr>
-                </tbody>`
-            )}
-        </body>
-        </html>
-    `;
-
-    // 🔹 Open print window
-    let printWindow = window.open("", "", "width=900,height=650");
-    printWindow.document.write(printHTML);
-    printWindow.document.close();
-    printWindow.print();
 });
-function formatDate(d) {
-    if (!d) return "";
-    const parts = d.split("-");
-    return `${parts[2]}-${parts[1]}-${parts[0]}`; // dd-mm-yyyy
-}
-
 </script>
 
 

@@ -195,6 +195,9 @@ urlpatterns = [
     path("lr_delete/<int:lr_id>/", views.lr_delete, name="lr_delete"),
     path("lr_report_search/", views.lr_report_search, name="lr_report_search"),
     path("lr_report/", views.lr_report, name="lr_report"),
+    path("update-lr-check-status/", views.update_lr_check_status, name="update_lr_check_status"),
+    path("view_report/", views.view_report, name="view_report"),
+
 
 
     # accounts - debit-note

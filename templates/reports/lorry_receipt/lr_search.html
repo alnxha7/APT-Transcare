@@ -32,12 +32,15 @@
 
             <!-- Buttons -->
             <div class="btn-group">
-                <button type="submit" class="btn save-btn">
-                    <i class="fa fa-search"></i> Search
+                <button type="submit" class="btn save-btn" name="action" value="despatch">
+                    <i class="fa fa-search"></i> Despatch
                 </button>
                 <a href="{% url 'main:index' %}" class="btn back-btn">
                     <i class="fa fa-arrow-left"></i> Back
                 </a>
+                <button type="submit" class="btn save-btn" name="action" value="report">
+                    <i class="fa fa-newspaper-o"></i> Report
+                </button>
             </div>
 
         </form>
