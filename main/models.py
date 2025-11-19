@@ -694,7 +694,7 @@ class RateMaster(models.Model):
 class RateChild(models.Model):
     master = models.ForeignKey(RateMaster, on_delete=models.CASCADE)
     district = models.CharField(max_length=200)
-    rate = models.FloatField(null=True, blank=True)
+    rate = models.FloatField()
     
     
 class Item_master(models.Model):
@@ -785,6 +785,7 @@ class LorryReceiptMaster(models.Model):
 
     payment = models.CharField(max_length=50)
     vehicle_no = models.CharField(max_length=80)
+    district = models.CharField(max_length=150)
 
     load_from = models.CharField(max_length=100)
     load_to = models.CharField(max_length=100)

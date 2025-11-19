@@ -7645,6 +7645,7 @@ def lorry_receipt(request):
 
                 payment=request.POST.get('payment_method'),
                 vehicle_no=request.POST.get('vehicle_no'),
+                district=request.POST.get('district'),
 
                 load_from=request.POST.get('load_from'),
                 load_to=request.POST.get('load_to'),
@@ -7718,6 +7719,47 @@ def get_serial_number_lr(request):
     except VoucherConfiguration.DoesNotExist:
         return JsonResponse({'error': 'Invalid series selected'}, status=400)
 
+@csrf_exempt
+def get_rate_ajax(request):
+    consigner_name = request.POST.get("consigner")
+    print('consigner_name', consigner_name)
+    district = request.POST.get("district")
+    print('district', district)
+
+    try:
+        rate_child = RateChild.objects.filter(
+            master__company__company_id=request.session.get("co_id"),
+            master__branch__branch_name=request.session.get("branch"),
+            master__customer_name=consigner_name,
+            district=district
+        ).first()
+
+        if rate_child:
+            print('rate is fetched')
+            return JsonResponse({
+                "status": "success",
+                "rate": rate_child.rate
+            })
+
+        print('rate is not fetched')
+        return JsonResponse({
+            "status": "not_found",
+            "rate": 0,
+            "message": "No matching rate found"
+        })
+
+    except Exception as e:
+        print("ERROR in get_rate_ajax:", e)
+        return JsonResponse({
+            "status": "error",
+            "rate": None,
+            "message": "Server error"
+        }, status=500)
+
+
+
+
+
 def item_search(request):
     query = request.GET.get('q', '')
     items = Item_master.objects.filter(name__icontains=query) | Item_master.objects.filter(item_code__icontains=query)
@@ -7760,6 +7802,7 @@ def lr_edit(request, lr_id):
         try:
             lr.payment = request.POST.get('payment_method')
             lr.vehicle_no = request.POST.get('vehicle_no')
+            lr.district = request.POST.get('district')
             lr.load_from = request.POST.get('load_from')
             lr.load_to = request.POST.get('load_to')
             lr.area = request.POST.get('area')

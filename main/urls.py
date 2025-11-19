@@ -187,6 +187,7 @@ urlpatterns = [
 
     path("lorry_receipt/", views.lorry_receipt, name="lorry_receipt"),
     path('get_serial_number_lr/', views.get_serial_number_lr, name='get_serial_number_lr'),
+    path("get_rate_ajax/", views.get_rate_ajax, name="get_rate_ajax"),
     path('ajax/item-search/', views.item_search, name='item_search'),
     path("lr_search/", views.lr_search, name="lr_search"),
     path("lr_edit/<int:lr_id>/", views.lr_edit, name="lr_edit"),

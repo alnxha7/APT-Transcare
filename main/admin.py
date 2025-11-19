@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import Brand, Vehicle, Vehicle_type, Vehicle_master, Employee_master, Trip_sheet, Table_Accountsmaster, \
     Table_Acntchild, VoucherConfiguration,Table_Companydetailsmaster,Table_companyDetailschild, Table_DrCrNote,Table_Acntchild,Table_Accountsmaster,Table_Voucher, Table_Contra_Entry, \
-    Table_Journal_Entry, RateMaster
+    Table_Journal_Entry, RateMaster, RateChild
 
 # Register your models here.
 
@@ -11,7 +11,25 @@ admin.site.register(Vehicle_type)
 # admin.site.register(Vehicle_master)
 admin.site.register(Employee_master)
 admin.site.register(Trip_sheet)
-admin.site.register(RateMaster)
+
+class RateChildInline(admin.TabularInline):
+    model = RateChild
+    extra = 1
+
+
+@admin.register(RateMaster)
+class RateMasterAdmin(admin.ModelAdmin):
+    list_display = ("customer_name", "company", "branch")
+    search_fields = ("customer_name", )
+    list_filter = ("company", "branch")
+    inlines = [RateChildInline]
+
+
+@admin.register(RateChild)
+class RateChildAdmin(admin.ModelAdmin):
+    list_display = ("master", "district", "rate")
+    search_fields = ("district", )
+    list_filter = ("district", )
 
 
 @admin.register(Vehicle_master)

@@ -98,7 +98,7 @@
             <p><img style="width: 140px;" src="{% static 'images/icon/bullet_logo.png' %}" alt="CoolAdmin"/> </p>
 
                            {% if request.user.is_authenticated %}
-                        <h4 style="color:#010867;">Hello {{ request.user.username }}</h4>
+                        <h4 style="color:#010867;">Branch: {{ request.user.branch.branch_name }}</h4>
                         <a href="{% url 'main:driver_logout' %}" style="color:white;border-radius: 5px; border:1px solid white;padding:8px; background:#010867;">Logout</a>
                     {% else %}
                         <!-- User is not logged in -->
