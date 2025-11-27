@@ -197,6 +197,7 @@ urlpatterns = [
     path("lr_report/", views.lr_report, name="lr_report"),
     path("update-lr-check-status/", views.update_lr_check_status, name="update_lr_check_status"),
     path("view_report/", views.view_report, name="view_report"),
+    path("customer_search/", views.customer_search, name="customer_search"),
 
 
 

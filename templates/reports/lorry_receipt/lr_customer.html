@@ -1,0 +1,609 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DESPATCH</title>
+<!-- Fontfaces CSS-->
+    <link href="{% static 'css/font-face.css' %}" rel="stylesheet" media="all">
+    <link href="{% static 'vendor/font-awesome-4.7/css/font-awesome.min.css' %}" rel="stylesheet" media="all">
+    <link href="{% static 'vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all">
+    <link href="{% static 'vendor/mdi-font/css/material-design-iconic-font.min.css' %}" rel="stylesheet" media="all">
+
+    <!-- Bootstrap CSS-->
+    <link href="{% static 'vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+
+    <!-- Vendor CSS-->
+    <link href="{% static 'vendor/animsition/animsition.min.css' %}" rel="stylesheet" media="all">
+    <link href="{% static 'vendor/bootstrap-progressbar/bootstrap-progressbar-3.3.4.min.css' %}" rel="stylesheet"
+          media="all">
+    <link href="{% static 'vendor/wow/animate.css' %}" rel="stylesheet" media="all">
+    <link href="{% static 'vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
+    <link href="{% static 'vendor/slick/slick.css' %}" rel="stylesheet" media="all">
+    <link href="{% static 'vendor/select2/select2.min.css' %}" rel="stylesheet" media="all">
+    <link href="{% static 'vendor/perfect-scrollbar/perfect-scrollbar.css' %}" rel="stylesheet" media="all">
+
+    <!-- Main CSS-->
+    <link href="{% static 'css/theme.css' %}" rel="stylesheet" media="all">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+    @media print {
+        body {
+            width: 210mm;
+            height: 297mm;
+            margin: 0;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+        }
+        #print-button {
+            display: none;
+        }
+    }
+        .form-control {
+        padding: 2px 8px;
+        font-size: 13px;
+        height: 24px !important;
+    }
+    .mb-3, .mb-2 {
+        margin-bottom: 8px !important;
+        align-items: center;
+    }
+     body {
+            font-family: Public Sans, sans-serif;
+            background-color: #f4f4f4;
+
+            margin: 0;
+            padding: 0;
+            font-size: 14px;
+            align-items: center;
+            color:black;
+
+        }
+         .logo p {
+        color:white;
+        }
+        .container_box {
+            background-color:antiquewhite;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border: 2px solid rgb(43, 114, 227);
+            margin-left:20px;
+            margin-top: 25px;
+        }
+
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+
+            margin-bottom: 5px;
+        }
+
+        
+        input, select {
+            width: 100%;
+           /* padding: 8px;*/
+            /*border-radius: 5px;*/
+            font-size: 10px;
+        }
+        select {
+        background:white;
+        
+
+        }
+        table {
+            background:white;
+            border-collapse: collapse;
+            margin-top: 20px;
+            margin-bottom:20px;
+        }
+        .table_input{
+            border:none;
+        }
+        th {
+            border: 1px solid black;
+            background:#f2f2f2;
+            padding:5px;
+            text-align: center;
+            font-size: 12px;
+        }
+        button {
+            padding: 10px;
+            background: #28a745;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+        .btn {
+            margin-top: -10px;
+            display: inline-block;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            color: white;
+            margin-right:10px;
+            margin-bottom:20px;
+        }
+
+        .btn-info{
+            margin-top: -25px;
+            display: inline-block;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            color: white;
+            margin-right:10px;
+            margin-bottom:-15px; 
+        }
+
+        .save-btn { background-color: #28a745; }
+        .back-btn { background-color: #007bff; }
+
+        .input-right {
+            text-align: right;
+        }
+    @media only screen and (max-width: 600px) {
+  .container_box  {
+    width: 90%;
+  }
+}
+    label {
+        font-weight: 500;
+        width: 90px;
+        font-size: 12px;
+    }
+    .form-group-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    .form-group-row label {
+        min-width: 120px;
+        margin-right: 8px;
+        margin-bottom: 0;
+    }
+    /* .table-container {
+            margin-top: 20px;
+            overflow-x: auto;
+        } */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th {
+            border: 1px solid #999;
+            padding: 2px;
+            text-align: center;
+        }
+        td {
+            border: 1px solid #999;
+            padding: -4px;
+            text-align: center;
+            font-size: 11px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        input[type="text"], input[type="number"] {
+            /* width: 100%; */
+            padding: -5px;
+            box-sizing: border-box;
+        }
+        .btn-delete {
+            color: white;
+            border: none;
+            padding: 0px 5px;
+            cursor: pointer;
+        }
+        .btn-delete:hover {
+            background-color: #c0392b;
+        }
+        .table_data {
+            font-size: 12px;
+            padding: 2px 4px;
+            text-align: center;
+            width: 70px; /* set a fixed width */
+            max-width: 80px; /* prevent stretching */
+            box-sizing: border-box;
+        }
+    .top-section {
+        width: 210%;
+        padding-left: 20px;
+        padding-right: 340px;
+    }
+
+
+
+    .bottom-section {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.column {
+    padding: 2px;
+    border-radius: 6px;
+   /* box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);*/
+}
+
+/* Widths to control layout */
+/* .first-column {
+    flex: 1; 
+} */
+
+.second-column {
+    flex: 0.5; /* Center - less space */
+    text-align: center;
+}
+
+.third-column {
+    padding-left: 10px;
+}
+
+/* Optional: Ensure inputs are consistent */
+.column input {
+    width: 100%;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+/* Make labels a little smaller for alignment */
+.column label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 13px;
+}
+.d-flex.align-items-center {
+    gap: 4px; /* Reduce space between label and input */
+}
+
+.d-flex.align-items-center > div {
+    margin-bottom: 0;
+    flex: 0 0 auto; /* Prevent stretching */
+    padding-right: 4px; /* Small spacing */
+}
+
+.d-flex.align-items-center label {
+    margin-bottom: 0;
+    font-size: 12px; /* Optional: reduce font size */
+    white-space: nowrap; /* Keep label on one line */
+}
+
+.d-flex.align-items-center input {
+    flex: 1; /* Let input take remaining space */
+    max-width: 150px; 
+    font-size: 13px;
+}
+
+
+/* ------------------------ INVOICE ------------------ */
+.print-only {
+    display: none;
+}
+
+/* Show only in print */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    .print-only, .print-only * {
+        visibility: visible;
+        display: block !important;
+    }
+
+    .print-only {
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+
+    table {
+        font-size: 10px;
+    }
+
+    th, td {
+        padding: 1px;
+    }
+
+    th {
+        white-space: nowrap;
+    }
+}
+.circle-checkbox {
+    width: 22px;
+    height: 10px;
+    accent-color: #010867; /* Orange */
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+
+    </style>
+        
+        <div class="container_box">
+       
+        <div class="container">
+
+<h2>Customer Wise Report</h2>
+    <div class="container">
+        <!-- 🔹 Table Section -->
+        <div class="table-container">
+            <p>LR Report Details</p>
+            <table id="billTable">
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">Sl.no</th>
+                        <th style="text-align: left;">LR Date</th>
+                        <th style="text-align: left;">LR No</th>
+                        <th style="text-align: left;">Consignee</th>
+                        <th style="text-align: left;">From</th>
+                        <th style="text-align: left;">To</th>
+                        <th style="text-align: left;">Payment</th>
+                        <th style="text-align: left;">Inv No</th>
+                        <th style="text-align: left;">Inv Amt</th>
+                        <th style="text-align: left;">Item</th>
+                        <th style="text-align: left;">Weight</th>
+                        <th style="text-align: left;">Rate</th>
+                        <th style="text-align: left;">Pkg</th>
+                        <th style="text-align: left;">Freight</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if lrs %}
+                        {% for lr in lrs %}
+                                <input type="hidden" name="lr_id[]" value="{{ lr.id }}">
+                                <tr data-lr-id="{{ lr.id }}">
+                                    <td style="text-align: center;">{{ forloop.counter }}</td>
+                                    <td style="text-align: center;">{{ lr.master.lr_date }}</td>
+                                    <td style="text-align: center;">{{ lr.master.lr_no }}</td>
+                                    <td style="text-align: left;">{{ lr.master.consignee_name }}</td>
+                                    <td style="text-align: left;">{{ lr.master.load_from }}</td>
+                                    <td style="text-align: left;"> {{ lr.master.load_to }} </td>
+                                    <td style="text-align: center;">{{ lr.master.payment }}</td>
+                                    <td style="text-align: center;">{{ lr.inv_no }}</td>
+                                    <td style="text-align: center;">{{ lr.inv_amount }}</td>
+                                    <td style="text-align: left;">{{ lr.item }}</td>
+                                    <td style="text-align: center;">{{ lr.weight }}</td>
+                                    <td style="text-align: center;">{{ lr.rate }}</td>
+                                    <td style="text-align: center;">{{ lr.pkg }}</td>
+                                    <td style="text-align: center;">{{ lr.freight }}</td>
+                                </tr>
+                        {% endfor %}
+                        <tr style="font-weight: bold; background-color: #f0f0f0;">
+                            <td colspan="13" style="text-align: right;">Grand Total: </td>
+                            <td style="text-align: center;">{{ grand_value }}</td>
+                        </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="11" style="text-align: center;">No LR found please try again</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <div class="bottom-section">
+        <div class="col-sm-12 text-end">
+            <a href="{% url 'main:customer_search' %}" id="" class="btn btn-danger btn-sm">Exit</a>
+            <button type="button" id="print-button" class="btn btn-secondary btn-sm print-button">Print</button>
+        </div>
+    </div>
+
+
+</div>
+</div>
+
+ </div>
+</div>
+
+
+
+
+<!-- ---------------------      INVOICE (PRINT VIEW)     ------------------------------>
+
+<div id="invoice-div" class="print-only">
+
+    <div style="width: 90%; margin: auto; font-family: Arial, sans-serif;">
+
+        <!-- Company Header -->
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center;">
+                <img src="{% static 'images/icon/bullet_logo.png' %}" alt="Company Logo" style="height: 70px; margin-right: 15px;">
+                <div>
+                    <h2 style="margin: 0; font-size: 22px;">{{ company.companyname }}</h2>
+                    <p style="margin: 2px 0; font-size: 13px;">
+                        {{ company.address1 }} {{ company.address2 }}<br>
+                        {{ company.address3 }} - {{ company.pinCode }}<br>
+                        GSTIN: {{ company.gst }}
+                    </p>
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <h3 style="margin: 0; font-size: 18px;">LR REPORT</h3>
+            </div>
+        </div>
+
+        <div id="print-filters" style="font-size:14px; margin-bottom:15px;">
+            <!-- JS will fill this -->
+        </div>
+
+        <!-- Table Section -->
+        <div style="margin-top: 10px;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 11px;" border="1">
+                <thead style="background-color: #f2f2f2;">
+                    <tr>
+                        <th>Sl.no</th>
+                        <th>LR Date</th>
+                        <th>LR No</th>
+                        <th>Customer</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Payment</th>
+                        <th>Inv No</th>
+                        <th>Inv Amt</th>
+                        <th>Item</th>
+                        <th>Weight</th>
+                        <th>Rate</th>
+                        <th>Freight</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lr in lrs %}
+                        <tr>
+                            <td style="text-align: center;">{{ forloop.counter }}</td>
+                            <td style="text-align: center;">{{ lr.lr_date }}</td>
+                            <td style="text-align: center;">{{ lr.lr_no }}</td>
+                            <td style="text-align: left;">{{ lr.customer }}</td>
+                            <td style="text-align: left;">{{ lr.load_from }}</td>
+                            <td style="text-align: left;">{{ lr.load_to }}</td>
+                            <td style="text-align: center;">{{ lr.payment }}</td>
+                            <td style="text-align: center;">{{ lr.inv_no }}</td>
+                            <td style="text-align: center;">{{ lr.inv_amount }}</td>
+                            <td style="text-align: left;">{{ lr.item }}</td>
+                            <td style="text-align: center;">{{ lr.weight }}</td>
+                            <td style="text-align: center;">{{ lr.rate }}</td>
+                            <td style="text-align: center;">{{ lr.freight }}</td>
+                        </tr>
+                    {% endfor %}
+                    <tr style="font-weight: bold; background-color: #e6e6e6;">
+                        <td colspan="12" style="text-align: right;">Grand Total:</td>
+                        <td style="text-align: right;">{{ grand_value }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer -->
+        <div style="margin-top: 40px; display: flex; justify-content: space-between; font-size: 13px;">
+            <div>
+                <strong>Prepared By:</strong> _______________________
+            </div>
+            <div style="text-align: right;">
+                <strong>Authorized Signatory</strong><br>
+                _______________________
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<script src="{% static 'vendor/jquery-3.2.1.min.js' %}"></script>
+
+<!-- Bootstrap JS-->
+<script src="{% static 'vendor/bootstrap-4.1/popper.min.js' %}"></script>
+<script src="{% static 'vendor/bootstrap-4.1/bootstrap.min.js' %}"></script>
+<!-- Vendor JS       -->
+<script src="{% static 'vendor/slick/slick.min.js' %}">
+</script>
+<script src="{% static 'vendor/wow/wow.min.js' %}"></script>
+<script src="{% static 'vendor/animsition/animsition.min.js' %}"></script>
+<script src="{% static 'vendor/bootstrap-progressbar/bootstrap-progressbar.min.js' %}">
+</script>
+<script src="{% static 'vendor/counter-up/jquery.waypoints.min.js' %}"></script>
+<script src="{% static 'vendor/counter-up/jquery.counterup.min.js' %}">
+</script>
+<script src="{% static 'vendor/circle-progress/circle-progress.min.js' %}"></script>
+<script src="{% static 'vendor/perfect-scrollbar/perfect-scrollbar.js' %}"></script>
+<script src="{% static 'vendor/chartjs/Chart.bundle.min.js' %}"></script>
+<script src="{% static 'vendor/select2/select2.min.js' %}">
+</script>
+
+<!-- Main JS-->
+<script src="{% static 'js/main.js' %}"></script>
+<!-- 🖨️ PRINT SCRIPT -->
+<script>
+document.getElementById("print-button").addEventListener("click", function () {
+
+    let updatedRows = "";
+    let grandTotal = 0;
+    let counter = 1;
+
+    let filterHTML = document.getElementById("print-filters").innerHTML;
+    document.querySelectorAll("tr[data-lr-id]").forEach(row => {
+        let cells = row.querySelectorAll("td");
+        updatedRows += `
+            <tr>
+                <td>${counter++}</td>
+                <td>${cells[1].innerText}</td>
+                <td>${cells[2].innerText}</td>
+                <td>${cells[3].innerText}</td>  
+                <td>${cells[4].innerText}</td>
+                <td>${cells[5].innerText}</td>
+                <td>${cells[6].innerText}</td>
+                <td>${cells[7].innerText}</td>
+                <td>${cells[8].innerText}</td>
+                <td>${cells[9].innerText}</td>
+                <td>${cells[10].innerText}</td>
+                <td>${cells[11].innerText}</td>
+                <td>${cells[13].innerText}</td>
+            </tr>
+        `;
+
+        grandTotal += parseFloat(cells[13].innerText) || 0;
+    });
+
+    let printHTML = `
+        <html>
+        <head>
+            <title>LR Report</title>
+            <style>
+                table, th, td {
+                    border: 1px solid black;
+                    border-collapse: collapse;
+                    font-size: 11px;
+                }
+                th, td { padding: 4px; }
+                th { background-color: #f2f2f2; }
+            </style>
+        </head>
+        <body>
+            ${document.getElementById("invoice-div").innerHTML.replace(
+                document.getElementById("print-filters").outerHTML,
+                filterHTML
+            ).replace(
+                /<tbody>[\s\S]*<\/tbody>/,
+                `<tbody>${updatedRows}
+                    <tr style="font-weight:bold;background:#e6e6e6;">
+                        <td colspan="12" style="text-align:right;">Grand Total:</td>
+                        <td>${grandTotal.toFixed(2)}</td>
+                    </tr>
+                </tbody>`
+            )}
+        </body>
+        </html>
+    `;
+
+    // 🔹 Open print window
+    let printWindow = window.open("", "", "width=900,height=650");
+    printWindow.document.write(printHTML);
+    printWindow.document.close();
+    printWindow.print();
+});
+function formatDate(d) {
+    if (!d) return "";
+    const parts = d.split("-");
+    return `${parts[2]}-${parts[1]}-${parts[0]}`; // dd-mm-yyyy
+}
+
+</script>
+
+
+{% endblock %}

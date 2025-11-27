@@ -8037,3 +8037,26 @@ def update_lr_check_status(request):
         lr.save()
 
         return JsonResponse({"status": "ok"})
+
+def customer_search(request):
+    customers = Table_Accountsmaster.objects.filter(group='SUNDRY DEBTORS', company__company_id=request.session.get('co_id'),
+                                                    branch__branch_name=request.session.get('branch'))
+    company = Table_Companydetailsmaster.objects.get(company_id=request.session.get('co_id'))
+    if request.method == 'POST':
+        customer = request.POST.get('customer')
+        date_from = request.POST.get('date_from')
+        date_to = request.POST.get('date_to')
+        if customer:
+            lrs = LorryReceiptItems.objects.filter(
+                master__consigner_name=customer,
+                master__lr_date__range=[date_from, date_to]
+            )
+            grand_value = sum(lr.freight for lr in lrs)
+            return render(request, 'reports/lorry_receipt/lr_customer.html', {'lrs': lrs, 'grand_value': grand_value, 'company': company})
+        else:
+            lrs = LorryReceiptItems.objects.filter(
+                master__lr_date__range=[date_from, date_to]
+            )
+            grand_value = sum(lr.freight for lr in lrs)
+            return render(request, 'reports/lorry_receipt/lr_customer.html', {'lrs': lrs, 'grand_value': grand_value, 'company': company})
+    return render(request, 'reports/lorry_receipt/customer_search.html', {'customers': customers})
