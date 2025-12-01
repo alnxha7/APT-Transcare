@@ -78,7 +78,7 @@ WSGI_APPLICATION = "magna.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'bullet_cargo_v1',
+        'NAME': 'apt_transcare_v1',
         'USER': 'root',     
         'PASSWORD': 'pentagon', 
         'HOST': 'localhost',              
