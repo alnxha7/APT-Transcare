@@ -65,7 +65,7 @@
         color:white;
         }
         .container_box {
-            background-color:antiquewhite;
+            background-color:#ffe79747;
             padding: 10px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -424,7 +424,7 @@
         <div class="form-row double" style="width: 154%;">
             <div class="field-pair">
                 <label>Series</label>
-                <select name="series" id="series" class="form-control" required style="padding: 3px 6px; font-size: 13px; height: 30px;" {% if lr.series %} disabled {% endif %}>
+                <select name="series" id="series" class="form-control" required style="padding: 3px 4px; font-size: 13px; height: 30px;" {% if lr.series %} disabled {% endif %}>
                         <option value="">Select Series</option>
                         {% for voucher in vouchers %}
                             <option value="{{ voucher.id }}" {% if lr.series.id == voucher.id %} selected {% endif %}>{{ voucher.series }}</option>
