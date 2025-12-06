@@ -4,19 +4,19 @@
 
 <div class="main_content">
     <div class="trip-form-container">
-        <h2>RUNSHEET</h2>
+        <h2>Receive</h2>
         <form method="post">
             {% csrf_token %}
 
             <!-- Area (Searchable Multi-Select with Checkboxes) -->
-<div class="form-group">
-    <label for="area">Area</label>
-    <select name="area" id="area" class="form-control" multiple="multiple">
-        {% for area in areas %}
-            <option value="{{ area.area }}">{{ area.area }}</option>
-        {% endfor %}
-    </select>
-</div>
+            <div class="form-group">
+                <label for="location">Location</label>
+                <select name="location" id="location" class="form-control">
+                    {% for location in locations %}
+                        <option value="{{ location }}">{{ location }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
             <!-- Date From -->
             <div class="form-group">
@@ -33,13 +33,13 @@
             <!-- Buttons -->
             <div class="btn-group">
                 <button type="submit" class="btn save-btn" name="action" value="despatch">
-                    <i class="fa fa-search"></i> Despatch
+                    <i class="fa fa-search"></i> Receive
                 </button>
                 <a href="{% url 'main:index' %}" class="btn back-btn">
                     <i class="fa fa-arrow-left"></i> Back
                 </a>
                 <button type="submit" class="btn save-btn" name="action" value="report">
-                    <i class="fa fa-newspaper-o"></i> Report
+                    <i class="fa fa-newspaper-o"></i> Stock
                 </button>
             </div>
 
@@ -71,7 +71,7 @@
     }
     .trip-form-container {
         width: 40%;
-        background-color: antiquewhite;
+        background-color: #FEF3E2;
         padding: 25px 40px;
         border-radius: 15px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.08);
@@ -159,23 +159,12 @@
 <script src="{% static 'vendor/select2/select2.min.js' %}"></script>
 <script>
     $(document).ready(function() {
-        $('#area').select2({
-            placeholder: "Select Area(s)",
+        $('#location').select2({
+            placeholder: "Select Location(s)",
             allowClear: true,
             width: '100%',
-            closeOnSelect: false, // keeps dropdown open while selecting
-            templateResult: formatOption, // adds checkbox-like visuals
-            templateSelection: formatSelection
+            closeOnSelect: false, 
         });
-
-        function formatOption(option) {
-            if (!option.id) return option.text;
-            return $('<span><input type="checkbox" style="margin-right:8px;">' + option.text + '</span>');
-        }
-
-        function formatSelection(option) {
-            return option.text;
-        }
     });
 </script>
 

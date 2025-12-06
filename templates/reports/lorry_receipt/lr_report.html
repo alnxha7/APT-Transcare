@@ -66,7 +66,7 @@
         color:white;
         }
         .container_box {
-            background-color:antiquewhite;
+            background-color:#FEF3E2;
             padding: 10px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -155,6 +155,10 @@
         .input-right {
             text-align: right;
         }
+
+        .row-selected {
+    background-color: #fff3a3 !important;  /* Light yellow highlighter */
+}
     @media only screen and (max-width: 600px) {
   .container_box  {
     width: 90%;
@@ -342,71 +346,6 @@
 <h2>DESPATCH</h2>
     <div class="container">
         <!-- ---------------- TOP FILTER SECTION ---------------- -->
-<form method="GET" action="" id="filterForm">
-    <div class="row" style="margin-bottom:15px;">
-
-        <!-- Date -->
-        <div class="col-md-2">
-            <label for="date" style="font-size:13px;">Date</label>
-            <input type="date" name="date" id="date"
-                   class="form-control"
-                   value="{% now 'Y-m-d' %}">
-        </div>
-
-        <!-- Vehicle No -->
-        <div class="col-md-2">
-            <label style="font-size:13px;">Vehicle No</label>
-            <select name="vehicle_no" class="form-control">
-                {% for v in vehicles %}
-                    <option value="{{ v.registration_number }}"
-                    {% if request.GET.vehicle_no == v.registration_number %}selected{% endif %}>
-                        {{ v.registration_number }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <!-- Driver Name (reduced size) -->
-        <div class="col-md-2">
-            <label style="font-size:13px;">Driver Name</label>
-            <select name="driver_name" class="form-control">
-                {% for d in drivers %}
-                    <option value="{{ d.employee_name }}"
-                    {% if request.GET.driver_name == d.employee_name %}selected{% endif %}>
-                        {{ d.employee_name }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <!-- From (increased size) -->
-        <div class="col-md-3">
-            <label style="font-size:13px;">From</label>
-            <select name="from" class="form-control">
-                {% for loc in locations %}
-                    <option value="{{ loc.location }}"
-                    {% if request.GET.from == loc.location %}selected{% endif %}>
-                        {{ loc.location }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <!-- To (increased size) -->
-        <div class="col-md-3">
-            <label style="font-size:13px;">To</label>
-            <select name="to" class="form-control">
-                {% for loc in locations %}
-                    <option value="{{ loc.location }}"
-                    {% if request.GET.to == loc.location %}selected{% endif %}>
-                        {{ loc.location }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-
-    </div>
-</form>
 
         <!-- 🔹 Table Section -->
         <div class="table-container">
@@ -419,7 +358,6 @@
                         <th style="text-align: left;">LR No</th>
                         <th style="text-align: left;">From</th>
                         <th style="text-align: left;">To</th>
-                        <th style="text-align: left;">Route</th>
                         <th style="text-align: left;">Payment</th>
                         <th style="text-align: left;">Inv No</th>
                         <th style="text-align: left;">Inv Amt</th>
@@ -441,7 +379,6 @@
                                     <td style="text-align: center;">{{ lr.master.lr_no }}</td>
                                     <td style="text-align: left;">{{ lr.master.load_from }}</td>
                                     <td style="text-align: left;"> {{ lr.master.load_to }} </td>
-                                    <td style="text-align: left;"> {{ lr.master.area }} </td>
                                     <td style="text-align: center;">{{ lr.master.payment }}</td>
                                     <td style="text-align: center;">{{ lr.inv_no }}</td>
                                     <td style="text-align: center;">{{ lr.inv_amount }}</td>
@@ -456,12 +393,12 @@
                                 </tr>
                         {% endfor %}
                         <tr style="font-weight: bold; background-color: #f0f0f0;">
-                            <td colspan="13" style="text-align: right;">Grand Total: </td>
+                            <td colspan="12" style="text-align: right;">Grand Total: </td>
                             <td style="text-align: center;">{{ grand_value }}</td>
                         </tr>
                     {% else %}
                     <tr>
-                        <td colspan="11" style="text-align: center;">No LR found please try again</td>
+                        <td colspan="10" style="text-align: center;">No LR found please try again</td>
                     </tr>
                     {% endif %}
                 </tbody>
@@ -511,10 +448,6 @@
             </div>
         </div>
 
-        <div id="print-filters" style="font-size:14px; margin-bottom:15px;">
-            <!-- JS will fill this -->
-        </div>
-
         <!-- Table Section -->
         <div style="margin-top: 10px;">
             <table style="width: 100%; border-collapse: collapse; font-size: 11px;" border="1">
@@ -525,7 +458,6 @@
                         <th>LR No</th>
                         <th>From</th>
                         <th>To</th>
-                        <th>Route</th>
                         <th>Payment</th>
                         <th>Inv No</th>
                         <th>Inv Amt</th>
@@ -544,7 +476,6 @@
                             <td style="text-align: center;">{{ lr.master.lr_no }}</td>
                             <td style="text-align: left;">{{ lr.master.load_from }}</td>
                             <td style="text-align: left;">{{ lr.master.load_to }}</td>
-                            <td style="text-align: left;">{{ lr.master.area }}</td>
                             <td style="text-align: center;">{{ lr.master.payment }}</td>
                             <td style="text-align: center;">{{ lr.inv_no }}</td>
                             <td style="text-align: center;">{{ lr.inv_amount }}</td>
@@ -556,7 +487,7 @@
                     {% endif %}
                     {% endfor %}
                     <tr style="font-weight: bold; background-color: #e6e6e6;">
-                        <td colspan="12" style="text-align: right;">Grand Total:</td>
+                        <td colspan="10" style="text-align: right;">Grand Total:</td>
                         <td style="text-align: right;">{{ grand_value }}</td>
                     </tr>
                 </tbody>
@@ -581,6 +512,17 @@
 <script>
 document.querySelectorAll(".lr-check").forEach(cb => {
     cb.addEventListener("change", function () {
+        
+        let row = this.closest("tr");
+
+        // 🔹 Highlight the row when checked
+        if (this.checked) {
+            row.classList.add("row-selected");
+        } else {
+            row.classList.remove("row-selected");
+        }
+
+        // 🔹 Save checkbox state to backend
         fetch("/update-lr-check-status/", {
             method: "POST",
             headers: {
@@ -652,30 +594,12 @@ document.getElementById("print-button").addEventListener("click", function () {
                     <td>${cells[9].innerText}</td>
                     <td>${cells[10].innerText}</td>
                     <td>${cells[11].innerText}</td>
-                    <td>${cells[13].innerText}</td>
                 </tr>
             `;
 
-            grandTotal += parseFloat(cells[13].innerText) || 0;
+            grandTotal += parseFloat(cells[11].innerText) || 0;
         }
     });
-
-    let dateVal = formatDate(document.getElementById("date").value);
-    let vehicleVal = document.querySelector("select[name='vehicle_no']").value || "";
-    let driverVal = document.querySelector("select[name='driver_name']").value || "";
-    let fromVal = document.querySelector("select[name='from']").value || "";
-    let toVal = document.querySelector("select[name='to']").value || "";
-
-    // 🔹 Build filter display HTML
-    let filterHTML = `
-        <div style="font-size:14px; margin-bottom:10px;">
-            <p><strong>Date:</strong> ${dateVal || "-"}</p>
-            <p><strong>Vehicle:</strong> ${vehicleVal || "-"}</p>
-            <p><strong>Driver:</strong> ${driverVal || "-"} </p>
-            <p><strong>From:</strong> ${fromVal || "-"}</p>
-            <p><strong>To:</strong> ${toVal || "-"}</p>
-        </div>
-    `;
 
     // 🔹 Build updated print HTML
     let printHTML = `
@@ -694,13 +618,10 @@ document.getElementById("print-button").addEventListener("click", function () {
         </head>
         <body>
             ${document.getElementById("invoice-div").innerHTML.replace(
-                document.getElementById("print-filters").outerHTML,
-                filterHTML
-            ).replace(
                 /<tbody>[\s\S]*<\/tbody>/,
                 `<tbody>${updatedRows}
                     <tr style="font-weight:bold;background:#e6e6e6;">
-                        <td colspan="12" style="text-align:right;">Grand Total:</td>
+                        <td colspan="11" style="text-align:right;">Grand Total:</td>
                         <td>${grandTotal.toFixed(2)}</td>
                     </tr>
                 </tbody>`
@@ -715,11 +636,6 @@ document.getElementById("print-button").addEventListener("click", function () {
     printWindow.document.close();
     printWindow.print();
 });
-function formatDate(d) {
-    if (!d) return "";
-    const parts = d.split("-");
-    return `${parts[2]}-${parts[1]}-${parts[0]}`; // dd-mm-yyyy
-}
 
 </script>
 

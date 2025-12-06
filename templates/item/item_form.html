@@ -150,7 +150,8 @@
     <div class="row mb-2">
         <div class="col-md-12 d-flex align-items-center">
             <label for="name" class="form-label me-2 mb-0" style="width: 85px;">ITEM Name</label>
-            <input type="text" class="form-control p-1" name="name" {% if updation %}readonly{% endif %} value="{{ item.name|default:'' }}" style="font-weight: bold; background-color: #90EE90; color: black;">
+            <input type="text" class="form-control p-1" name="name" {% if updation %}readonly{% endif %} value="{{ item.name|default:'' }}" 
+            oninput="this.value = this.value.toUpperCase();" style="font-weight: bold; background-color: #90EE90; color: black;">
         </div>
             {% if name_error %}
             <small class="text-danger">{{ name_error }}</small>

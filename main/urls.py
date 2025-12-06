@@ -199,6 +199,10 @@ urlpatterns = [
     path("view_report/", views.view_report, name="view_report"),
     path("customer_search/", views.customer_search, name="customer_search"),
 
+    path("cash_receipt_search/", views.cash_receipt_search, name="cash_receipt_search"),
+    path("lr_edit_cash_receipt/<int:lr_id>/", views.lr_edit_cash_receipt, name="lr_edit_cash_receipt"),
+    path('get_serial_number_cr/', views.get_serial_number_cr, name='get_serial_number_cr'),
+
 
 
     # accounts - debit-note

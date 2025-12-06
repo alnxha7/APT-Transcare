@@ -412,7 +412,7 @@
  <div class="container">
 
 
-<h2>Lorry Receipt</h2>
+<h2>Cash Receipt</h2>
 
 <form method="post" id="bill-form">
     {% csrf_token %}
@@ -424,16 +424,16 @@
         <div class="form-row double" style="width: 154%;">
             <div class="field-pair">
                 <label>Series</label>
-                <select name="series" id="series" class="form-control" required style="padding: 3px 4px; font-size: 13px; height: 30px;" {% if lr.series %} disabled {% endif %}>
-                        <option value="">Select Series</option>
-                        {% for voucher in vouchers %}
-                            <option value="{{ voucher.id }}" {% if lr.series.id == voucher.id %} selected {% endif %}>{{ voucher.series }}</option>
-                        {% endfor %}
-                    </select>
+                <select name="series" id="series" class="form-control" required style="padding: 3px 4px; font-size: 13px; height: 30px;">
+                    <option value="">Select Series</option>
+                    {% for voucher in vouchers %}
+                        <option value="{{ voucher.id }}">{{ voucher.series }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="field-pair">
-                <label>Lr No</label>
-                <input type="text" name="entry_number" id="entry_number" class="form-control" value="{{ lr.lr_no }}" readonly required>
+                <label>Receipt No</label>
+                <input type="text" name="entry_number" id="entry_number" class="form-control" readonly required>
             </div>
             <div class="field-pair">
             <label>Date</label>
@@ -475,12 +475,7 @@
 
         <div class="form-row">
             <label>Vehicle No</label>
-            <select id="vehicle_no" name="vehicle_no" class="form-control" style="width:230px;height:25px;padding:0 4px;">
-                <option value="">Select series</option>
-                {% for vehicle in vehicles %}
-                <option value="{{ vehicle.registration_number }}" {% if lr.vehicle_no == vehicle.registration_number %} selected {% endif %}> {{ vehicle.registration_number }} </option>
-                {% endfor %}
-            </select>
+            <input type="text" name="vehicle_no" id="vehicle_no" class="form-control" value="{{ lr.vehicle_no }}">
         </div>
 
         <div class="form-row">
@@ -583,44 +578,14 @@
   <div class="column" style="flex:1;min-width:250px;">
     <div class="d-flex align-items-center" style="margin-bottom:8px;">
       <label for="load_from" style="width:90px;">Load From</label>
-      <select name="load_from" id="load_from"
-              class="form-control"
-              style="width:230px;height:25px;padding:0 4px;" required>
-        <option value="">Select</option>
-        {% for loc in locations %}
-          <option value="{{ loc.location }}" {% if loc.location == lr.load_from %}selected{% endif %}>
-            {{ loc.location }}
-          </option>
-        {% endfor %}
-      </select>
+      <input type="text" name="load_from" id="load_from" class="form-control" value="{{ lr.load_from }}"
+             style="max-width:230px;height:25px;padding:0 4px;" required>
     </div>
 
     <div class="d-flex align-items-center" style="margin-bottom:8px;">
       <label for="load_to" style="width:90px;">Load To</label>
-      <select name="load_to" id="load_to"
-              class="form-control"
-              style="width:230px;height:25px;padding:0 4px;" required>
-        <option value="">Select</option>
-        {% for loc in locations %}
-          <option value="{{ loc.location }}" {% if loc.location == lr.load_to %}selected{% endif %}>
-            {{ loc.location }}
-          </option>
-        {% endfor %}
-      </select>
-    </div>
-
-    <div class="d-flex align-items-center" style="margin-bottom:8px;">
-      <label for="branch" style="width:90px;">Branch</label>
-      <select name="branch" id="branch"
-              class="form-control"
-              style="width:230px;height:25px;padding:0 4px;" required>
-        <option value="">Select</option>
-        {% for bra in branches %}
-          <option value="{{ bra.branch_name }}" {% if bra.branch_name == lr.branch_to %}selected{% endif %}>
-            {{ bra.branch_name }}
-          </option>
-        {% endfor %}
-      </select>
+      <input type="text" name="load_to" id="load_to" class="form-control" value="{{ lr.load_to }}"
+             style="max-width:230px;height:25px;padding:0 4px;" required>
     </div>
   </div>
 
@@ -732,174 +697,86 @@
 <div id="print-header" 
      style="display:none; width:100%; padding:10px 30px; box-sizing:border-box; background:white;">
 
-  <!-- ========================= HEADER ROW ========================= -->
-  <div style="display:flex; width:100%;">
+<!-- ===================== HEADER START ===================== -->
 
-    <!-- LEFT: Logo -->
-    <div style="flex:1; display:flex; align-items:flex-start;">
-      <img src="{% static 'images/icon/apt_logo.png' %}" 
-           alt="Company Logo"
-           style="width:140px; height:auto; margin-top:10px;">
-    </div>
+<div style="display:flex; width:100%; align-items:center; padding:10px 20px; box-sizing:border-box;">
 
-    <!-- CENTER -->
-    <div style="flex:2; text-align:center;">
-
-      <div style="font-size:10px; margin-bottom:5px; font-weight:600;">
-        Goods consignment under this note is at owner's risk subjected to Coimbatore jurisdiction only
-      </div>
-
-      <div style="font-size:36px; font-weight:800; text-transform:uppercase; color: green;">
-        {{ lr.company.companyname }}
-      </div>
-
-      <div style="font-size:14px; margin-top:3px; font-weight:600;">
-        Goods and Transport Agency
-      </div>
-
-      <div style="font-size:12px; margin-top:6px; line-height:1.4;">
-        {{ lr.company.address1 }}<br>
-        {{ lr.company.address2 }} {{ lr.company.address3 }}<br>
-        Phone: {{ lr.company.phoneno }} | Mobile: {{ lr.company.mobile }}
-      </div>
-
-    </div>
-
-    <!-- RIGHT: Booking Office -->
-    <div style="flex:1; display:flex; justify-content:flex-end;">
-      <div style="border:1px solid #000; padding:10px; width:180px; font-size:12px;">
-        <div style="font-weight:bold; margin-bottom:5px;">Booking Office:</div>
-      </div>
-    </div>
-
-  </div> <!-- END HEADER ROW -->
-
-
-  <!-- ========================= SECTION 2 ========================= -->
-  <div style="display:flex; width:100%; margin-top:10px; gap:10px;">
-
-    <!-- LEFT HALF -->
+    <!-- LEFT : LOGO -->
     <div style="flex:1;">
+        <img src="{% static 'images/icon/apt_logo.png' %}" 
+             alt="Company Logo"
+             style="width:130px; height:auto;">
+    </div>
 
-      <!-- GST No -->
-      <div style="font-size:20px; font-weight:700; margin-bottom:8px;">
-        GST No: {{ lr.company.gst }}
-      </div>
+    <!-- CENTER : COMPANY DETAILS -->
+    <div style="flex:3; text-align:center; line-height:1.4;">
 
-      <!-- 3 BOXES HORIZONTAL -->
-      <div style="display:flex; gap:10px; margin-bottom:10px;">
-
-        <!-- BOX 1 -->
-        <div style="flex:1; border:1px solid #000; padding:8px; font-size:12px; line-height:1.4;">
-          <div><strong>Consignee Copy</strong></div>
-          <div>CONSIGNMENT</div>
-          <div style="margin-top:6px; display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
-            <label style="display:flex; align-items:center; gap:6px;">
-              <input type="checkbox" style="width:14px; height:14px;">
-              <span>Insured</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:6px;">
-              <input type="checkbox" style="width:14px; height:14px;">
-              <span>Not Insured</span>
-            </label>
-          </div>
+        <!-- Company Name -->
+        <div style="font-size:32px; font-weight:800; text-transform:uppercase;">
+            {{ lr.company.companyname }}
         </div>
 
-        <!-- BOX 2 -->
-        <div style="flex:1; border:1px solid #000; padding:8px; font-size:12px;">
-          <strong>Invoice / Sales Tax Permit No:</strong>
-          <div style="margin-top:4px;">{{ lr.sales_tax_no }}</div>
+        <!-- Company Address -->
+        <div style="font-size:13px; margin-top:6px;">
+            {{ lr.company.address1 }}<br>
+            {{ lr.company.address2 }} {{ lr.company.address3 }}
         </div>
 
-        <!-- BOX 3 -->
-        <div style="flex:1; border:1px solid #000; padding:8px; font-size:12px;">
-          <strong>At Owner's Risk</strong>
-          <div style="margin-top:4px;"><strong>Delivery Address:</strong></div>
-          <div>{{ lr.delivery_address }}</div>
+        <!-- Phone Numbers -->
+        <div style="font-size:13px; margin-top:4px;">
+            Phone: {{ lr.company.phoneno }}  
+            &nbsp; | &nbsp;  
+            Mobile: {{ lr.company.mobile }}
         </div>
 
-      </div>
+        <!-- GST Number -->
+        <div style="font-size:14px; margin-top:4px; font-weight:600;">
+            GST No: {{ lr.company.gst }}
+        </div>
 
-      <!-- CONSIGNOR / CONSIGNEE INFO -->
-      <div style="margin-top:10px; font-size:13px; line-height:1.5;">
+    </div>
+
+    <!-- RIGHT : EMPTY / FUTURE USE -->
+    <div style="flex:1;"></div>
+
+</div>
+<!-- ======= CASH RECEIPT HEADING ======= -->
+<div style="text-align:center; margin-top:5px; margin-bottom:10px;">
+    <span style="font-size:20px; font-weight:700; text-decoration:underline;">
+        CASH RECEIPT
+    </span>
+</div>
+<!-- ===================== HEADER END ===================== -->
+
+<!-- ===================== DETAILS SECTION ===================== -->
+
+<div style="display:flex; width:100%; gap:20px; margin-top:10px; font-size:14px;">
+
+    <!-- LEFT COLUMN -->
+    <div style="flex:1; line-height:1.8;">
+
+        <div><strong>CR No:</strong> {{ lr.receipt_no }}</div>
+        <div><strong>CR Date:</strong> {{ lr.receipt_date }}</div>
+        <div><strong>LR No:</strong> {{ lr.lr_no }}</div>
+        <div><strong>LR Date:</strong> {{ lr.lr_date }}</div>
         <div><strong>Consignor:</strong> {{ lr.consigner_name }}</div>
-        <div><strong>GST No:</strong> {{ lr.consigner_account.gstno }}</div>
-        <div style="margin-top:6px;"><strong>Consignee:</strong> {{ lr.consignee_name }}</div>
-        <div><strong>GST No:</strong> {{ lr.consignee_account.gstno }}</div>
-      </div>
-
-    </div> <!-- END LEFT HALF -->
-
-
-
-    <!-- RIGHT HALF -->
-    <div style="flex:1; display:flex; flex-direction:column; gap:10px;">
-
-      <!-- CONSIGNMENT NOTE -->
-      <div style="border:1px solid #000; padding:8px; font-size:13px;">
-        <div style="font-weight:700; text-align:center; margin-bottom:6px;">
-          CONSIGNMENT NOTE
-        </div>
-
-        <div><strong>No:</strong> {{ lr.lr_no }}</div>
-        <div><strong>Date:</strong> {{ lr.lr_date }}</div>
-        <div style="margin-top:6px;"><strong>From:</strong> {{ lr.load_from }}</div>
+        
+    </div>
+    
+    <!-- RIGHT COLUMN -->
+    <div style="flex:1; line-height:1.8;">
+        
+        <div><strong>From:</strong> {{ lr.load_from }}</div>
         <div><strong>To:</strong> {{ lr.load_to }}</div>
-      </div>
+        <div><strong>Payment Mode:</strong> {{ lr.payment }}</div>
+        <div><strong>Branch:</strong> {{ lr.branch.branch_name }}</div>
+        <div><strong>Consignee:</strong> {{ lr.consignee_name }}</div>
 
-      <!-- LIABILITY BOX -->
-      <div style="border:1px solid #000; padding:8px; font-size:13px;">
+    </div>
 
-        <div style="font-weight:700; text-align:center; margin-bottom:6px;">
-          Person Liable to Pay @ 5%<br>
-          (Subject to Reverse Charge Mechanism)
-        </div>
+</div>
 
-        <!-- Two rows -->
-        <div style="display:flex; flex-direction:column; gap:6px;">
-
-          <!-- ROW 1 -->
-          <div style="display:flex; align-items:center;">
-            <div style="flex:0.4; display:flex; gap:6px; align-items:center;">
-              <input type="checkbox" style="width:16px; height:16px;">
-              <span style="font-size:12px;">Consignor</span>
-            </div>
-            <div style="flex:0.6;">
-              <div style="border:1px solid #000; height:22px;"></div>
-            </div>
-          </div>
-
-          <!-- ROW 2 -->
-          <div style="display:flex; align-items:center;">
-            <div style="flex:0.4; display:flex; gap:6px; align-items:center;">
-              <input type="checkbox" style="width:16px; height:16px;">
-              <span style="font-size:12px;">Consignee</span>
-            </div>
-            <div style="flex:0.6;">
-              <div style="border:1px solid #000; height:22px;"></div>
-            </div>
-          </div>
-
-          <!-- ROW 3 -->
-          <div style="display:flex; align-items:center;">
-            <div style="flex:0.4; display:flex; gap:6px; align-items:center;">
-              <input type="checkbox" style="width:16px; height:16px;">
-              <span style="font-size:12px;">Transport</span>
-            </div>
-            <div style="flex:0.6;">
-              <div style="border:1px solid #000; height:22px;"></div>
-            </div>
-          </div>
-
-        </div>
-
-      </div> <!-- END LIABILITY BOX -->
-
-    </div> <!-- END RIGHT HALF -->
-
-  </div> <!-- END SECTION 2 -->
-
-  <!-- ===================== ITEM TABLE ====================== -->
+ <!-- ===================== ITEM TABLE ====================== -->
 
 <table border="1" style="width:100%; border-collapse:collapse; margin-top:10px; font-size:12px; text-align:center;">
     <thead>
@@ -955,74 +832,61 @@
     </tbody>
 </table>
 
-<!-- ===================================================== -->
-<!-- LEFT SIDE : DECLARATION ONLY                         -->
-<!-- ===================================================== -->
-<div style="display:flex; width:100%; margin-top:10px; gap:25px;">
+<!-- ===================== CHARGES SECTION ===================== -->
 
-    <div style="flex:1; min-width:260px;">
+<div style="display:flex; width:100%; margin-top:12px; gap:40px; font-size:14px;">
 
-        <div style="border:1px solid #000; padding:10px; font-size:12px; line-height:1.5;">
-            <div style="margin-bottom:6px;"><strong>Declaration:</strong></div>
-            <div style="margin-bottom:4px;">1) Carrier are not responsible for breakage and leakage in transit.</div>
-            <div>2) Goods as per details above are accepted for carriage on the terms and conditions as stated overleaf.</div>
+    <!-- LEFT COLUMN: INDIVIDUAL CHARGES -->
+    <div style="flex:1; line-height:1.8;">
+
+        <div style="display:flex; justify-content:space-between;">
+            <span>Hamali</span>
+            <span>{{ lr.hamali|default:'0.00' }}</span>
+        </div>
+
+        <div style="display:flex; justify-content:space-between;">
+            <span>Door CL/DL</span>
+            <span>{{ lr.door_cl_dl|default:'0.00' }}</span>
+        </div>
+
+        <div style="display:flex; justify-content:space-between;">
+            <span>Risk Charge</span>
+            <span>{{ lr.risk_charge|default:'0.00' }}</span>
+        </div>
+
+        <div style="display:flex; justify-content:space-between;">
+            <span>Statutory Charge</span>
+            <span>{{ lr.statutory_charge|default:'0.00' }}</span>
         </div>
 
     </div>
 
-<!-- RIGHT SIDE : COMPACT BILL CHARGES -->
-<div style="min-width:180px; font-size:12px; line-height:1.5;">
+    <!-- RIGHT COLUMN: TOTALS -->
+    <div style="flex:1; line-height:1.8;">
 
-    <!-- GROSS AMOUNT -->
-    <div style="display:flex; justify-content:space-between;">
-        <label>Gross Amount</label>
-        <span>{{ lr.gross_amount|default:'0.00' }}</span>
-    </div>
+        <div style="display:flex; justify-content:space-between;">
+            <strong>Gross Amount</strong>
+            <strong>{{ lr.gross_amount|default:'0.00' }}</strong>
+        </div>
 
-    <!-- HAMALI -->
-    <div style="display:flex; justify-content:space-between;">
-        <label>Hamali</label>
-        <span>{{ lr.hamali|default:'0.00' }}</span>
-    </div>
+        <div style="display:flex; justify-content:space-between;">
+            <strong>Total Charges</strong>
+            <strong>{{ lr.total_charges|default:'0.00' }}</strong>
+        </div>
 
-    <!-- DOOR CL/DL -->
-    <div style="display:flex; justify-content:space-between;">
-        <label>Door CL/DL</label>
-        <span>{{ lr.door_cl_dl|default:'0.00' }}</span>
-    </div>
+        <div style="display:flex; justify-content:space-between; margin-top:6px;">
+            <span style="font-weight:bold; font-size:16px;">Grand Total</span>
+            <span style="font-weight:bold; font-size:17px; color:green;">
+                {{ lr.grand_total|default:'0.00' }}
+            </span>
+        </div>
 
-    <!-- RISK CHARGE -->
-    <div style="display:flex; justify-content:space-between;">
-        <label>Risk Charge</label>
-        <span>{{ lr.risk_charge|default:'0.00' }}</span>
-    </div>
-
-    <!-- STATUTORY CHARGE -->
-    <div style="display:flex; justify-content:space-between;">
-        <label>Statutory</label>
-        <span>{{ lr.statutory_charge|default:'0.00' }}</span>
-    </div>
-
-    <!-- TOTAL CHARGES -->
-    <div style="display:flex; justify-content:space-between; font-weight:bold;">
-        <label>Total Charges</label>
-        <span>{{ lr.total_charges|default:'0.00' }}</span>
-    </div>
-
-    <!-- GRAND TOTAL (COMPACT DISPLAY) -->
-    <div style="display:flex; justify-content:space-between; margin-top:2px;">
-        <label style="font-weight:bold; font-size:16px;">Grand Total</label>
-        <span style="font-size:16px; font-weight:bold; color: green;">
-            {{ lr.grand_total|default:'0.00' }}
-        </span>
     </div>
 
 </div>
 
-
 </div>
 
-</div>
 
 <!-- --------------------------------------------------- INVOICE END ----------------------------------------------------- -->
 
@@ -1072,10 +936,10 @@
     }).then((result) => {
         if (result.isConfirmed) {
             printInvoice();  
-            window.location.href = "{% url 'main:lorry_receipt' %}"
+            window.location.href = "{% url 'main:cash_receipt_search' %}"
         }
         else {
-            window.location.href = "{% url 'main:lorry_receipt' %}"
+            window.location.href = "{% url 'main:cash_receipt_search' %}"
         }
     });
 </script>
@@ -1088,10 +952,10 @@
         confirmButtonText: 'OK',
     }).then((result) => {
         if (result.isConfirmed) {
-            window.location.href = "{% url 'main:lr_search' %}"
+            window.location.href = "{% url 'main:cash_receipt_search' %}"
         }
         else {
-            window.location.href = "{% url 'main:lr_search' %}"
+            window.location.href = "{% url 'main:cash_receipt_search' %}"
         }
     });
 </script>
@@ -1104,10 +968,10 @@
         confirmButtonText: 'OK',
     }).then((result) => {
         if (result.isConfirmed) {
-            window.location.href = "{% url 'main:lorry_receipt' %}"
+            window.location.href = "{% url 'main:cash_receipt_search' %}"
         }
         else {
-            window.location.href = "{% url 'main:lorry_receipt' %}"
+            window.location.href = "{% url 'main:cash_receipt_search' %}"
         }
     });
 </script>
@@ -1118,6 +982,10 @@
         title: 'Error',
         text: 'Error Saving the LR....Please Try Again.....!!! {{error|escapejs}}',
         confirmButtonText: 'OK'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = "{% url 'main:cash_receipt_search' %}"
+        }
     });
 </script>
 {% endif %}
@@ -1125,7 +993,7 @@
     document.getElementById('series').addEventListener('change', function () {
         const seriesId = this.value;
         if (seriesId) {
-            fetch(`/get_serial_number_lr/?series_id=${seriesId}`)
+            fetch(`/get_serial_number_cr/?series_id=${seriesId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.serial_no !== undefined) {

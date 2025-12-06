@@ -67,8 +67,18 @@
                     <li><a href="{% url 'main:lorry_receipt' %}">Entry</a></li>
                     <li><a href="{% url 'main:lr_search' %}">Edit</a></li>
                     <li><a href="{% url 'main:lr_delete_search' %}">Delete</a></li>
-                    <li><a href="{% url 'main:lr_report_search' %}">Runsheet</a></li>
+                    <li><a href="{% url 'main:lr_report_search' %}">Receive</a></li>
                     <li><a href="{% url 'main:customer_search' %}">Report</a></li>
+                </ul>
+            </li>
+
+            <li class="has-sub">
+                <a href="#">
+                    <i class="fas fa-clone"></i><span>Cash Receipt</span>
+                    <i class="arrow fas fa-chevron-right"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="{% url 'main:cash_receipt_search' %}">Cash Receipt</a></li>
                 </ul>
             </li>
 <li class="has-sub">

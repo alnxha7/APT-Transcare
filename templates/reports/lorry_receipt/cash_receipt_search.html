@@ -122,16 +122,26 @@
 
 <div class="main_content">
     <div class="bill-form-container">
-        <h2>Modify LR</h2>
+        <h2>Cash Receipt LR</h2>
         <form method="post">
             {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="branch">Branch</label>
+                <select name="branch" id="branch" class="form-control" required>
+                    <option value="">Select Branch</option>
+                    {% for b in branches %}
+                        <option value="{{ b }}">{{ b }}</option>
+                    {% endfor %}
+                </select>
+            </div>
             
             <div class="form-group">
                 <label for="series">Series</label>
                 <select name="series" id="series" class="form-control" required>
                     <option value="">Select Series</option>
                     {% for s in series %}
-                        <option value="{{ s.id }}">{{ s.series }}</option>
+                        <option value="{{ s }}">{{ s }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -163,7 +173,7 @@
 
 <script>
     $(document).ready(function() {
-        $('#series').select2({
+        $('#series, #branch').select2({
             placeholder: "Select Series",
             allowClear: true,
             width: '100%'

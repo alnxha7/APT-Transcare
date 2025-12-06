@@ -20,7 +20,7 @@ body {
 .sidebar {
   width: 260px;   /* always full width */
   height: 100vh;
-  background: #e38c00;
+  background: #d88604;
   color: var(--text);
   position: fixed;
   top: 0; left: 0;

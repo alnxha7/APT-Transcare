@@ -65,7 +65,7 @@
         color:white;
         }
         .container_box {
-            background-color:antiquewhite;
+            background-color:#FEF3E2;
             padding: 10px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -337,11 +337,11 @@
        
         <div class="container">
 
-<h2>LR Report</h2>
+<h2>STOCK</h2>
     <div class="container">
         <!-- 🔹 Table Section -->
         <div class="table-container">
-            <p>LR Report Details</p>
+            <p>LR Stock Details</p>
             <table id="billTable">
                 <thead>
                     <tr>
@@ -350,7 +350,7 @@
                         <th style="text-align: left;">LR No</th>
                         <th style="text-align: left;">From</th>
                         <th style="text-align: left;">To</th>
-                        <th style="text-align: left;">Route</th>
+                        <th style="text-align: left;">Branch</th>
                         <th style="text-align: left;">Payment</th>
                         <th style="text-align: left;">Inv No</th>
                         <th style="text-align: left;">Inv Amt</th>
@@ -372,7 +372,7 @@
                                     <td style="text-align: center;">{{ lr.master.lr_no }}</td>
                                     <td style="text-align: left;">{{ lr.master.load_from }}</td>
                                     <td style="text-align: left;"> {{ lr.master.load_to }} </td>
-                                    <td style="text-align: left;"> {{ lr.master.area }} </td>
+                                    <td style="text-align: left;"> {{ lr.master.branch_to }} </td>
                                     <td style="text-align: center;">{{ lr.master.payment }}</td>
                                     <td style="text-align: center;">{{ lr.inv_no }}</td>
                                     <td style="text-align: center;">{{ lr.inv_amount }}</td>

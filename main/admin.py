@@ -180,7 +180,7 @@ from .models import LorryReceiptMaster, LorryReceiptItems
 @admin.register(LorryReceiptMaster)
 class LorryReceiptMasterAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'lr_no', 'lr_date', 'company', 'branch',
+        'id', 'lr_no', 'lr_date', 'company', 'branch', 'branch_to',
         'consigner_name', 'consignee_name', 'vehicle_no',
         'total_charges', 'grand_total'
     )
@@ -193,6 +193,34 @@ class LorryReceiptMasterAdmin(admin.ModelAdmin):
 class LorryReceiptItemsAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'master', 'checked', 'item_code', 'item', 'weight', 'rate', 'freight', 'pkg'
+    )
+    list_filter = ('master',)
+    search_fields = ('item_code', 'item', 'pkg')
+
+from .models import User
+from django.contrib.auth.admin import UserAdmin
+
+admin.site.register(User, UserAdmin)
+
+from .models import CashReceipt, CashReceiptItems
+
+
+@admin.register(CashReceipt)
+class CashReceiptAdmin(admin.ModelAdmin):
+    list_display = (
+        'id', 'receipt_no', 'receipt_date', 'company', 'branch',
+        'consigner_name', 'consignee_name', 'vehicle_no',
+        'total_charges', 'grand_total'
+    )
+    list_filter = ('company', 'branch', 'receipt_date')
+    search_fields = ('receipt_no', 'consigner_name', 'consignee_name', 'vehicle_no')
+    date_hierarchy = 'receipt_date'
+
+
+@admin.register(CashReceiptItems)
+class CashReceiptItemsAdmin(admin.ModelAdmin):
+    list_display = (
+        'id', 'master', 'item_code', 'item', 'weight', 'rate', 'freight', 'pkg'
     )
     list_filter = ('master',)
     search_fields = ('item_code', 'item', 'pkg')

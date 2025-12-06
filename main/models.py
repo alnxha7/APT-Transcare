@@ -293,11 +293,11 @@ class Table_Accountsmaster(models.Model):
 
 
     class Meta:
-        unique_together = ('user', 'head')  # Uniqueness is enforced per user 
+        unique_together = ('branch', 'head')  # Uniqueness is enforced per user 
 
     def save(self, *args, **kwargs):
         if not self.account_code:
-            last_id = Table_Accountsmaster.objects.filter(user=self.user).aggregate(max_id=Max('account_code'))['max_id']
+            last_id = Table_Accountsmaster.objects.filter(branch=self.branch).aggregate(max_id=Max('account_code'))['max_id']
             self.account_code = (last_id or 999) + 1
 
         if self.head:
@@ -368,6 +368,7 @@ class VoucherConfiguration(models.Model):
         ('Trip sheet', 'Trip sheet'),
         ('Sales', 'Sales'),
         ('Lorry Receipt', 'Lorry Receipt'),
+        ('Cash Receipt', 'Cash Receipt'),
         ('Service Voucher', 'Service Voucher'),
     ]
     category = models.CharField(max_length=255, choices=CATEGORY_CHOICES)
@@ -785,11 +786,18 @@ class LorryReceiptMaster(models.Model):
 
     payment = models.CharField(max_length=50)
     vehicle_no = models.CharField(max_length=80, null=True, blank=True)
-    district = models.CharField(max_length=150)
+    remarks = models.CharField(max_length=255, null=True, blank=True)
 
     load_from = models.CharField(max_length=100)
     load_to = models.CharField(max_length=100)
-    area = models.CharField(max_length=200, null=True, blank=True)
+    branch_to = models.CharField(max_length=100, default='TRIVANDRUM')
+
+    hamali = models.FloatField(default=0.00)
+    door_cl_dl = models.FloatField(default=0.00)
+    risk_charge = models.FloatField(default=0.00)
+    statutory_charge = models.FloatField(default=0.00)
+
+    gross_amount = models.FloatField(default=0.00)
     total_charges = models.FloatField()
     grand_total = models.FloatField()
 
@@ -804,3 +812,47 @@ class LorryReceiptItems(models.Model):
     freight = models.FloatField()
     pkg = models.CharField(max_length=255)
     checked = models.BooleanField(default=False)
+
+class CashReceipt(models.Model):
+    company = models.ForeignKey(Table_Companydetailsmaster, on_delete=models.CASCADE, null=True, blank=True)
+    branch = models.ForeignKey(Branch_master, on_delete=models.CASCADE, null=True, blank=True)
+    fy_code = models.CharField(max_length=15, default='2025-2026')
+    lr = models.ForeignKey(LorryReceiptMaster, on_delete=models.SET_NULL, null=True, blank=True)
+    series = models.ForeignKey(VoucherConfiguration,on_delete=models.CASCADE)
+    receipt_no = models.PositiveIntegerField()
+    receipt_date = models.DateField()
+
+    consigner_name = models.CharField(max_length=200)
+    consigner_code = models.IntegerField()
+    consigner_account = models.ForeignKey(Table_Accountsmaster,on_delete=models.SET_NULL, null=True, blank=True, related_name='cash_consigner_accounts')
+
+    consignee_name = models.CharField(max_length=200)
+    consignee_code = models.IntegerField()
+    consignee_account = models.ForeignKey(Table_Accountsmaster,on_delete=models.SET_NULL, null=True, blank=True, related_name='cash_consignee_accounts')
+
+    payment = models.CharField(max_length=50)
+    vehicle_no = models.CharField(max_length=80, null=True, blank=True)
+    remarks = models.CharField(max_length=255, null=True, blank=True)
+
+    load_from = models.CharField(max_length=100)
+    load_to = models.CharField(max_length=100)
+
+    hamali = models.FloatField(default=0.00)
+    door_cl_dl = models.FloatField(default=0.00)
+    risk_charge = models.FloatField(default=0.00)
+    statutory_charge = models.FloatField(default=0.00)
+
+    gross_amount = models.FloatField(default=0.00)
+    total_charges = models.FloatField()
+    grand_total = models.FloatField()
+
+class CashReceiptItems(models.Model):
+    master = models.ForeignKey(CashReceipt, on_delete=models.CASCADE)
+    item_code = models.CharField(max_length=255)
+    item = models.CharField(max_length=255)
+    inv_no = models.CharField(max_length=255)
+    weight = models.FloatField()
+    rate = models.FloatField()
+    inv_amount = models.FloatField()
+    freight = models.FloatField()
+    pkg = models.CharField(max_length=255)
