@@ -13,6 +13,7 @@ from django.urls import reverse
 from django.db.models import Max
 from .models import Brand, Vehicle, Vehicle_type, Vehicle_master, Employee_master, Trip_sheet, VoucherConfiguration, Table_companyDetailschild, Table_BillItems, Table_BillMaster, LocationMaster, VendorMaster    
 from django.db.models import Max
+from .models import GoodsDespatchMemo, GDMChild, LorryHire
 
     
 from django.contrib.auth import get_user_model
@@ -7916,75 +7917,72 @@ def lr_delete(request, lr_id):
         return render(request, 'lorry_receipt/lr_delete.html', {'error': str(e)})
 
 def lr_report_search(request):
-    locations = LorryReceiptMaster.objects.filter(company__company_id=request.session.get('co_id'), 
+    locations = GoodsDespatchMemo.objects.filter(company__company_id=request.session.get('co_id'), 
                                                   branch_to=request.session.get('branch')).values_list('branch__branch_name', flat=True).distinct()
+    series = GoodsDespatchMemo.objects.filter(company__company_id=request.session.get('co_id'), 
+                                                  branch_to=request.session.get('branch')).values('series__series', 'branch__branch_name', 'series__id').distinct()
     if request.method == 'POST':
         location = request.POST.get('location')
-        date_from = request.POST.get('date_from')
-        date_to = request.POST.get('date_to')
+        series_selected = request.POST.get('series')
+        gdm_no = request.POST.get('gdm_no')
         action = request.POST.get('action')
 
         if action == 'report':
             print('Generating report...')
-            if location or (date_from and date_to):
+            if location and (series_selected and gdm_no):
                 params = {}
                 if location:
                     params['location'] = location
-                if date_from:
-                    params['date_from'] = date_from
-                if date_to:
-                    params['date_to'] = date_to
+                if series_selected:
+                    params['series_selected'] = series_selected
+                if gdm_no:
+                    params['gdm_no'] = gdm_no
 
                 return redirect(f"{reverse('main:view_report')}?{urlencode(params)}")
 
             else:
                 return render(request, 'reports/lorry_receipt/lr_search.html', {
                     'locations': locations,
+                    'series': series,
                     'error': 'Please input any field'
                 })
         else:
-            if location or (date_from and date_to):
+            if location or (series_selected and gdm_no):
                 params = {}
                 if location:
                     params['location'] = location
-                if date_from:
-                    params['date_from'] = date_from
-                if date_to:
-                    params['date_to'] = date_to
+                if series_selected:
+                    params['series_selected'] = series_selected
+                if gdm_no:
+                    params['gdm_no'] = gdm_no
 
                 return redirect(f"{reverse('main:lr_report')}?{urlencode(params)}")
 
             else:
                 return render(request, 'reports/lorry_receipt/lr_search.html', {
                     'locations': locations,
+                    'series': series,
                     'error': 'Please input any field'
                 })
-    return render(request, 'reports/lorry_receipt/lr_search.html', {'locations': locations})
+    return render(request, 'reports/lorry_receipt/lr_search.html', {'locations': locations, 'series': series,})
 
 def lr_report(request):
     co_id = request.session.get('co_id')
     branch = request.session.get('branch')
 
     location = request.GET.get('location')     # ⬅ single location
-    date_from = request.GET.get('date_from')
-    date_to = request.GET.get('date_to')
+    series_selected = request.GET.get('series_selected')
+    gdm_no = request.GET.get('gdm_no')
+
+    gdm = GoodsDespatchMemo.objects.filter(series__id=series_selected, gdm_no=gdm_no).first()
+    children = GDMChild.objects.filter(master=gdm)
 
     # Load LRs with master
     lrs = LorryReceiptItems.objects.filter(
-        master__company__company_id=co_id,
-        master__branch_to=branch,
-        checked=False
+        id__in=children.values('lr_fk')
     ).select_related("master")
 
     company = Table_Companydetailsmaster.objects.get(company_id=co_id)
-
-    # Filters
-    if location and date_from and date_to:
-        lrs = lrs.filter(master__branch__branch_name=location, master__lr_date__range=[date_from, date_to])
-    elif location:
-        lrs = lrs.filter(master__branch__branch_name=location)
-    elif date_from and date_to:
-        lrs = lrs.filter(master__lr_date__range=[date_from, date_to])
 
     # Always get latest checked values
     for lr in lrs:
@@ -8236,3 +8234,287 @@ def get_serial_number_cr(request):
         return JsonResponse({'serial_no': voucher.serial_no})
     except VoucherConfiguration.DoesNotExist:
         return JsonResponse({'error': 'Invalid series selected'}, status=400)
+
+def despatch_send(request):
+    branches = LorryReceiptMaster.objects.filter(company__company_id=request.session.get('co_id'), 
+                                                  branch__branch_name=request.session.get('branch')).values_list('branch_to', flat=True).distinct()
+    if request.method == 'POST':
+        branch = request.POST.get('branch')
+        date_from = request.POST.get('date_from')
+        date_to = request.POST.get('date_to')
+
+        if branch and (date_from and date_to):
+            params = {}
+            if branch:
+                params['branch'] = branch
+            if date_from:
+                params['date_from'] = date_from
+            if date_to:
+                params['date_to'] = date_to
+
+            return redirect(f"{reverse('main:despatch_memo')}?{urlencode(params)}")
+
+        else:
+            return render(request, 'despatch_memo/despatch_send.html', {
+                'branches': branches,
+                'error': 'Please input any field'
+            })
+    return render(request, "despatch_memo/despatch_send.html", {'branches': branches})
+
+def despatch_memo(request):
+    co_id = request.session.get('co_id')
+    branch = request.session.get('branch')
+
+    branch_to = request.GET.get('branch')
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+
+    lrs = LorryReceiptItems.objects.filter(
+        master__company__company_id=co_id,
+        master__branch__branch_name=branch,
+        master__branch_to=branch_to,
+        send=False
+    ).select_related("master")
+
+    company = Table_Companydetailsmaster.objects.get(company_id=co_id)
+
+    if branch and date_from and date_to:
+        lrs = lrs.filter(master__lr_date__range=[date_from, date_to])
+    elif branch:
+        lrs = lrs.filter(master__branch_to=branch_to)
+    elif date_from and date_to:
+        lrs = lrs.filter(master__lr_date__range=[date_from, date_to])
+
+    for lr in lrs:
+        lr.refresh_from_db(fields=['send'])
+        
+    grand_value = sum(lr.freight for lr in lrs)
+
+    if request.method == 'POST':
+        try:
+            series = VoucherConfiguration.objects.filter(id=request.POST.get('series')).first()
+            master = GoodsDespatchMemo.objects.create(
+                company=company,
+                branch=Branch_master.objects.get(branch_name=branch),
+                fy_code=request.session.get('fycode'),
+                
+                series=series,
+                gdm_no=series.serial_no,
+                date=request.POST.get('date'),
+                branch_to=request.POST.get('branch_to'),
+                vehicle_no=request.POST.get('vehicle_no'),
+                driver_name=request.POST.get('driver_name'),
+                grand_total=grand_value
+            )
+            lr_ids = request.POST.getlist("lr_ids[]")
+            for lr_id in lr_ids:
+                lr = LorryReceiptItems.objects.get(id=lr_id)
+                GDMChild.objects.create(
+                    master=master,
+                    lr_fk=lr,
+                    lr_date=lr.master.lr_date,
+                    lr_no=lr.master.lr_no,
+                    load_from=lr.master.load_from,
+                    load_to=lr.master.load_to,
+                    payment=lr.master.payment,
+                    inv_no=lr.inv_no,
+                    inv_amount=lr.inv_amount,
+                    item=lr.item,
+                    weight=lr.weight,
+                    rate=lr.rate,
+                    pkg=lr.pkg,
+                    freight=lr.freight
+                )
+                lr.send = True
+                lr.save()
+            series.serial_no = series.serial_no + 1
+            series.save()
+            child = GDMChild.objects.filter(master=master)
+            context = {
+                'gdm': master,
+                'child': child,
+                'lrs': lrs,
+                'company': company,
+                'drivers': Employee_master.objects.filter(co_id=co_id, branch_id=branch),
+                'vehicles': Vehicle_master.objects.filter(co_id=co_id, branch_id=branch),
+                'series': VoucherConfiguration.objects.filter(company=company, branch__branch_name=branch, category='GDM'),
+                'branch_to': branch_to,
+                'grand_child': sum(ch.freight for ch in child),
+                'success': True
+            }
+            return render(request, 'despatch_memo/despatch_memo.html', context)
+        
+        except Exception as e:
+            print(e)
+            return render(request, 'despatch_memo/despatch_memo.html', {'error': e})
+            
+
+    context = {
+        'lrs': lrs,
+        'company': company,
+        'drivers': Employee_master.objects.filter(co_id=co_id, branch_id=branch),
+        'vehicles': Vehicle_master.objects.filter(co_id=co_id, branch_id=branch),
+        'series': VoucherConfiguration.objects.filter(company=company, branch__branch_name=branch, category='GDM'),
+        'branch_to': branch_to,
+        'grand_value': grand_value,
+    }
+    return render(request, 'despatch_memo/despatch_memo.html', context)
+
+@csrf_exempt
+def update_despatch_check_status(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        lr_id = data.get("lr_id")
+        checked = data.get("checked")
+        print(checked)
+        lr = LorryReceiptItems.objects.get(id=lr_id)
+        lr.send = checked
+        lr.save()
+        return JsonResponse({"status": "ok"})
+
+def get_serial_number_gdm(request):
+    series_id = request.GET.get('series_id')
+    try:
+        voucher = VoucherConfiguration.objects.get(id=series_id, category='GDM')
+        return JsonResponse({'serial_no': voucher.serial_no})
+    except VoucherConfiguration.DoesNotExist:
+        return JsonResponse({'error': 'Invalid series selected'}, status=400)
+
+def lorry_hire(request):
+    series = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'), 
+                                                 branch__branch_name=request.session.get('branch'), category='Lorry Hire')
+    if request.method == "POST":
+        try:
+            lh = LorryHire.objects.create(
+                company=Table_Companydetailsmaster.objects.get(company_id=request.session.get('co_id')),
+                branch=Branch_master.objects.get(branch_name=request.session.get('branch')),
+                fy_code="2025-2026",
+
+                series=VoucherConfiguration.objects.get(id=request.POST.get("series")),
+                memo_no=request.POST.get("entry_number"),
+
+                date=request.POST.get("date"),
+                to=request.POST.get("to"),
+                load_from=request.POST.get("load_from"),
+                load_to=request.POST.get("load_to"),
+                transport=request.POST.get("transport") or '',
+                lorry_no=request.POST.get("lorry_number"),
+                owner=request.POST.get("owner") or '',
+                owner_phone=request.POST.get("owner_phone") or '',
+                driver=request.POST.get("driver"),
+                driver_phone=request.POST.get("driver_phone") or '',
+                dl_no=request.POST.get("dl_no") or '',
+                weight=request.POST.get("weight") or 0,
+                product=request.POST.get("product"),
+                loading_coolie=request.POST.get("loading_coolie") or 0,
+                lorry_hire=request.POST.get("lorry_hire") or 0,
+                advance=request.POST.get("advance") or 0,
+                balance=request.POST.get("balance") or 0,
+            )
+            lh.series.serial_no += 1
+            lh.series.save()
+            return render(request, 'lorry_hire/lorry_hire.html', {'series': series, 
+                                                                  'success': 'Lorry Hire Saved successfully',
+                                                                  'lh': lh,
+                                                                  'print': True if request.POST.get("action") == "print" else False})
+
+        except Exception as e:
+            print(e)
+            return render(request, 'lorry_hire/lorry_hire.html', {'series': series, 'error': e})
+    return render(request, 'lorry_hire/lorry_hire.html', {'series': series})
+
+def get_serial_number_lh(request):
+    series_id = request.GET.get('series_id')
+    try:
+        voucher = VoucherConfiguration.objects.get(id=series_id, category='Lorry Hire')
+        return JsonResponse({'serial_no': voucher.serial_no})
+    except VoucherConfiguration.DoesNotExist:
+        return JsonResponse({'error': 'Invalid series selected'}, status=400)
+
+def lorry_hire_search(request):
+    series = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'), 
+                                                 branch__branch_name=request.session.get('branch'),
+                                                 category='Lorry Hire')
+    if request.method == 'POST':
+        series_id = request.POST.get('series')
+        memo_no = request.POST.get('entry_number')
+
+        try:
+            seriess = VoucherConfiguration.objects.filter(id=series_id).first()
+            lh = LorryHire.objects.get(branch__branch_name=request.session.get('branch'), memo_no=memo_no, series=seriess)
+            return redirect("main:lorry_hire_edit", lh_id=lh.id)
+        except Exception as e:
+            print(e)
+            series = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'), 
+                                                 branch__branch_name=request.session.get('branch'),
+                                                 category='Lorry Hire')
+            return render(request, "lorry_hire/lorry_search.html", {'error': 'No Lorry Hire found for your Memo No number and series', 'series': series})
+    return render(request, 'lorry_hire/lorry_search.html', {'series': series})
+
+def lorry_hire_edit(request, lh_id):
+    lh = LorryHire.objects.get(id=lh_id)
+    series = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch'), 
+                                                   category='Lorry Hire')
+    if request.method == 'POST':
+        try:
+            lh.date = request.POST.get("date")
+            lh.to = request.POST.get("to")
+            lh.load_from = request.POST.get("load_from")
+            lh.load_to = request.POST.get("load_to")
+            lh.transport = request.POST.get("transport")
+            lh.lorry_no = request.POST.get("lorry_number")
+
+            lh.owner = request.POST.get("owner")
+            lh.owner_phone = request.POST.get("owner_phone")
+            lh.driver = request.POST.get("driver")
+            lh.driver_phone = request.POST.get("driver_phone")
+            lh.dl_no = request.POST.get("dl_no")
+
+            lh.weight = float(request.POST.get("weight")) 
+            lh.product = request.POST.get("product")
+            lh.loading_coolie = float(request.POST.get("loading_coolie")) 
+            lh.lorry_hire = float(request.POST.get("lorry_hire")) 
+            lh.advance = float(request.POST.get("advance"))
+            lh.balance = float(request.POST.get("balance")) 
+            lh.save()
+            return render(request, 'lorry_hire/lorry_hire.html', {'lh': lh, 'series': series, 
+                                                                  'success': 'successfully edited Lorry Hire',
+                                                                  'lh': lh,
+                                                                  'print': True if request.POST.get("action") == "print" else False})
+        except Exception as e:
+            print(e)
+            return render(request, 'lorry_hire/lorry_hire.html', {'lh': lh, 'series': series, 'error': e})
+    context = {
+        'lh': lh,
+        'series': series
+    }
+    return render(request, 'lorry_hire/lorry_hire.html', context)
+
+def lorry_hire_delete_search(request):
+    series = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'),
+                                                 branch__branch_name=request.session.get('branch'),
+                                                 category='Lorry Hire')
+    if request.method == 'POST':
+        series_id = request.POST.get('series')
+        memo_no = request.POST.get('entry_number')
+
+        try:
+            seriess = VoucherConfiguration.objects.filter(id=series_id).first()
+            lh = LorryHire.objects.get(memo_no=memo_no, series=seriess)
+            return redirect(f"/lorry_hire_edit/{lh.id}?action=delete")
+        except Exception as e:
+            print(e)
+            series = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'), 
+                                                 branch__branch_name=request.session.get('branch'),
+                                                 category='Lorry Hire')
+            return render(request, "lorry_hire/lorry_delete.html", {'error': 'No Lorry Hire found for your Memo number and series', 'series': series})
+    return render(request, "lorry_hire/lorry_delete.html", {'series': series})
+
+def lorry_hire_delete(request, lh_id):
+    try:
+        lr = LorryHire.objects.get(id=lh_id)
+        lr.delete()
+        return render(request, 'lorry_hire/lorry_delete.html', {'success': 'Lorry Hire Deleted Successfully'})
+    except Exception as e:
+        print(e)
+        return render(request, 'lorry_hire/lorry_delete.html', {'error': str(e)})

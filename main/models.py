@@ -368,6 +368,8 @@ class VoucherConfiguration(models.Model):
         ('Trip sheet', 'Trip sheet'),
         ('Sales', 'Sales'),
         ('Lorry Receipt', 'Lorry Receipt'),
+        ('Lorry Hire', 'Lorry Hire'),
+        ('GDM', 'GDM'),
         ('Cash Receipt', 'Cash Receipt'),
         ('Service Voucher', 'Service Voucher'),
     ]
@@ -812,6 +814,7 @@ class LorryReceiptItems(models.Model):
     freight = models.FloatField()
     pkg = models.CharField(max_length=255)
     checked = models.BooleanField(default=False)
+    send = models.BooleanField(default=False)
 
 class CashReceipt(models.Model):
     company = models.ForeignKey(Table_Companydetailsmaster, on_delete=models.CASCADE, null=True, blank=True)
@@ -856,3 +859,57 @@ class CashReceiptItems(models.Model):
     inv_amount = models.FloatField()
     freight = models.FloatField()
     pkg = models.CharField(max_length=255)
+
+class GoodsDespatchMemo(models.Model):
+    company = models.ForeignKey(Table_Companydetailsmaster, on_delete=models.CASCADE, null=True, blank=True)
+    branch = models.ForeignKey(Branch_master, on_delete=models.CASCADE, null=True, blank=True)
+    fy_code = models.CharField(max_length=15, default='2025-2026')
+
+    series = models.ForeignKey(VoucherConfiguration,on_delete=models.CASCADE)
+    gdm_no = models.PositiveIntegerField()
+    date = models.DateField()
+    branch_to = models.CharField(max_length=80)
+    vehicle_no = models.CharField(max_length=25)
+    driver_name = models.CharField(max_length=125)
+    grand_total = models.FloatField()
+
+class GDMChild(models.Model):
+    master = models.ForeignKey(GoodsDespatchMemo, on_delete=models.CASCADE)
+    lr_fk = models.ForeignKey(LorryReceiptItems, on_delete=models.SET_NULL, null=True, blank=True)
+    lr_date = models.DateField()
+    lr_no = models.PositiveIntegerField()
+    load_from = models.CharField(max_length=255)
+    load_to = models.CharField(max_length=255)
+    payment = models.CharField(max_length=30)
+    inv_no = models.CharField(max_length=85)
+    inv_amount = models.FloatField()
+    item = models.CharField(max_length=255)
+    weight = models.FloatField()
+    rate = models.FloatField()
+    pkg = models.CharField(max_length=155)
+    freight = models.FloatField()
+
+class LorryHire(models.Model):
+    company = models.ForeignKey(Table_Companydetailsmaster, on_delete=models.CASCADE, null=True, blank=True)
+    branch = models.ForeignKey(Branch_master, on_delete=models.CASCADE, null=True, blank=True)
+    fy_code = models.CharField(max_length=15, default='2025-2026')
+    series = models.ForeignKey(VoucherConfiguration,on_delete=models.CASCADE)
+    memo_no = models.PositiveIntegerField()
+
+    date = models.DateField()
+    to = models.CharField(max_length=255)
+    load_from = models.CharField(max_length=255)
+    load_to = models.CharField(max_length=255)
+    transport = models.CharField(max_length=100, null=True, blank=True)
+    lorry_no = models.CharField(max_length=100)
+    owner = models.CharField(max_length=255, null=True, blank=True)
+    owner_phone = models.CharField(max_length=50, null=True, blank=True)
+    driver = models.CharField(max_length=255)
+    driver_phone = models.CharField(max_length=50, null=True, blank=True)
+    dl_no = models.CharField(max_length=100, null=True, blank=True)
+    weight = models.FloatField(default=0.00)
+    product = models.CharField(max_length=100, null=True, blank=True)
+    loading_coolie = models.FloatField(default=0.00)
+    lorry_hire = models.FloatField(default=0.00)
+    advance = models.FloatField(default=0.00)
+    balance = models.FloatField(default=0.00)

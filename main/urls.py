@@ -203,6 +203,17 @@ urlpatterns = [
     path("lr_edit_cash_receipt/<int:lr_id>/", views.lr_edit_cash_receipt, name="lr_edit_cash_receipt"),
     path('get_serial_number_cr/', views.get_serial_number_cr, name='get_serial_number_cr'),
 
+    path("despatch_send/", views.despatch_send, name="despatch_send"),
+    path("despatch_memo/", views.despatch_memo, name="despatch_memo"),
+    path("update_despatch_check_status/", views.update_despatch_check_status, name="update_despatch_check_status"),
+    path("get_serial_number_gdm/", views.get_serial_number_gdm, name="get_serial_number_gdm"),
+
+    path("lorry_hire/", views.lorry_hire, name="lorry_hire"),
+    path('get_serial_number_lh/', views.get_serial_number_lh, name='get_serial_number_lh'),
+    path('lorry_hire_search/', views.lorry_hire_search, name='lorry_hire_search'),
+    path("lorry_hire_edit/<int:lh_id>/", views.lorry_hire_edit, name="lorry_hire_edit"),
+    path('lorry_hire_delete_search/', views.lorry_hire_delete_search, name='lorry_hire_delete_search'),
+    path("lorry_hire_delete/<int:lh_id>/", views.lorry_hire_delete, name="lorry_hire_delete"),
 
 
     # accounts - debit-note

@@ -4,45 +4,39 @@
 
 <div class="main_content">
     <div class="trip-form-container">
-        <h2>Receive</h2>
+        <h2>DESPATCH MEMO</h2>
         <form method="post">
             {% csrf_token %}
 
             <!-- Area (Searchable Multi-Select with Checkboxes) -->
             <div class="form-group">
-                <label for="location">Location</label>
-                <select name="location" id="location" class="form-control">
-                    {% for location in locations %}
-                        <option value="{{ location }}">{{ location }}</option>
+                <label for="branch">Branch</label>
+                <select name="branch" id="branch" class="form-control">
+                    {% for branch in branches %}
+                        <option value="{{ branch }}">{{ branch }}</option>
                     {% endfor %}
                 </select>
             </div>
 
-            <!-- Series -->
+            <!-- Date From -->
             <div class="form-group">
-                <label for="series" style="font-size:13px;">Series</label>
-                <select name="series" id="series" class="form-control" required>
-                    {% for s in series %}
-                        <option value="{{ s.series__id }}">{{ s.series__series }} - {{ s.branch__branch_name }}</option>
-                    {% endfor %}
-                </select>
+                <label for="date_from">Date From</label>
+                <input type="date" name="date_from" id="date_from" class="form-control" value="{% now 'Y-m-d' %}">
             </div>
 
+            <!-- Date To -->
             <div class="form-group">
-                <label for="gdm_no">GDM No</label>
-                <input type="number" name="gdm_no" id="gdm_no">
+                <label for="date_to">Date To</label>
+                <input type="date" name="date_to" id="date_to" class="form-control" value="{% now 'Y-m-d' %}">
             </div>
 
             <!-- Buttons -->
             <div class="btn-group">
-                <button type="submit" class="btn save-btn" name="action" value="despatch">
-                    <i class="fa fa-search"></i> Receive
-                </button>
                 <a href="{% url 'main:index' %}" class="btn back-btn">
                     <i class="fa fa-arrow-left"></i> Back
                 </a>
-                <button type="submit" class="btn save-btn" name="action" value="report">
-                    <i class="fa fa-newspaper-o"></i> Stock
+                <button type="submit" class="btn save-btn" name="action" value="despatch">
+                    <i class="fa fa-search"></i> Despatch
                 </button>
             </div>
 
@@ -160,14 +154,5 @@
 <script src="{% static 'vendor/jquery-3.2.1.min.js' %}"></script>
 <script src="{% static 'vendor/bootstrap-4.1/bootstrap.min.js' %}"></script>
 <script src="{% static 'vendor/select2/select2.min.js' %}"></script>
-<script>
-    $(document).ready(function() {
-        $('#location, #series').select2({
-            allowClear: true,
-            width: '100%',
-            closeOnSelect: false, 
-        });
-    });
-</script>
 
 {% endblock %}

@@ -224,3 +224,101 @@ class CashReceiptItemsAdmin(admin.ModelAdmin):
     )
     list_filter = ('master',)
     search_fields = ('item_code', 'item', 'pkg')
+
+from django.contrib import admin
+from .models import GoodsDespatchMemo, GDMChild
+
+
+class GDMChildInline(admin.TabularInline):
+    model = GDMChild
+    extra = 0
+    fields = (
+        "lr_date", "lr_no", "load_from", "load_to", "payment",
+        "inv_no", "inv_amount", "item", "weight", "rate", "pkg", "freight"
+    )
+    readonly_fields = ()
+    show_change_link = True
+
+
+@admin.register(GoodsDespatchMemo)
+class GoodsDespatchMemoAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "id", "gdm_no", "date", "branch", "branch_to",
+        "vehicle_no", "driver_name", "grand_total"
+    )
+
+    list_filter = (
+        "branch",
+        "branch_to",
+        "date",
+        "vehicle_no",
+        "driver_name"
+    )
+
+    search_fields = (
+        "gdm_no",
+        "vehicle_no",
+        "driver_name",
+        "branch__branch_name",
+        "branch_to",
+    )
+
+    inlines = [GDMChildInline]
+
+    fieldsets = (
+        ("GDM Information", {
+            "fields": ("series", "gdm_no", "date", "fy_code")
+        }),
+        ("Branch & Vehicle Details", {
+            "fields": ("company", "branch", "branch_to", "vehicle_no", "driver_name")
+        }),
+        ("Totals", {
+            "fields": ("grand_total",)
+        }),
+    )
+
+    readonly_fields = ("gdm_no",)  # if serial must not be editable
+
+
+@admin.register(GDMChild)
+class GDMChildAdmin(admin.ModelAdmin):
+    list_display = (
+        "id", "master", "lr_date", "lr_no",
+        "load_from", "load_to", "payment",
+        "inv_no", "inv_amount", "item",
+        "weight", "rate", "pkg", "freight"
+    )
+
+    list_filter = ("payment", "lr_date")
+    search_fields = ("lr_no", "inv_no", "item", "load_from", "load_to")
+
+from django.contrib import admin
+from .models import LorryHire
+
+
+@admin.register(LorryHire)
+class LorryHireAdmin(admin.ModelAdmin):
+
+    list_display = (
+        'memo_no',
+        'date',
+        'company',
+        'lorry_no',
+        'driver',
+        'lorry_hire',
+        'balance',
+    )
+
+    list_filter = (
+        'date',
+        'company',
+    )
+
+    search_fields = (
+        'memo_no',
+        'lorry_no',
+        'driver',
+    )
+
+    ordering = ('-date', '-memo_no')

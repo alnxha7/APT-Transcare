@@ -1,60 +1,75 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 <div class="main_content">
     <div class="trip-form-container">
-        <h2>Receive</h2>
+        <h2>Delete Lorry Hire</h2>
         <form method="post">
             {% csrf_token %}
 
-            <!-- Area (Searchable Multi-Select with Checkboxes) -->
-            <div class="form-group">
-                <label for="location">Location</label>
-                <select name="location" id="location" class="form-control">
-                    {% for location in locations %}
-                        <option value="{{ location }}">{{ location }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
             <!-- Series -->
             <div class="form-group">
-                <label for="series" style="font-size:13px;">Series</label>
+                <label for="series">Series</label>
                 <select name="series" id="series" class="form-control" required>
+                    <option value="">Select Series</option>
                     {% for s in series %}
-                        <option value="{{ s.series__id }}">{{ s.series__series }} - {{ s.branch__branch_name }}</option>
+                        <option value="{{ s.id }}">{{ s.series }}</option>
                     {% endfor %}
                 </select>
             </div>
 
+            <!-- Bill Number -->
             <div class="form-group">
-                <label for="gdm_no">GDM No</label>
-                <input type="number" name="gdm_no" id="gdm_no">
+                <label for="entry_number">Memo Number</label>
+                <input type="number" name="entry_number" id="entry_number" class="form-control" placeholder="Enter Memo Number" required>
             </div>
 
             <!-- Buttons -->
             <div class="btn-group">
-                <button type="submit" class="btn save-btn" name="action" value="despatch">
-                    <i class="fa fa-search"></i> Receive
+                <button type="submit" class="btn save-btn">
+                    <i class="fa fa-trash"></i> Delete
                 </button>
                 <a href="{% url 'main:index' %}" class="btn back-btn">
                     <i class="fa fa-arrow-left"></i> Back
                 </a>
-                <button type="submit" class="btn save-btn" name="action" value="report">
-                    <i class="fa fa-newspaper-o"></i> Stock
-                </button>
             </div>
 
         </form>
 
         {% if error %}
-            <p class="error-text">{{ error }}</p>
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: '{{error}}',
+                    confirmButtonText: 'OK',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "{% url 'main:lorry_hire_delete_search' %}";
+                    }
+                });
+            </script>
+        {% elif success %}
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Lorry Hire Deleted Successfully',
+                    confirmButtonText: 'OK',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "{% url 'main:lorry_hire_delete_search' %}";
+                    }
+                });
+            </script>
         {% endif %}
     </div>
 </div>
 
-<!-- CSS -->
+<!-- CSS & JS -->
 <link href="{% static 'vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet">
 <link href="{% static 'vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet">
 <link href="{% static 'vendor/select2/select2.min.css' %}" rel="stylesheet">
@@ -96,7 +111,7 @@
         margin-bottom: 5px;
         display: block;
     }
-    select, input[type="text"], input[type="date"], input[type="number"] {
+    select, input[type="text"], input[type="number"] {
         width: 100%;
         padding: 4px 12px;
         border-radius: 8px;
@@ -120,7 +135,7 @@
         transition: all 0.3s ease;
     }
     .btn:focus { outline: none; box-shadow: none; }
-    .save-btn { background-color: #28a745; color: #fff; }
+    .save-btn { background-color: #d9534f; color: #fff; } /* red for delete */
     .back-btn { background-color: #007bff; color: #fff; }
     .btn:hover { box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
     .btn-group { display: flex; justify-content: center; gap: 15px; margin-top: 25px; }
@@ -128,44 +143,17 @@
     @media only screen and (max-width: 600px) {
         .trip-form-container { padding: 25px 20px; width: 90%; }
     }
-    .checkbox-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px 20px;
-    background-color: #fafafa;
-    padding: 10px 15px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-}
-
-.form-check {
-    display: flex;
-    align-items: center;
-}
-
-.form-check-input {
-    margin-right: 6px;
-    transform: scale(1.2);
-}
-.select2-results__option {
-    padding-left: 28px !important;
-}
-.select2-results__option--highlighted[aria-selected] {
-    background-color: #e6f3ff !important;
-    color: #333 !important;
-}
 </style>
 
-<!-- JS -->
 <script src="{% static 'vendor/jquery-3.2.1.min.js' %}"></script>
 <script src="{% static 'vendor/bootstrap-4.1/bootstrap.min.js' %}"></script>
 <script src="{% static 'vendor/select2/select2.min.js' %}"></script>
 <script>
     $(document).ready(function() {
-        $('#location, #series').select2({
+        $('#series').select2({
+            placeholder: "Select Series",
             allowClear: true,
-            width: '100%',
-            closeOnSelect: false, 
+            width: '100%'
         });
     });
 </script>

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DESPATCH</title>
+    <title>DESPATCH MEMO</title>
 <!-- Fontfaces CSS-->
     <link href="{% static 'css/font-face.css' %}" rel="stylesheet" media="all">
     <link href="{% static 'vendor/font-awesome-4.7/css/font-awesome.min.css' %}" rel="stylesheet" media="all">
@@ -241,13 +241,8 @@
 .column {
     padding: 2px;
     border-radius: 6px;
-   /* box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);*/
 }
 
-/* Widths to control layout */
-/* .first-column {
-    flex: 1; 
-} */
 
 .second-column {
     flex: 0.5; /* Center - less space */
@@ -343,9 +338,71 @@
        
         <div class="container">
 
-<h2>DESPATCH</h2>
+<h2>GOODS DESPATCH MEMO</h2>
     <div class="container">
         <!-- ---------------- TOP FILTER SECTION ---------------- -->
+<form method="post" action="" id="filterForm">
+    {% csrf_token %}
+    <div class="row" style="margin-bottom:15px;">
+        <div id="lr-hidden-container"></div>
+
+        <!-- Series -->
+        <div class="col-md-2">
+            <label for="series" style="font-size:13px;">Series</label>
+            <select name="series" id="series" class="form-control" required>
+                <option value="">--SELECT--</option>
+                {% for series in series %}
+                    <option value="{{ series.id }}">{{ series.series }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Serial No-->
+        <div class="col-md-2">
+            <label for="entry_number" style="font-size:13px;">GDM No</label>
+            <input type="number" name="entry_number" id="entry_number" class="form-control" readonly>
+        </div>
+
+        <!-- Date -->
+        <div class="col-md-2">
+            <label for="date" style="font-size:13px;">Date</label>
+            <input type="date" name="date" id="date"
+                   class="form-control"
+                   value="{% now 'Y-m-d' %}">
+        </div>
+
+        <div class="col-md-2">
+            <label style="font-size:13px;">Branch To</label>
+            <input type="text" name="branch_to" id="branch_to" class="form-control" value="{{ branch_to }}">
+        </div>
+
+        <!-- Vehicle No -->
+        <div class="col-md-2">
+            <label style="font-size:13px;">Vehicle No</label>
+            <select name="vehicle_no" class="form-control">
+                {% for v in vehicles %}
+                    <option value="{{ v.registration_number }}"
+                    {% if request.GET.vehicle_no == v.registration_number %}selected{% endif %}>
+                        {{ v.registration_number }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Driver Name (reduced size) -->
+        <div class="col-md-2">
+            <label style="font-size:13px;">Driver Name</label>
+            <select name="driver_name" class="form-control">
+                {% for d in drivers %}
+                    <option value="{{ d.employee_name }}"
+                    {% if request.GET.driver_name == d.employee_name %}selected{% endif %}>
+                        {{ d.employee_name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+    </div>
 
         <!-- 🔹 Table Section -->
         <div class="table-container">
@@ -388,7 +445,7 @@
                                     <td style="text-align: center;">{{ lr.pkg }}</td>
                                     <td style="text-align: center;">{{ lr.freight }}</td>
                                     <td style="text-align:center;">
-                                        <input type="checkbox" class="circle-checkbox lr-check" data-id="{{ lr.id }}" {% if lr.checked %}checked{% endif %}>
+                                        <input type="checkbox" class="circle-checkbox lr-check" data-id="{{ lr.id }}" {% if lr.send %}checked{% endif %}>
                                     </td>
                                 </tr>
                         {% endfor %}
@@ -410,9 +467,11 @@
     <div class="bottom-section">
         <div class="col-sm-12 text-end">
             <a href="{% url 'main:lr_report_search' %}" id="" class="btn btn-danger btn-sm">Exit</a>
-            <button type="button" id="print-button" class="btn btn-secondary btn-sm print-button">Print</button>
+            <button type="submit" class="btn btn-success">Save</button>
         </div>
     </div>
+    
+</form>
 
 
 </div>
@@ -444,8 +503,17 @@
                 </div>
             </div>
             <div style="text-align: right;">
-                <h3 style="margin: 0; font-size: 18px;">LR REPORT</h3>
+                <h3 style="margin: 0; font-size: 18px;">DESPATCH MEMO</h3>
             </div>
+        </div>
+
+        <div id="print-filters" style="font-size:14px; margin-bottom:15px;">
+            <strong>Series:</strong> {{ gdm.series.series }} &nbsp;&nbsp;&nbsp;
+            <strong>GDM No:</strong> {{ gdm.gdm_no }} &nbsp;&nbsp;&nbsp;
+            <strong>Date:</strong> {{ gdm.date }} &nbsp;&nbsp;&nbsp;
+            <strong>Branch To:</strong> {{ gdm.branch_to }} &nbsp;&nbsp;&nbsp;
+            <strong>Vehicle No:</strong> {{ gdm.vehicle_no }} &nbsp;&nbsp;&nbsp;
+            <strong>Driver Name:</strong> {{ gdm.driver_name }} &nbsp;&nbsp;&nbsp;
         </div>
 
         <!-- Table Section -->
@@ -468,27 +536,25 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for lr in lrs %}
-                    {% if lr.checked %}
+                    {% for item in child %}
                         <tr>
                             <td style="text-align: center;">{{ forloop.counter }}</td>
-                            <td style="text-align: center;">{{ lr.master.lr_date }}</td>
-                            <td style="text-align: center;">{{ lr.master.lr_no }}</td>
-                            <td style="text-align: left;">{{ lr.master.load_from }}</td>
-                            <td style="text-align: left;">{{ lr.master.load_to }}</td>
-                            <td style="text-align: center;">{{ lr.master.payment }}</td>
-                            <td style="text-align: center;">{{ lr.inv_no }}</td>
-                            <td style="text-align: center;">{{ lr.inv_amount }}</td>
-                            <td style="text-align: left;">{{ lr.item }}</td>
-                            <td style="text-align: center;">{{ lr.weight }}</td>
-                            <td style="text-align: center;">{{ lr.rate }}</td>
-                            <td style="text-align: center;">{{ lr.freight }}</td>
+                            <td style="text-align: center;">{{ item.lr_date }}</td>
+                            <td style="text-align: center;">{{ item.lr_no }}</td>
+                            <td style="text-align: left;">{{ item.load_from }}</td>
+                            <td style="text-align: left;">{{ item.load_to }}</td>
+                            <td style="text-align: center;">{{ item.payment }}</td>
+                            <td style="text-align: center;">{{ item.inv_no }}</td>
+                            <td style="text-align: center;">{{ item.inv_amount }}</td>
+                            <td style="text-align: left;">{{ item.item }}</td>
+                            <td style="text-align: center;">{{ item.weight }}</td>
+                            <td style="text-align: center;">{{ item.rate }}</td>
+                            <td style="text-align: center;">{{ item.freight }}</td>
                         </tr>
-                    {% endif %}
                     {% endfor %}
                     <tr style="font-weight: bold; background-color: #e6e6e6;">
-                        <td colspan="10" style="text-align: right;">Grand Total:</td>
-                        <td style="text-align: right;">{{ grand_value }}</td>
+                        <td colspan="11" style="text-align: right;">Grand Total:</td>
+                        <td style="text-align: right;">{{ grand_child }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -508,37 +574,6 @@
     </div>
 </div>
 
-
-<script>
-document.querySelectorAll(".lr-check").forEach(cb => {
-    cb.addEventListener("change", function () {
-        
-        let row = this.closest("tr");
-
-        // 🔹 Highlight the row when checked
-        if (this.checked) {
-            row.classList.add("row-selected");
-        } else {
-            row.classList.remove("row-selected");
-        }
-
-        // 🔹 Save checkbox state to backend
-        fetch("/update-lr-check-status/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": "{{ csrf_token }}"
-            },
-            body: JSON.stringify({
-                lr_id: this.dataset.id,
-                checked: this.checked
-            })
-        })
-        .then(res => res.json())
-        .then(data => console.log("Saved:", data));
-    });
-});
-</script>
 
 
 
@@ -565,79 +600,126 @@ document.querySelectorAll(".lr-check").forEach(cb => {
 
 <!-- Main JS-->
 <script src="{% static 'js/main.js' %}"></script>
-<!-- 🖨️ PRINT SCRIPT -->
+
+{% if success %}
 <script>
-document.getElementById("print-button").addEventListener("click", function () {
-
-    // 🔹 READ updated checkboxes from the table
-    let updatedRows = "";
-    let grandTotal = 0;
-    let counter = 1;
-
-    document.querySelectorAll("tr[data-lr-id]").forEach(row => {
-        let cb = row.querySelector(".lr-check");
-
-        if (cb && cb.checked) {
-            let cells = row.querySelectorAll("td");
-
-            updatedRows += `
-                <tr>
-                    <td>${counter++}</td>
-                    <td>${cells[1].innerText}</td>
-                    <td>${cells[2].innerText}</td>
-                    <td>${cells[3].innerText}</td>
-                    <td>${cells[4].innerText}</td>
-                    <td>${cells[5].innerText}</td>
-                    <td>${cells[6].innerText}</td>
-                    <td>${cells[7].innerText}</td>
-                    <td>${cells[8].innerText}</td>
-                    <td>${cells[9].innerText}</td>
-                    <td>${cells[10].innerText}</td>
-                    <td>${cells[12].innerText}</td>
-                </tr>
-            `;
-
-            grandTotal += parseFloat(cells[12].innerText) || 0;
-        }
-    });
-
-    // 🔹 Build updated print HTML
-    let printHTML = `
-        <html>
-        <head>
-            <title>LR Report</title>
-            <style>
-                table, th, td {
-                    border: 1px solid black;
-                    border-collapse: collapse;
-                    font-size: 11px;
-                }
-                th, td { padding: 4px; }
-                th { background-color: #f2f2f2; }
-            </style>
-        </head>
-        <body>
-            ${document.getElementById("invoice-div").innerHTML.replace(
-                /<tbody>[\s\S]*<\/tbody>/,
-                `<tbody>${updatedRows}
-                    <tr style="font-weight:bold;background:#e6e6e6;">
-                        <td colspan="11" style="text-align:right;">Grand Total:</td>
-                        <td>${grandTotal.toFixed(2)}</td>
-                    </tr>
-                </tbody>`
-            )}
-        </body>
-        </html>
-    `;
-
-    // 🔹 Open print window
-    let printWindow = window.open("", "", "width=900,height=650");
-    printWindow.document.write(printHTML);
-    printWindow.document.close();
-    printWindow.print();
+Swal.fire({
+    title: "Saved Successfully!",
+    text: "Do you want to print the GDM?",
+    icon: "success",
+    showCancelButton: true,
+    confirmButtonText: "Print",
+    cancelButtonText: "Close"
+}).then((result) => {
+    if (result.isConfirmed) {
+        triggerPrint(() => {
+            window.location.href = window.location.href;
+        });
+    } else {
+        window.location.href = window.location.href;
+    }
 });
 
 </script>
+{% elif error %}
+<script>
+    Swal.fire({
+    title: "Error Occured..!!",
+    text: "{{ error }}",
+    icon: "error",
+});
+</script>
+{% endif %}
+
+<script>
+    document.getElementById('series').addEventListener('change', function () {
+        const seriesId = this.value;
+        if (seriesId) {
+            fetch(`/get_serial_number_gdm/?series_id=${seriesId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.serial_no !== undefined) {
+                        $('input[name="entry_number"]').val(data.serial_no);
+                    } else {
+                        document.getElementById('entry_number').value = '';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching serial number:', error);
+                    document.getElementById('entry_number').value = '';
+                });
+        } else {
+            document.getElementById('entry_number').value = '';
+        }
+    });
+</script>
+<script>
+let selectedLRs = new Set();
+
+document.querySelectorAll(".lr-check").forEach(cb => {
+
+    // Restore row highlight on load
+    if (cb.checked) {
+        selectedLRs.add(cb.dataset.id);
+        cb.closest("tr").classList.add("row-selected");
+    }
+
+    // Handle user clicking checkbox
+    cb.addEventListener("change", function () {
+
+        if (this.checked) {
+            selectedLRs.add(this.dataset.id);
+            this.closest("tr").classList.add("row-selected");
+        } else {
+            selectedLRs.delete(this.dataset.id);
+            this.closest("tr").classList.remove("row-selected");
+        }
+
+        console.log("Selected LRs:", Array.from(selectedLRs));
+    });
+});
+</script>
+<script>
+document.querySelector("button[type='submit']").addEventListener("click", function () {
+
+    const container = document.getElementById("lr-hidden-container");
+    container.innerHTML = "";
+
+    // Add selected IDs as hidden inputs
+    Array.from(selectedLRs).forEach(id => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "lr_ids[]";
+        input.value = id;
+        container.appendChild(input);
+    });
+
+});
+</script>
+
+<script>
+function triggerPrint(callback) {
+    let invoiceHTML = document.getElementById("invoice-div").innerHTML;
+
+    let win = window.open("", "", "width=900,height=650");
+    win.document.write(`
+        <html>
+        <head><title>DESPATCH MEMO</title></head>
+        <body>${invoiceHTML}</body>
+        </html>
+    `);
+    win.document.close();
+
+    win.focus();
+    win.print();
+    window.location.href = window.location.href;
+    win.onafterprint = () => {
+        win.close();
+        if (callback) callback();
+    };
+}
+</script>
+
 
 
 {% endblock %}

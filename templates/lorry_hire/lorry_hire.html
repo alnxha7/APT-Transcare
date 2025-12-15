@@ -1,0 +1,612 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+ 
+<style>
+     body {
+            font-family: Public Sans, sans-serif;
+            background-color: #f4f4f4;
+
+            margin: 0;
+            padding: 0;
+            font-size: 12px;
+            /*font-weight: 100;*/
+            align-items: center;
+            color:black;
+
+        }
+         .logo p {
+        color:white;
+        }
+        .container_box {
+            /*background:#f5f5f5;*/
+            background-color:#FEF3E2;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            /*width: 50%;*/
+           /* border: 2px solid rgb(43, 114, 227);*/
+            margin:auto;
+            margin-top:20px;
+            height: 85vh;
+            overflow: hidden;
+            overflow-y: scroll;
+            margin:40px auto;
+            width: 70%;
+        }
+
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+
+            margin-bottom: 5px;
+            /*font-weight: bold;*/
+        }
+
+        
+        input, select {
+            width: 100%;
+           /* padding: 8px;*/
+            margin-bottom: 10px;
+            border: 1px solid #ced4da;
+	    height:20px;
+            /*border-radius: 5px;*/
+            font-size: 12px;
+        }
+        select {
+        padding:1px;
+        background:white;
+
+        }
+        table {
+            background:white;
+            border-collapse: collapse;
+            margin-top: 20px;
+            margin-bottom:20px;
+        
+        }
+        .table_input{
+            border:none;
+            margin-bottom: 0px;;
+        }
+        th {
+            /*border: 1px solid black;*/
+            background:#f2f2f2;
+           /* padding:5px;*/
+            text-align: center;
+        }
+        td {
+           /*border: 1px solid black;*/
+           background:white;
+        }
+        button {
+
+            padding: 10px;
+            background: #28a745;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+        .btn {
+            margin-top: 10px;
+            display: inline-block;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            color: white;
+            margin-right:10px;
+            margin-bottom:20px;
+        }
+        #tripTable {
+            border:1px solid #ced4da;
+            border-collapse: collapse;
+        }
+        #tripTable th, #tripTable td {
+            border: 1px solid #ced4da;
+        }
+        .save-btn { background-color: #28a745; }
+        .back-btn { background-color: #007bff; }
+
+        .input-right {
+            text-align: right;
+        }
+    @media only screen and (max-width: 600px) {
+  .container_box  {
+    width: 90%;
+  }
+}
+</style>
+<style>
+@media print {
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 12px;
+        color: #000;
+    }
+
+    @page {
+        size: A4 portrait;
+        margin: 15mm;
+    }
+
+    /* 🔥 HIDE EVERYTHING */
+    body * {
+        visibility: hidden;
+    }
+
+    /* 🔥 SHOW ONLY PRINT AREA */
+    #print-header,
+    #print-header * {
+        visibility: visible;
+    }
+
+    #print-header {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        display: block !important;
+    }
+
+    .print-box {
+        border: 1px solid #000;
+        padding: 8px;
+        margin-bottom: 8px;
+    }
+
+    .section-title {
+        font-weight: bold;
+        font-size: 13px;
+        border-bottom: 1px solid #000;
+        margin-bottom: 5px;
+        padding-bottom: 3px;
+    }
+
+    .grid-2 {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .grid-2 div {
+        width: 48%;
+        line-height: 1.6;
+    }
+
+    .value {
+        font-weight: bold;
+    }
+
+    .amount {
+        text-align: right;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .sign-box {
+        margin-top: 50px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .sign-box div {
+        width: 40%;
+        text-align: center;
+        border-top: 1px solid #000;
+        padding-top: 5px;
+        font-size: 12px;
+    }
+}
+</style>
+
+
+<div class="container_box">
+    <form method="post">
+        {% csrf_token %}
+        <div class="container mt-4">
+            <h2 class="text-center">Lorry Hire</h2>
+
+            <div class="row mb-2">
+                <div class="col-md-6 d-flex align-items-center">
+                    <label class="form-label me-2 mb-0" style="width: 78px;">Series</label>
+                    <select name="series" id="series" style="width: 36%;" required>
+                        <option value="">--Select--</option>
+                        {% for s in series %}
+                            <option value="{{ s.id }}"
+                                {% if lh and lh.series_id == s.id %}selected{% endif %}>
+                                {{ s.series }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-6 d-flex align-items-center">
+                    <label class="form-label me-2 mb-0" style="width: 78px;">Serial No</label>
+                    <input type="number"  id="entry_number" name="entry_number" style="width: 36%;" value="{{ lh.memo_no|default:'' }}" required readonly>
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-md-6 d-flex align-items-center">
+                    <label class="form-label me-2 mb-0" style="width: 78px;">Entry Date</label>
+                    <input type="date" name="date" id="date" value="{% if lh and lh.date %}{{ lh.date|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}" style="width: 36%;">
+                </div>
+
+                <div class="col-md-6 d-flex align-items-center">
+                    <label class="form-label me-2 mb-0" style="width: 100px;">To</label>
+                    <input type="text"  name="to" value="{{ lh.to|default:'' }}" required>
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-md-6 d-flex align-items-center">
+                    <label class="form-label me-2 mb-0" style="width: 100px;">Load From</label>
+                    <input type="text"  name="load_from" value="{{ lh.load_from|default:'' }}" required>
+                </div>
+
+                <div class="col-md-6 d-flex align-items-center">
+                    <label class="form-label me-2 mb-0" style="width: 100px;">Load To</label>
+                    <input type="text" name="load_to" id="load_to" value="{{ lh.load_to|default:'' }}" required>
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-md-6 d-flex align-items-center">
+                    <label class="form-label me-2 mb-0" style="width: 100px;">Transport</label>
+                    <input type="text"  name="transport" value="{{ lh.transport|default:'' }}">
+                </div>
+
+                <div class="col-md-6 d-flex align-items-center">
+                    <label class="form-label me-2 mb-0" style="width: 100px;">Lorry Number</label>
+                    <input type="text" name="lorry_number" id="lorry_number" value="{{ lh.lorry_no|default:'' }}" required>
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-md-6 d-flex align-items-center">
+                    <label class="form-label me-2 mb-0" style="width: 100px;">Owner</label>
+                    <input type="text"  name="owner" value="{{ lh.owner|default:'' }}">
+                </div>
+
+                <div class="col-md-6 d-flex align-items-center">
+                    <label class="form-label me-2 mb-0" style="width: 100px;">Owner Phone</label>
+                    <input type="text" name="owner_phone" id="owner_phone" value="{{ lh.owner_phone|default:'' }}">
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-md-6 d-flex align-items-center">
+                    <label class="form-label me-2 mb-0" style="width: 100px;">Driver</label>
+                    <input type="text"  name="driver" value="{{ lh.driver|default:'' }}" required>
+                </div>
+
+                <div class="col-md-6 d-flex align-items-center">
+                    <label class="form-label me-2 mb-0" style="width: 100px;">Driver Phone</label>
+                    <input type="text" name="driver_phone" value="{{ lh.driver_phone|default:'' }}" id="driver_phone">
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-md-6 d-flex align-items-center">
+                    <label class="form-label me-2 mb-0" style="width: 100px;">DL No</label>
+                    <input type="text" value="{{ lh.dl_no|default:'' }}" name="dl_no">
+                </div>
+
+                <div class="col-md-6 d-flex align-items-center">
+                    <label class="form-label me-2 mb-0" style="width: 100px;">Weight</label>
+                    <input type="number" name="weight" id="weight" step="0.01" value="{{ lh.weight|default:'0.00' }}">
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-md-6 d-flex align-items-center">
+                    <label class="form-label me-2 mb-0" style="width: 100px;">Product</label>
+                    <input type="text" value="{{ lh.product|default:'' }}" name="product">
+                </div>
+
+                <div class="col-md-6 d-flex align-items-center">
+                    <label class="form-label me-2 mb-0" style="width: 100px;">Loading Coolie</label>
+                    <input type="number" name="loading_coolie" id="loading_coolie" step="0.01" value="{{ lh.loading_coolie|default:'0.00' }}">
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-md-6 d-flex align-items-center">
+                    <label class="form-label me-2 mb-0" style="width: 100px;">Lorry Hire</label>
+                    <input type="number"  name="lorry_hire" step="0.01" value="{{ lh.lorry_hire }}" required>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-6 d-flex align-items-center">
+                    <label class="form-label me-2 mb-0" style="width: 100px;">Advance</label>
+                    <input type="number" name="advance" id="advance" step="0.01" value="{{ lh.advance|default:'0.00' }}">
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-6 d-flex align-items-center">
+                    <label class="form-label me-2 mb-0" style="width: 100px;">Balance</label>
+                    <input type="number"  name="balance" step="0.01" value="{{ lh.balance|default:'0.00' }}">
+                </div>
+            </div>
+
+        </div>
+        {% if request.GET.action == 'delete' %}
+            <a href="{% url 'main:lorry_hire_delete_search' %}" class="btn btn-primary btn-sm">Cancel</a>
+            <button type="button" class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+        {% else %} 
+        <a href="{% url 'main:index' %}" class="btn back-btn">Back</a>
+        <button type="submit" class="btn btn-info print-button" name="action" value="print">Print</button>
+        <button type="submit" class="btn btn-success">Save</button>
+        {% endif %}
+    </form>
+</div>
+
+
+
+
+
+
+
+
+<!-- ================= PRINT AREA ================= -->
+<div id="print-header" style="display:none; width:100%;">
+
+    <!-- ================= HEADER ================= -->
+    <div style="border-bottom:2px solid #000; padding-bottom:8px; margin-bottom:10px;">
+        <div style="display:flex; align-items:center;">
+
+            <!-- Logo -->
+            <div style="width:20%;">
+                <img src="{% static 'images/icon/apt_logo.png' %}" style="width:100px;">
+            </div>
+
+            <!-- Company -->
+            <div style="width:60%; text-align:center;">
+                <div style="font-size:22px; font-weight:bold;">
+                    {{ lh.company.companyname }}
+                </div>
+                <div style="font-size:11px;">
+                    {{ lh.company.address1 }},
+                    {{ lh.company.address2 }},
+                    {{ lh.company.address3 }}<br>
+                    Ph: {{ lh.company.phoneno }} | Mob: {{ lh.company.mobile }}
+                </div>
+            </div>
+
+            <!-- Document Title -->
+            <div style="width:20%; text-align:right;">
+                <div style="font-size:14px; font-weight:bold;">
+                    LORRY HIRE
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= BASIC DETAILS ================= -->
+    <div class="print-box">
+        <div class="section-title">Basic Details</div>
+        <div class="grid-2">
+            <div>
+                Series : <span class="value">{{ lh.series.series }}</span><br>
+                Memo No : <span class="value">{{ lh.memo_no }}</span>
+            </div>
+            <div>
+                Date : <span class="value">{{ lh.date }}</span><br>
+                To : <span class="value">{{ lh.to }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= TRANSPORT DETAILS ================= -->
+    <div class="print-box">
+        <div class="section-title">Transport Details</div>
+        <div class="grid-2">
+            <div>
+                Load From : <span class="value">{{ lh.load_from }}</span><br>
+                Load To : <span class="value">{{ lh.load_to }}</span>
+            </div>
+            <div>
+                Transport : <span class="value">{{ lh.transport }}</span><br>
+                Lorry No : <span class="value">{{ lh.lorry_no }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= DRIVER DETAILS ================= -->
+    <div class="print-box">
+        <div class="section-title">Driver Details</div>
+        <div class="grid-2">
+            <div>
+                Driver : <span class="value">{{ lh.driver }}</span><br>
+                Phone : <span class="value">{{ lh.driver_phone }}</span>
+            </div>
+            <div>
+                DL No : <span class="value">{{ lh.dl_no }}</span><br>
+                Owner : <span class="value">{{ lh.owner }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= CARGO DETAILS ================= -->
+    <div class="print-box">
+        <div class="section-title">Cargo Details</div>
+        Product : <span class="value">{{ lh.product }}</span><br>
+        Weight : <span class="value">{{ lh.weight }}</span>
+    </div>
+
+    <!-- ================= PAYMENT SUMMARY ================= -->
+    <div class="print-box">
+        <div class="section-title">Payment Summary</div>
+        Lorry Hire : ₹ {{ lh.lorry_hire }}<br>
+        Advance : ₹ {{ lh.advance }}<br>
+        <div class="amount">
+            Balance : ₹ {{ lh.balance }}
+        </div>
+    </div>
+
+    <!-- ================= SIGNATURES ================= -->
+    <div class="sign-box">
+        <div>Driver Signature</div>
+        <div>Authorized Signature</div>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+<script src="{% static 'vendor/jquery-3.2.1.min.js' %}"></script>
+<!-- Then jQuery UI -->
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<!-- Then jQuery UI -->
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<!-- Bootstrap JS-->
+<script src="{% static 'vendor/bootstrap-4.1/popper.min.js' %}"></script>
+<script src="{% static 'vendor/bootstrap-4.1/bootstrap.min.js' %}"></script>
+<!-- Vendor JS       -->
+<script src="{% static 'vendor/slick/slick.min.js' %}">
+</script>
+<script src="{% static 'vendor/wow/wow.min.js' %}"></script>
+<script src="{% static 'vendor/animsition/animsition.min.js' %}"></script>
+<script src="{% static 'vendor/bootstrap-progressbar/bootstrap-progressbar.min.js' %}">
+</script>
+<script src="{% static 'vendor/counter-up/jquery.waypoints.min.js' %}"></script>
+<script src="{% static 'vendor/counter-up/jquery.counterup.min.js' %}">
+</script>
+<script src="{% static 'vendor/circle-progress/circle-progress.min.js' %}"></script>
+<script src="{% static 'vendor/perfect-scrollbar/perfect-scrollbar.js' %}"></script>
+<script src="{% static 'vendor/chartjs/Chart.bundle.min.js' %}"></script>
+<script src="{% static 'vendor/select2/select2.min.js' %}">
+</script>
+
+<!-- Main JS-->
+<script src="{% static 'js/main.js' %}"></script>
+
+
+{% if print %}
+<script>
+Swal.fire({
+    title: "Saved Successfully!",
+    text: "Do you want to print the Lorry Hire?",
+    icon: "success",
+    showCancelButton: true,
+    confirmButtonText: "Print",
+    cancelButtonText: "Close"
+}).then((result) => {
+    if (result.isConfirmed) {
+        triggerPrint();
+    } else {
+        window.location.href = "{% url 'main:lorry_hire' %}"
+    }
+});
+</script>
+{% elif success %}
+    <script>
+        Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: '{{success}}',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = "{% url 'main:lorry_hire' %}"
+        }
+        else {
+            window.location.href = "{% url 'main:lorry_hire' %}"
+        }
+    });
+    </script>
+{% elif error %}
+<script>
+        Swal.fire({
+            title: "Error {{error}}",
+            icon: "error",
+            });
+    </script>
+{% endif %}
+<script>
+    document.getElementById('series').addEventListener('change', function () {
+        const seriesId = this.value;
+        if (seriesId) {
+            fetch(`/demo.com/get_serial_number_lh/?series_id=${seriesId}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.serial_no)
+                    if (data.serial_no !== undefined) {
+                        $('input[name="entry_number"]').val(data.serial_no);
+                    } else {
+                        document.getElementById('entry_number').value = '';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching serial number:', error);
+                    document.getElementById('entry_number').value = '';
+                });
+        } else {
+            document.getElementById('entry_number').value = '';
+        }
+    });
+</script>
+
+{% if lh.id %}
+<script>
+    function confirmDelete() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This action cannot be undone.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "{% url 'main:lorry_hire_delete' lh_id=lh.id %}";
+            }
+        });
+    }
+</script>
+{% endif %}
+
+<script>
+function triggerPrint() {
+    const printArea = document.getElementById("print-header");
+
+    if (!printArea) {
+        console.error("Print area not found!");
+        return;
+    }
+
+    // Show print area
+    printArea.style.display = "block";
+
+    // Small delay to allow DOM rendering
+    setTimeout(() => {
+        window.print();
+
+        // Hide print area again after print
+        printArea.style.display = "none";
+        window.location.href = "{% url 'main:lorry_hire' %}"
+    }, 300);
+}
+</script>
+
+{% endblock %}
