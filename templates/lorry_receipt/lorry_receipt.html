@@ -476,7 +476,7 @@
         <div class="form-row">
             <label>Vehicle No</label>
             <select id="vehicle_no" name="vehicle_no" class="form-control" style="width:230px;height:25px;padding:0 4px;">
-                <option value="">Select series</option>
+                <option value="">Select Vehicle No</option>
                 {% for vehicle in vehicles %}
                 <option value="{{ vehicle.registration_number }}" {% if lr.vehicle_no == vehicle.registration_number %} selected {% endif %}> {{ vehicle.registration_number }} </option>
                 {% endfor %}

@@ -637,7 +637,7 @@ def employee_create(request):
         bank_name = request.POST.get('bank_name').strip().upper()
         branch = request.POST.get('branch').strip().upper()
         ifsc_code = request.POST.get('ifsc_code').strip().upper()
-        casual_leaves = request.POST.get('casual_leaves')
+        casual_leaves = request.POST.get('casual_leaves') or 0
 
         # Validate mobile number (must be exactly 10 digits)
         if not re.fullmatch(r'\d{10}', mobile):
@@ -728,7 +728,7 @@ def employee_update(request, pk):
         bank_name = request.POST.get('bank_name').strip().upper()
         branch = request.POST.get('branch').strip().upper()
         ifsc_code = request.POST.get('ifsc_code').strip().upper()
-        casual_leaves = request.POST.get('casual_leaves')
+        casual_leaves = request.POST.get('casual_leaves') or 0
 
         # Validate mobile number (must be exactly 10 digits)
         if not re.fullmatch(r'\d{10}', mobile):

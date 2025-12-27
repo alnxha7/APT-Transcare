@@ -47,19 +47,6 @@
 
             <li class="has-sub">
                 <a href="#">
-                    <i class="fas fa-file-alt"></i><span>Billing Entry</span>
-                    <i class="arrow fas fa-chevron-right"></i>
-                </a>
-                <ul class="submenu">
-                    <li><a href="{% url 'main:bill_details' %}">Bill Entry</a></li>
-                    <li><a href="{% url 'main:bill_search' %}">Modify Bill</a></li>
-                    <li><a href="{% url 'main:bill_delete_search' %}">Delete Bill</a></li>
-                    <li><a href="{% url 'main:bill_report_search' %}">Report</a></li>
-                </ul>
-            </li>
-
-                <li class="has-sub">
-                <a href="#">
                     <i class="fas fa-shipping-fast"></i><span>Lorry Receipt</span>
                     <i class="arrow fas fa-chevron-right"></i>
                 </a>
@@ -68,28 +55,6 @@
                     <li><a href="{% url 'main:lr_search' %}">Edit</a></li>
                     <li><a href="{% url 'main:lr_delete_search' %}">Delete</a></li>
                     <li><a href="{% url 'main:customer_search' %}">Report</a></li>
-                </ul>
-            </li>
-
-            <li class="has-sub">
-                <a href="#">
-                    <i class="fas fa-download"></i><span>Receive</span>
-                    <i class="arrow fas fa-chevron-right"></i>
-                </a>
-                <ul class="submenu">
-                    <li><a href="{% url 'main:lr_report_search' %}">Despatch Receive</a></li>
-                </ul>
-            </li>
-
-            <li class="has-sub">
-                <a href="#">
-                    <i class="fas fa-sitemap"></i><span>Lorry Hire</span>
-                    <i class="arrow fas fa-chevron-right"></i>
-                </a>
-                <ul class="submenu">
-                    <li><a href="{% url 'main:lorry_hire' %}">Entry</a></li>
-                    <li><a href="{% url 'main:lorry_hire_search' %}">Modify</a></li>
-                    <li><a href="{% url 'main:lorry_hire_delete_search' %}">Delete</a></li>
                 </ul>
             </li>
 
@@ -105,6 +70,16 @@
 
             <li class="has-sub">
                 <a href="#">
+                    <i class="fas fa-download"></i><span>Receive</span>
+                    <i class="arrow fas fa-chevron-right"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="{% url 'main:lr_report_search' %}">Despatch Receive</a></li>
+                </ul>
+            </li>
+
+            <li class="has-sub">
+                <a href="#">
                     <i class="fas fa-clone"></i><span>Cash Receipt</span>
                     <i class="arrow fas fa-chevron-right"></i>
                 </a>
@@ -112,6 +87,20 @@
                     <li><a href="{% url 'main:cash_receipt_search' %}">Cash Receipt</a></li>
                 </ul>
             </li>
+
+            <li class="has-sub">
+                <a href="#">
+                    <i class="fas fa-sitemap"></i><span>Lorry Hire</span>
+                    <i class="arrow fas fa-chevron-right"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="{% url 'main:lorry_hire' %}">Entry</a></li>
+                    <li><a href="{% url 'main:lorry_hire_search' %}">Modify</a></li>
+                    <li><a href="{% url 'main:lorry_hire_delete_search' %}">Delete</a></li>
+                </ul>
+            </li>
+
+            
 <li class="has-sub">
     <a href="#">
         <i class="fas fa-calculator"></i><span>Accounts</span>
@@ -225,18 +214,6 @@
 
     </ul>
 </li>
-
-
-
-            <li class="has-sub">
-                <a href="#">
-                    <i class="fas fa-cogs"></i><span>Driver Bata</span>
-                    <i class="arrow fas fa-chevron-right"></i>
-                </a>
-                <ul class="submenu">
-                    <li><a href="{% url 'main:driver_bata' %}">Driver Bata</a></li>
-                </ul>
-            </li>
 
 
 

@@ -162,7 +162,7 @@ class Employee_master(models.Model):
     bank_name = models.CharField(max_length=100)
     branch = models.CharField(max_length=100)
     ifsc_code = models.CharField(max_length=100)
-    casual_leaves = models.IntegerField(default=12)
+    casual_leaves = models.IntegerField(default=12, null=True, blank=True)
 
     co_id = models.CharField(max_length=10, default='c')  # Default value 'c'
     branch_id = models.CharField(max_length=50,default="branch")
