@@ -339,19 +339,21 @@
        
         <div class="container">
 
-<h2>Customer Wise Report</h2>
+<h2>Cash Receipt Report</h2>
     <div class="container">
         <!-- 🔹 Table Section -->
         <div class="table-container">
-            <p>LR Report Details</p>
+            <p>CR Report Details</p>
             <table id="billTable">
                 <thead>
                     <tr>
                         <th style="text-align: left;">Sl.no</th>
-                        <th style="text-align: left;">LR Date</th>
-                        <th style="text-align: left;">LR No</th>
+                        <th style="text-align: left;">CR No</th>
                         <th style="text-align: left;">Consignee</th>
-                        <th style="text-align: left;">From</th>
+                        <th style="text-align: left;">CR Date</th>
+                        <th style="text-align: left;">LR No</th>
+                        <th style="text-align: left;">LR Date</th>
+                        <th style="text-align: left;">Art</th>
                         <th style="text-align: left;">To</th>
                         <th style="text-align: left;">Payment</th>
                         <th style="text-align: left;">Inv No</th>
@@ -364,24 +366,26 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% if lrs %}
-                        {% for lr in lrs %}
-                                <input type="hidden" name="lr_id[]" value="{{ lr.id }}">
-                                <tr data-lr-id="{{ lr.id }}">
+                    {% if crs %}
+                        {% for cr in crs %}
+                                <input type="hidden" name="cr_id[]" value="{{ cr.id }}">
+                                <tr data-lr-id="{{ cr.id }}">
                                     <td style="text-align: center;">{{ forloop.counter }}</td>
-                                    <td style="text-align: center;">{{ lr.master.lr_date }}</td>
-                                    <td style="text-align: center;">{{ lr.master.lr_no }}</td>
-                                    <td style="text-align: left;">{{ lr.master.consignee_name }}</td>
-                                    <td style="text-align: left;">{{ lr.master.load_from }}</td>
-                                    <td style="text-align: left;"> {{ lr.master.load_to }} </td>
-                                    <td style="text-align: center;">{{ lr.master.payment }}</td>
-                                    <td style="text-align: center;">{{ lr.inv_no }}</td>
-                                    <td style="text-align: center;">{{ lr.inv_amount }}</td>
-                                    <td style="text-align: left;">{{ lr.item }}</td>
-                                    <td style="text-align: center;">{{ lr.weight }}</td>
-                                    <td style="text-align: center;">{{ lr.rate }}</td>
-                                    <td style="text-align: center;">{{ lr.pkg }}</td>
-                                    <td style="text-align: center;">{{ lr.freight }}</td>
+                                    <td style="text-align: center;">{{ cr.master.receipt_no }}</td>
+                                    <td style="text-align: left;">{{ cr.master.consignee_name }}</td>
+                                    <td style="text-align: center;">{{ cr.master.receipt_date }}</td>
+                                    <td style="text-align: center;">{{ cr.master.lr.lr_no }}</td>
+                                    <td style="text-align: center;">{{ cr.master.lr.lr_date }}</td>
+                                    <td style="text-align: left;">{{ cr.load_from }}</td>
+                                    <td style="text-align: left;"> {{ cr.load_to }} </td>
+                                    <td style="text-align: center;">{{ cr.payment }}</td>
+                                    <td style="text-align: center;">{{ cr.inv_no }}</td>
+                                    <td style="text-align: center;">{{ cr.inv_amount }}</td>
+                                    <td style="text-align: left;">{{ cr.item }}</td>
+                                    <td style="text-align: center;">{{ cr.weight }}</td>
+                                    <td style="text-align: center;">{{ cr.rate }}</td>
+                                    <td style="text-align: center;">{{ cr.pkg }}</td>
+                                    <td style="text-align: center;">{{ cr.freight }}</td>
                                 </tr>
                         {% endfor %}
                         <tr style="font-weight: bold; background-color: #f0f0f0;">

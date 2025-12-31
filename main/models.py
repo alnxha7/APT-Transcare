@@ -786,6 +786,7 @@ class LorryReceiptMaster(models.Model):
     consignee_code = models.IntegerField()
     consignee_account = models.ForeignKey(Table_Accountsmaster,on_delete=models.CASCADE, related_name='consignee_accounts')
 
+    eway_billno = models.CharField(max_length=100, null=True, blank=True)
     payment = models.CharField(max_length=50)
     vehicle_no = models.CharField(max_length=80, null=True, blank=True)
     remarks = models.CharField(max_length=255, null=True, blank=True)
@@ -809,6 +810,8 @@ class LorryReceiptItems(models.Model):
     item = models.CharField(max_length=255)
     inv_no = models.CharField(max_length=255)
     weight = models.FloatField()
+    charged_weight = models.FloatField(default=0.00)
+    numbers = models.IntegerField(default=1)
     rate = models.FloatField()
     inv_amount = models.FloatField()
     freight = models.FloatField()
@@ -836,6 +839,7 @@ class CashReceipt(models.Model):
     payment = models.CharField(max_length=50)
     vehicle_no = models.CharField(max_length=80, null=True, blank=True)
     remarks = models.CharField(max_length=255, null=True, blank=True)
+    employee = models.ForeignKey(Employee_master, on_delete=models.SET_NULL, null=True, blank=True)
 
     load_from = models.CharField(max_length=100)
     load_to = models.CharField(max_length=100)
@@ -844,6 +848,11 @@ class CashReceipt(models.Model):
     door_cl_dl = models.FloatField(default=0.00)
     risk_charge = models.FloatField(default=0.00)
     statutory_charge = models.FloatField(default=0.00)
+
+    cr_hamali = models.FloatField(default=0.00)
+    cr_door_cl_dl = models.FloatField(default=0.00)
+    cr_risk_charge = models.FloatField(default=0.00)
+    cr_statutory_charge = models.FloatField(default=0.00)
 
     gross_amount = models.FloatField(default=0.00)
     total_charges = models.FloatField()
@@ -855,6 +864,8 @@ class CashReceiptItems(models.Model):
     item = models.CharField(max_length=255)
     inv_no = models.CharField(max_length=255)
     weight = models.FloatField()
+    charged_weight = models.FloatField(default=0.00)
+    numbers = models.IntegerField(default=1)
     rate = models.FloatField()
     inv_amount = models.FloatField()
     freight = models.FloatField()

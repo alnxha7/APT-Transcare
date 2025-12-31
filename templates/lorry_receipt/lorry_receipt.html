@@ -382,6 +382,195 @@
 }
  </style>
 
+<style>
+.status-box {
+    max-width: 450px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    margin: 12px 0 18px;
+    font-size: 13px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+/* Header */
+.status-header {
+    background: linear-gradient(90deg, #f7f7f7, #eeeeee);
+    padding: 10px 12px;
+    font-weight: 700;
+    border-bottom: 1px solid #dcdcdc;
+    border-radius: 8px 8px 0 0;
+    letter-spacing: 0.3px;
+}
+
+/* Rows */
+.status-row {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    padding: 10px 12px;
+    border-bottom: 1px dashed #e2e2e2;
+    align-items: center;
+}
+
+.status-row:last-child {
+    border-bottom: none;
+}
+
+/* Left column */
+.task {
+    font-weight: 600;
+    color: #333;
+}
+
+/* Right column */
+.status {
+    text-align: right;
+    font-weight: 600;
+}
+
+/* Status pills */
+.status.completed {
+    color: #155724;
+}
+
+.status.pending {
+    color: #856404;
+}
+
+/* Badge effect */
+.status.completed::before,
+.status.pending::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+.status.completed::before {
+    background: #28a745;
+}
+
+.status.pending::before {
+    background: #ffc107;
+}
+
+/* Document numbers */
+.doc-no {
+    display: block;
+    font-size: 11.5px;
+    color: #666;
+    font-weight: normal;
+    margin-top: 3px;
+}
+.lr-status-card {
+    max-width: 480px;
+    border-radius: 14px;
+    background: #FEF3E2;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+    margin: 15px 0 25px;
+    overflow: hidden;
+    font-size: 13.5px;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+/* Header */
+.lr-status-header {
+    padding: 14px 16px;
+    font-weight: 700;
+    font-size: 15px;
+    color: #d88604;
+    background: linear-gradient(135deg, #ffe797, #ffe797);
+    letter-spacing: 0.4px;
+}
+
+/* Body */
+.lr-status-body {
+    padding: 10px 12px;
+}
+
+/* Row */
+.lr-status-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    padding: 12px 10px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    background: #f8f9fb;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.lr-status-row:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* Task */
+.task {
+    font-weight: 700;
+    color: #2b2b2b;
+}
+
+/* Status Pill */
+.status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Completed */
+.status.completed {
+    background: linear-gradient(135deg, #d88604, #d88604);
+    color: #ffffff;
+}
+
+/* Pending */
+.status.pending {
+    background: linear-gradient(135deg, #f5ebc8, #f5ebc8);
+    color: #000000b3;
+}
+
+/* Status dot */
+.status::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.9);
+}
+
+/* Document number */
+.doc-no {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    opacity: 0.9;
+    margin-top: 4px;
+    text-transform: none;
+    color: white;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+</style>
 <!-- /* --------------------------- INVOICE STYLE ----------------------------- */ -->
 
 <style>
@@ -465,21 +654,25 @@
     <!-- 2?? Middle Column -->
     <div class="column" style="position: relative; top: 75px;">
         <div class="form-row">
+            <label>E-Way Bill No</label>
+            <input type="text" class="form-control" id="eway_billno" name="eway_billno" value="{{ lr.eway_billno|default_if_none:'' }}" readonly>
+        </div>
+
+        <div class="form-row">
             <label>Payment</label>
             <select id="payment_method" name="payment_method">
                 <option value="PAID" {% if lr.payment == "PAID" %} selected {% endif %}>PAID</option>
                 <option value="TO_PAY" {% if lr.payment == "TO_PAY" %} selected {% endif %}>TO PAY</option>
-                <option value="CREDIT" {% if lr.payment == "CREDIT" %} selected {% endif %}>CREDIT</option>
+                <option value="CREDIT" {% if lr.payment == "CREDIT" %} selected {% endif %}>TBB</option>
             </select>
         </div>
 
         <div class="form-row">
-            <label>Vehicle No</label>
+            <label>Delivery Type</label>
             <select id="vehicle_no" name="vehicle_no" class="form-control" style="width:230px;height:25px;padding:0 4px;">
-                <option value="">Select Vehicle No</option>
-                {% for vehicle in vehicles %}
-                <option value="{{ vehicle.registration_number }}" {% if lr.vehicle_no == vehicle.registration_number %} selected {% endif %}> {{ vehicle.registration_number }} </option>
-                {% endfor %}
+                <option value="">Select Delivery Type</option>
+                <option value="GODOWN DELIVERY" {% if lr.vehicle_no == "GODOWN DELIVERY" %} selected {% endif %}>GODOWN DELIVERY</option>
+                <option value="DOOR DELIVERY" {% if lr.vehicle_no == "DOOR DELIVERY" %} selected {% endif %}>DOOR DELIVERY</option>
             </select>
         </div>
 
@@ -509,7 +702,7 @@
         <div class="form-row"><label>Address 2</label><input type="text" name="consignee_address2" id="consignee_address2" class="form-control" value="{{ lr.consignee_account.address2 }}"></div>
         <div class="form-row"><label>Address 3</label><input type="text" name="consignee_address3" id="consignee_address3" class="form-control" value="{{ lr.consignee_account.address3 }}"></div>
         <div class="form-row"><label>GST No</label><input type="text" name="consignee_gstno" id="consignee_gstno" class="form-control" value="{{ lr.consignee_account.gstno }}"></div>
-        <div class="form-row"><label>Phone</label><input type="text" name="consignee_phone" id="consignee_phone" class="form-control" value="{{ lr.consignee_account.mobile }}"></div>
+        <div class="form-row"><label>Phone</label><input type="text" name="consignee_phone" id="consignee_phone" class="form-control" value="{{ lr.consignee_account.mobile }}" required></div>
         </div>
     </div>
 </div>
@@ -524,7 +717,9 @@
                     <th style="width: 25%;">Commodity/Item</th>
                     <th>Inv No</th>
                     <th>Inv Amt</th>
-                    <th>Weight</th>
+                    <th>Actual Weight</th>
+                    <th style="width: 10%;">Charged Weight</th>
+                    <th>Nos</th>
                     <th>Rate</th>
                     <th>Freight</th>
                     <th>Pkg</th>
@@ -541,8 +736,10 @@
                         <td><input type="text" name="inv_no[]" class="inv_no form-control" value="{{ item.inv_no }}"></td>
                         <td><input type="number" name="inv_amount[]" class="inv_amount form-control" value="{{ item.inv_amount }}"></td>
                         <td><input type="number" name="weight[]" class="weight form-control" value="{{ item.weight }}"></td>
+                        <td><input type="number" name="charged_weight[]" class="charged_weight form-control" value="{{ item.charged_weight }}"></td>
+                        <td><input type="number" name="numbers[]" class="numbers form-control" value="{{ item.numbers }}"></td>
                         <td><input type="number" name="rate[]" class="rate form-control" step="0.01" value="{{ item.rate }}"></td>
-                        <td><input type="number" name="freight[]" class="freight form-control" value="{{ item.freight }}" readonly></td>
+                        <td><input type="number" name="freight[]" class="freight form-control" value="{{ item.freight }}"></td>
                         <td><input type="text" name="pkg[]" class="pkg form-control" value="{{ item.pkg }}"></td>
                         <td><span class="delete-row" style="cursor:pointer; color:red;">
                             <svg xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 640 640">
@@ -559,8 +756,10 @@
                         <td><input type="text" name="inv_no[]" class="inv_no form-control"></td>
                         <td><input type="number" name="inv_amount[]" class="inv_amount form-control"></td>
                         <td><input type="number" name="weight[]" class="weight form-control"></td>
+                        <td><input type="number" name="charged_weight[]" class="charged_weight form-control"></td>
+                        <td><input type="number" name="numbers[]" class="numbers form-control"></td>
                         <td><input type="number" name="rate[]" step="0.01" class="rate form-control"></td>
-                        <td><input type="number" name="freight[]" class="freight form-control" readonly></td>
+                        <td><input type="number" name="freight[]" class="freight form-control"></td>
                         <td><input type="text" name="pkg[]" class="pkg form-control"></td>
                         <td><span class="delete-row" style="cursor:pointer; color:red;">
                             <svg xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 640 640">
@@ -703,7 +902,7 @@
 
 </div>
 
-
+{% if not request.GET.action == 'check_status' %}
 <!-- ?? Buttons Section -->
 <div class="text-end" style="margin-top:0px;">
 {% if request.GET.action == 'delete' %}
@@ -715,7 +914,57 @@
   <button type="submit" class="btn btn-success btn-sm" name="action" value="save">Save</button>
 {% endif %}
 </div>
+{% endif %}
 </form>
+
+
+
+{% if request.GET.action == 'check_status' %}
+<div class="lr-status-card">
+    <div class="lr-status-header">
+        🚚 LR Status Tracker
+    </div>
+
+    <div class="lr-status-body">
+
+        <div class="lr-status-row">
+            <div class="task">GDM</div>
+            <div class="status {% if request.GET.gdm == '1' %}completed{% else %}pending{% endif %}">
+                {% if request.GET.gdm == '1' %}
+                    Completed
+                    {% if request.GET.gdm_no %}
+                        <span class="doc-no">GDM No: {{ request.GET.gdm_no }}</span>
+                    {% endif %}
+                {% else %}
+                    Pending
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="lr-status-row">
+            <div class="task">Received</div>
+            <div class="status {% if request.GET.received == '1' %}completed{% else %}pending{% endif %}">
+                {% if request.GET.received == '1' %}Received{% else %}Pending{% endif %}
+            </div>
+        </div>
+
+        <div class="lr-status-row">
+            <div class="task">Delivery</div>
+            <div class="status {% if request.GET.delivery == '1' %}completed{% else %}pending{% endif %}">
+                {% if request.GET.delivery == '1' %}
+                    Delivered
+                    {% if request.GET.cash_no %}
+                        <span class="doc-no">Receipt: {{ request.GET.cash_no }}</span>
+                    {% endif %}
+                {% else %}
+                    Pending
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endif %}
 
 
 </div>
@@ -907,7 +1156,9 @@
             <th style="width:5%;">Sl.No</th>
             <th style="width:30%;">Item</th>
             <th style="width:12%;">Inv Amt</th>
-            <th style="width:12%;">Weight</th>
+            <th style="width:12%;">Actual Weight</th>
+            <th style="width:12%;">Charged Weight</th>
+            <th style="width:12%;">Nos</th>
             <th style="width:12%;">Rate</th>
             <th style="width:12%;">Freight</th>
             <th style="width:10%;">Pkg</th>
@@ -930,6 +1181,12 @@
 
                 <!-- Weight -->
                 <td>{{ item.weight }}</td>
+
+                <!-- Charged Weight -->
+                <td>{{ item.charged_weight }}</td>
+
+                <!-- Nos -->
+                <td>{{ item.numbers }}</td>
 
                 <!-- Rate -->
                 <td>{{ item.rate }}</td>
@@ -1202,7 +1459,13 @@ function updateTotals() {
 
     $("#total_charges").val(total_charges.toFixed(2));
     $("#grand_total").val(grand_total.toFixed(2));
+    toggleEwayBill();
 }
+
+$(document).on("input", ".freight", function () {
+    if (this.value < 0) this.value = 0;
+    updateTotals();
+});
 
 
 $(document).on("input", "#hamali, #door_cl, #risk_charge, #statutory", function () {
@@ -1225,11 +1488,13 @@ $(document).ready(function() {
             <td><input type="text" name="inv_no[]" class="inv_no form-control"></td>
             <td><input type="number" name="inv_amount[]" class="inv_amount form-control"></td>
             <td><input type="number" name="weight[]" class="weight form-control"></td>
+            <td><input type="number" name="charged_weight[]" class="charged_weight form-control"></td>
+            <td><input type="number" name="numbers[]" class="numbers form-control"></td>
 
             <!-- ?? auto-apply rate when creating row -->
-            <td><input type="number" name="rate[]" class="rate form-control" value="${globalRate}"></td>
+            <td><input type="number" name="rate[]" class="rate form-control"></td>
 
-            <td><input type="number" name="freight[]" class="freight form-control" readonly></td>
+            <td><input type="number" name="freight[]" class="freight form-control"></td>
             <td><input type="text" name="pkg[]" class="pkg form-control"></td>
             <td><span class="delete-row" style="cursor:pointer; color:red;">
                 <svg xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 640 640">
@@ -1240,13 +1505,6 @@ $(document).ready(function() {
 
     table.append(newRow);
     updateSerialNumbers();
-
-    // After adding, compute freight for the new row
-    let lastRow = $("#tripTable tbody tr").last();
-    let weight = parseFloat(lastRow.find(".weight").val()) || 0;
-    let freight = globalRate * weight;
-    lastRow.find(".freight").val(freight.toFixed(2));
-
     updateTotals();
 }
 
@@ -1257,17 +1515,6 @@ $(document).ready(function() {
             $(this).find(".slno").text(index + 1);
         });
     }
-
-    // ?? Recalculate freight and totals on rate/weight input
-    $(document).on("input", ".rate, .weight", function() {
-        const row = $(this).closest("tr");
-        const rate = parseFloat(row.find(".rate").val()) || 0;
-        const weight = parseFloat(row.find(".weight").val()) || 0;
-        const freight = rate * weight;
-        row.find(".freight").val(freight.toFixed(2));
-
-        updateTotals(); // ?? Update total every time a value changes
-    });
 
     // ?? Delete a row
     $(document).on("click", ".delete-row", function() {
@@ -1365,6 +1612,7 @@ document.addEventListener("DOMContentLoaded", function() {
   document.querySelectorAll('input, textarea').forEach(el => {
     const insideTable = el.closest('#tripTable'); 
     if (el.id === 'remarks') return;
+    if (el.id === 'eway_billno') return;
     if (el.id === 'hamali') return;
     if (el.id === 'door_cl') return;
     if (el.id === 'risk_charge') return;
@@ -1422,44 +1670,38 @@ function printInvoice() {
     }
 </script>
 {% endif %}
+
 <script>
-let globalRate = 0;
-function applyRateToAllRows(rate) {
-    document.querySelectorAll("#tripTable tbody tr").forEach(function (row) {
+function toggleEwayBill() {
+    const grandTotal = parseFloat($("#grand_total").val()) || 0;
 
-        // Set the updated rate
-        let rateInput = row.querySelector(".rate");
-        rateInput.value = rate;
-
-        // Get weight from row
-        let weight = parseFloat(row.querySelector(".weight").value) || 0;
-
-        // Recalculate freight
-        let freight = rate * weight;
-        row.querySelector(".freight").value = freight.toFixed(2);
-    });
-
-    // Update totals after all rows updated
-    if (typeof updateTotals === "function") {
-        updateTotals();
+    if (grandTotal >= 50000) {
+        $("#eway_billno").prop("readonly", false).prop("required", true);
+    } else {
+        $("#eway_billno").prop("readonly", true).val("").prop("required", false).val("");
     }
 }
 
-function updateAllRowsWithNewRate() {
-    $("#tripTable tbody tr").each(function () {
-        const row = $(this);
-        row.find(".rate").val(globalRate);
-
-        const weight = parseFloat(row.find(".weight").val()) || 0;
-        const freight = (parseFloat(globalRate) * weight) || 0;
-
-        row.find(".freight").val(freight.toFixed(2));
-    });
-
-    updateTotals();
-}
-
+// Run once on page load
+$(document).ready(function () {
+    toggleEwayBill();
+});
 </script>
 
+{% if request.GET.action == 'check_status' %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('input, textarea').forEach(el => {
+            
+            if (!['button', 'submit'].includes(el.type)) {
+                el.setAttribute('readonly', true);
+            }
+        });
+        document.querySelectorAll('select').forEach(el => {
+            el.disabled = true;
+        });
+    });
+</script>
+{% endif %}
 
 {% endblock %}

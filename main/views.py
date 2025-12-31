@@ -644,7 +644,7 @@ def employee_create(request):
             messages.error(request, "Invalid mobile number! It must be exactly 10 digits.")
             return render(request, 'employee/employee_form.html',{'existing_departments': existing_departments,'existing_designations': existing_designations})
         # Check if mobile already exists
-        if Employee_master.objects.filter(mobile=mobile).exists():
+        if Employee_master.objects.filter(co_id=co_id, branch_id=branch_id, mobile=mobile).exists():
             messages.error(request, "Mobile number already exists!")
             return render(request, 'employee/employee_form.html', {'existing_departments': existing_departments,'existing_designations': existing_designations})
 
@@ -7645,6 +7645,7 @@ def lorry_receipt(request):
                                                     branch__branch_name=request.session.get('branch'), 
                                                     account_code=request.POST.get('consignee_code')),
 
+                eway_billno=request.POST.get('eway_billno') or None,
                 payment=request.POST.get('payment_method'),
                 vehicle_no=request.POST.get('vehicle_no') or None,
                 remarks=request.POST.get('remarks'),
@@ -7662,10 +7663,12 @@ def lorry_receipt(request):
                 total_charges=request.POST.get('total_charges'),
                 grand_total=request.POST.get('grand_total'),
             )
-            for item_code, item, weight, rate, inv_no, inv_amount, freight, pkg in zip(
+            for item_code, item, weight, charged_weight, numbers, rate, inv_no, inv_amount, freight, pkg in zip(
                 request.POST.getlist('item_code[]'),
                 request.POST.getlist('commodity[]'),
                 request.POST.getlist('weight[]'),
+                request.POST.getlist('charged_weight[]'),
+                request.POST.getlist('numbers[]'),
                 request.POST.getlist('rate[]'),
                 request.POST.getlist('inv_no[]'),
                 request.POST.getlist('inv_amount[]'),
@@ -7680,6 +7683,8 @@ def lorry_receipt(request):
                         inv_no=inv_no,
                         inv_amount=inv_amount,
                         weight=float(weight) if weight else 0,
+                        numbers=int(numbers) if numbers else 0,
+                        charged_weight=float(charged_weight) if charged_weight else 0,
                         rate=float(rate) if rate else 0,
                         freight=float(freight) if freight else 0,
                         pkg=pkg,
@@ -7813,6 +7818,7 @@ def lr_edit(request, lr_id):
     branches = Branch_master.objects.all()
     if request.method == 'POST':
         try:
+            lr.eway_billno = request.POST.get('eway_billno') or None
             lr.payment = request.POST.get('payment_method')
             lr.vehicle_no = request.POST.get('vehicle_no') or None
             lr.remarks = request.POST.get('remarks') or ''
@@ -7828,10 +7834,12 @@ def lr_edit(request, lr_id):
             lr.grand_total = request.POST.get('grand_total')
             lr.save()
             lr_items.delete()
-            for item_code, item, weight, rate, inv_no, inv_amount, freight, pkg in zip(
+            for item_code, item, weight, charged_weight, numbers, rate, inv_no, inv_amount, freight, pkg in zip(
                 request.POST.getlist('item_code[]'),
                 request.POST.getlist('commodity[]'),
                 request.POST.getlist('weight[]'),
+                request.POST.getlist('charged_weight[]'),
+                request.POST.getlist('numbers[]'),
                 request.POST.getlist('rate[]'),
                 request.POST.getlist('inv_no[]'),
                 request.POST.getlist('inv_amount[]'),
@@ -7846,6 +7854,8 @@ def lr_edit(request, lr_id):
                         inv_no=inv_no,
                         inv_amount=inv_amount,
                         weight=float(weight) if weight else 0,
+                        charged_weight=float(charged_weight) if charged_weight else 0,
+                        numbers=int(numbers) if numbers else 0,
                         rate=float(rate) if rate else 0,
                         freight=float(freight) if freight else 0,
                         pkg=pkg,
@@ -7921,6 +7931,11 @@ def lr_report_search(request):
                                                   branch_to=request.session.get('branch')).values_list('branch__branch_name', flat=True).distinct()
     series = GoodsDespatchMemo.objects.filter(company__company_id=request.session.get('co_id'), 
                                                   branch_to=request.session.get('branch')).values('series__series', 'branch__branch_name', 'series__id').distinct()
+    gdms = GoodsDespatchMemo.objects.filter(
+        company__company_id=request.session.get('co_id'),
+        branch_to=request.session.get('branch')
+    ).order_by('gdm_no')
+
     if request.method == 'POST':
         location = request.POST.get('location')
         series_selected = request.POST.get('series')
@@ -7944,6 +7959,7 @@ def lr_report_search(request):
                 return render(request, 'reports/lorry_receipt/lr_search.html', {
                     'locations': locations,
                     'series': series,
+                    'gdms': gdms,
                     'error': 'Please input any field'
                 })
         else:
@@ -7962,9 +7978,10 @@ def lr_report_search(request):
                 return render(request, 'reports/lorry_receipt/lr_search.html', {
                     'locations': locations,
                     'series': series,
+                    'gdms': gdms,
                     'error': 'Please input any field'
                 })
-    return render(request, 'reports/lorry_receipt/lr_search.html', {'locations': locations, 'series': series,})
+    return render(request, 'reports/lorry_receipt/lr_search.html', {'locations': locations, 'series': series, 'gdms': gdms,})
 
 def lr_report(request):
     co_id = request.session.get('co_id')
@@ -8104,21 +8121,18 @@ def lr_edit_cash_receipt(request, lr_id):
     lr_items = LorryReceiptItems.objects.filter(master=lr)
     vouchers = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch'), 
                                                    category='Cash Receipt')
+    employees = Employee_master.objects.filter(co_id=request.session.get('co_id'), branch_id=request.session.get('branch'))
     if request.method == 'POST':
         try:
-            existing_cr = CashReceipt.objects.filter(lr=lr).first()
-            if existing_cr:
-                return render(request, "lorry_receipt/lr_edit.html", {'error': 'Cash Receipt already exists for this LR'})
+            # existing_cr = CashReceipt.objects.filter(lr=lr).first()
+            # if existing_cr:
+            #     return render(request, "lorry_receipt/lr_edit.html", {'error': 'Cash Receipt already exists for this LR'})
             series_id = request.POST.get('series')
             voucher_config = VoucherConfiguration.objects.get(id=series_id, category='Cash Receipt')
             serial_no = voucher_config.serial_no
 
             lr.payment = request.POST.get('payment_method')
             lr.remarks = request.POST.get('remarks') or ''
-            lr.hamali = request.POST.get('hamali')
-            lr.door_cl_dl = request.POST.get('door_cl')
-            lr.risk_charge = request.POST.get('risk_charge')
-            lr.statutory_charge = request.POST.get('statutory')
             lr.gross_amount = request.POST.get('gross_amount')
             lr.total_charges = request.POST.get('total_charges')
             lr.grand_total = request.POST.get('grand_total')
@@ -8144,6 +8158,7 @@ def lr_edit_cash_receipt(request, lr_id):
                 payment=request.POST.get('payment_method'),
                 vehicle_no=request.POST.get('vehicle_no') or None,
                 remarks=request.POST.get('remarks') or None,
+                employee=Employee_master.objects.filter(id=request.POST.get('employee')).first() or None,
 
                 load_from=lr.load_from,
                 load_to=lr.load_to,
@@ -8153,6 +8168,11 @@ def lr_edit_cash_receipt(request, lr_id):
                 risk_charge=request.POST.get('risk_charge'),
                 statutory_charge=request.POST.get('statutory'),
 
+                cr_hamali=request.POST.get('cr_hamali'),
+                cr_door_cl_dl=request.POST.get('cr_door_cl_dl'),
+                cr_risk_charge=request.POST.get('cr_risk_charge'),
+                cr_statutory_charge=request.POST.get('cr_statutory_charge'),
+
                 gross_amount=request.POST.get('gross_amount'),
                 total_charges=request.POST.get('total_charges'),
                 grand_total=request.POST.get('grand_total'),
@@ -8161,10 +8181,12 @@ def lr_edit_cash_receipt(request, lr_id):
             voucher_config.save()
 
             lr_items.delete()
-            for item_code, item, weight, rate, inv_no, inv_amount, freight, pkg in zip(
+            for item_code, item, weight, charged_weight, numbers, rate, inv_no, inv_amount, freight, pkg in zip(
                 request.POST.getlist('item_code[]'),
                 request.POST.getlist('commodity[]'),
                 request.POST.getlist('weight[]'),
+                request.POST.getlist('charged_weight[]'),
+                request.POST.getlist('numbers[]'),
                 request.POST.getlist('rate[]'),
                 request.POST.getlist('inv_no[]'),
                 request.POST.getlist('inv_amount[]'),
@@ -8179,6 +8201,8 @@ def lr_edit_cash_receipt(request, lr_id):
                         inv_no=inv_no,
                         inv_amount=inv_amount,
                         weight=float(weight) if weight else 0,
+                        charged_weight=float(charged_weight) if charged_weight else 0,
+                        numbers=int(numbers) if numbers else 0,
                         rate=float(rate) if rate else 0,
                         freight=float(freight) if freight else 0,
                         pkg=pkg,
@@ -8192,6 +8216,8 @@ def lr_edit_cash_receipt(request, lr_id):
                         inv_no=inv_no,
                         inv_amount=inv_amount,
                         weight=float(weight) if weight else 0,
+                        charged_weight=float(charged_weight) if charged_weight else 0,
+                        numbers=int(numbers) if numbers else 0,
                         rate=float(rate) if rate else 0,
                         freight=float(freight) if freight else 0,
                         pkg=pkg,
@@ -8201,6 +8227,7 @@ def lr_edit_cash_receipt(request, lr_id):
                 'vouchers': vouchers,
                 'locations': LocationMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch')),
                 'vehicles': Vehicle_master.objects.filter(co_id=request.session.get('co_id'), branch_id=request.session.get('branch')),
+                'employees': employees,
                 'lr': cash_receipt,
                 'lr_items': LorryReceiptItems.objects.filter(master=lr),
                 'print': True if request.POST.get('action') == 'print' else False,
@@ -8215,6 +8242,7 @@ def lr_edit_cash_receipt(request, lr_id):
                 'lr_items': lr_items,
                 'locations': LocationMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch')),
                 'vehicles': Vehicle_master.objects.filter(co_id=request.session.get('co_id'), branch_id=request.session.get('branch')),
+                'employees': employees,
                 'error': str(e),
             }
             return render(request, "lorry_receipt/lr_edit.html", context)
@@ -8224,6 +8252,7 @@ def lr_edit_cash_receipt(request, lr_id):
         'lr_items': lr_items,
         'locations': LocationMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch')),
         'vehicles': Vehicle_master.objects.filter(co_id=request.session.get('co_id'), branch_id=request.session.get('branch')),
+        'employees': employees,
     }
     return render(request, "lorry_receipt/lr_edit.html", context)
 
@@ -8518,3 +8547,79 @@ def lorry_hire_delete(request, lh_id):
     except Exception as e:
         print(e)
         return render(request, 'lorry_hire/lorry_delete.html', {'error': str(e)})
+
+def lr_check_status(request):
+    series = VoucherConfiguration.objects.filter(
+        company__company_id=request.session.get('co_id'),
+        branch__branch_name=request.session.get('branch'),
+        category='Lorry Receipt'
+    )
+
+    if request.method == 'POST':
+        series_id = request.POST.get('series')
+        bill_no = request.POST.get('entry_number')
+
+        try:
+            seriess = VoucherConfiguration.objects.filter(id=series_id).first()
+            lr = LorryReceiptMaster.objects.get(
+                branch__branch_name=request.session.get('branch'),
+                lr_no=bill_no,
+                series=seriess
+            )
+
+            # ---- GDM ----
+            gdm_obj = GDMChild.objects.filter(
+                master__company__company_id=request.session.get('co_id'),
+                master__branch__branch_name=request.session.get('branch'),
+                lr_fk__master=lr
+            ).select_related('master').first()
+
+            gdm_done = bool(gdm_obj)
+            gdm_no = gdm_obj.master.gdm_no if gdm_obj else ""
+
+            # ---- RECEIVED ----
+            received_done = LorryReceiptItems.objects.filter(
+                master=lr,
+                checked=True
+            ).exists()
+
+            # ---- DELIVERY / CASH RECEIPT ----
+            cash_obj = CashReceipt.objects.filter(lr=lr).first()
+            delivery_done = bool(cash_obj)
+            cash_no = cash_obj.receipt_no if cash_obj else ""
+
+            # Auto mark GDM if later stages exist
+            if delivery_done and received_done:
+                gdm_done = True
+
+            return redirect(
+                f"/lr_edit/{lr.id}?action=check_status"
+                f"&gdm={int(gdm_done)}"
+                f"&received={int(received_done)}"
+                f"&delivery={int(delivery_done)}"
+                f"&gdm_no={gdm_no}"
+                f"&cash_no={cash_no}"
+            )
+
+        except Exception as e:
+            print(e)
+            return render(
+                request,
+                "lorry_receipt/status_search.html",
+                {
+                    'error': 'No LR found for your LR number and series',
+                    'series': series
+                }
+            )
+
+    return render(request, "lorry_receipt/status_search.html", {'series': series})
+
+def cr_report_search(request):
+    if request.method == 'POST':
+        date_from = request.POST.get('date_from')
+        date_to = request.POST.get('date_to')
+        crs = CashReceiptItems.objects.filter(master__receipt_date__range=[date_from, date_to],
+                                        master__company__company_id=request.session.get('co_id'),
+                                        master__branch__branch_name=request.session.get('branch'))
+        return render(request, 'reports/cash_receipt/cr_report.html', {'crs': crs, 'date_from': date_from, 'date_to': date_to})
+    return render(request, 'reports/cash_receipt/search.html')
