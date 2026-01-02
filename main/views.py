@@ -8630,3 +8630,134 @@ def cr_report_search(request):
                                                                        'company': Table_Companydetailsmaster.objects.get(company_id=request.session.get('co_id')),
                                                                        'date_to': date_to, 'grand_value': grand_value})
     return render(request, 'reports/cash_receipt/search.html')
+
+
+def cr_search(request):
+    series = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'),
+                                                 branch__branch_name=request.session.get('branch'),
+                                                    category='Cash Receipt')
+    if request.method == 'POST':
+        series_id = request.POST.get('series')
+        bill_no = request.POST.get('entry_number')
+
+        try:
+            seriess = VoucherConfiguration.objects.filter(id=series_id).first()
+            cr = CashReceipt.objects.get(branch__branch_name=request.session.get('branch'), receipt_no=bill_no, series=seriess)
+            return redirect("main:cr_edit", cr_id=cr.id)
+        except Exception as e:
+            print(e)
+            return render(request, "lorry_receipt/cr_search.html", {'error': 'No LR found for your LR number and series', 'series': series})
+    return render(request, 'lorry_receipt/cr_search.html', {'series': series})
+
+def cr_edit(request, cr_id):
+    cr = CashReceipt.objects.get(id=cr_id)
+    cr_items = CashReceiptItems.objects.filter(master=cr)
+    vouchers = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch'), 
+                                                   category='Cash Receipt')
+    employees = Employee_master.objects.filter(co_id=request.session.get('co_id'), branch_id=request.session.get('branch'))
+    if request.method == 'POST':
+        try:
+            cr.payment = request.POST.get('payment_method')
+            cr.employee = Employee_master.objects.filter(id=request.POST.get('employee')).first() or None
+            cr.remarks = request.POST.get('remarks') or ''
+
+            cr.load_from = request.POST.get('load_from')
+            cr.load_to = request.POST.get('load_to')
+
+            cr.hamali = request.POST.get('hamali')
+            cr.door_cl_dl = request.POST.get('door_cl')
+            cr.risk_charge = request.POST.get('risk_charge')
+            cr.statutory_charge = request.POST.get('statutory')
+
+            cr.cr_hamali = request.POST.get('cr_hamali')
+            cr.cr_door_cl_dl = request.POST.get('cr_door_cl_dl')
+            cr.cr_risk_charge = request.POST.get('cr_risk_charge')
+            cr.cr_statutory_charge = request.POST.get('cr_statutory_charge')
+
+            cr.gross_amount = request.POST.get('gross_amount')
+            cr.total_charges = request.POST.get('total_charges')
+            cr.grand_total = request.POST.get('grand_total')
+            cr.save()
+            cr_items.delete()
+            for item_code, item, weight, charged_weight, numbers, rate, inv_no, inv_amount, freight, pkg in zip(
+                request.POST.getlist('item_code[]'),
+                request.POST.getlist('commodity[]'),
+                request.POST.getlist('weight[]'),
+                request.POST.getlist('charged_weight[]'),
+                request.POST.getlist('numbers[]'),
+                request.POST.getlist('rate[]'),
+                request.POST.getlist('inv_no[]'),
+                request.POST.getlist('inv_amount[]'),
+                request.POST.getlist('freight[]'),
+                request.POST.getlist('pkg[]'),  # or 'pkg[]' if renamed
+            ):
+                if item_code.strip():  # skip empty rows
+                    CashReceiptItems.objects.create(
+                        master=cr,
+                        item_code=item_code,
+                        item=item,
+                        inv_no=inv_no,
+                        inv_amount=inv_amount,
+                        weight=float(weight) if weight else 0,
+                        charged_weight=float(charged_weight) if charged_weight else 0,
+                        numbers=int(numbers) if numbers else 0,
+                        rate=float(rate) if rate else 0,
+                        freight=float(freight) if freight else 0,
+                        pkg=pkg,
+                    )
+            context = {
+                'locations': LocationMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch')),
+                'areas': AreaMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch')),
+                'vehicles': Vehicle_master.objects.filter(co_id=request.session.get('co_id'), branch_id=request.session.get('branch')),
+                'lr': cr,
+                'employees': employees,
+                'vouchers': vouchers,
+                'lr_items': CashReceiptItems.objects.filter(master=cr),
+                'print': True if request.POST.get('action') == 'print' else False,
+                'success': 'Cash Receipt Edited successfully.',
+            }
+            return render(request, "lorry_receipt/lr_edit.html", context)
+
+        except Exception as e:
+            print(e)
+            context = {
+                'lr': cr,
+                'lr_items': cr_items,
+                'vouchers': vouchers,
+                'employees': employees,
+                'locations': LocationMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch')),
+                'areas': AreaMaster.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch')),
+                'vehicles': Vehicle_master.objects.filter(co_id=request.session.get('co_id'), branch_id=request.session.get('branch')),
+                'error': str(e),
+            }
+            return render(request, "lorry_receipt/lr_edit.html", context)
+    return render(request, 'lorry_receipt/lr_edit.html', {'lr': cr, 'lr_items': cr_items, 'vouchers': vouchers, 'employees': employees})
+
+def cr_delete_search(request):
+    series = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'),
+                                                 branch__branch_name=request.session.get('branch'),
+                                                 category='Cash Receipt')
+    if request.method == 'POST':
+        series_id = request.POST.get('series')
+        bill_no = request.POST.get('entry_number')
+
+        try:
+            seriess = VoucherConfiguration.objects.filter(id=series_id).first()
+            cr = CashReceipt.objects.get(receipt_no=bill_no, series=seriess)
+            return redirect(f"/cr_edit/{cr.id}?action=delete")
+        except Exception as e:
+            print(e)
+            series = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'), 
+                                                 branch__branch_name=request.session.get('branch'),
+                                                 category='Cash Receipt')
+            return render(request, "lorry_receipt/cr_search.html", {'error': 'No Cash Receipt found for your Receipt number and series', 'series': series})
+    return render(request, "lorry_receipt/cr_delete.html", {'series': series})
+
+def cr_delete(request, cr_id):
+    try:
+        lr = CashReceipt.objects.get(id=cr_id)
+        lr.delete()
+        return render(request, 'lorry_receipt/cr_delete.html', {'success': 'Cash Receipt Deleted Successfully'})
+    except Exception as e:
+        print(e)
+        return render(request, 'lorry_receipt/cr_delete.html', {'error': str(e)})

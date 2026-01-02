@@ -205,6 +205,10 @@ urlpatterns = [
     path("lr_edit_cash_receipt/<int:lr_id>/", views.lr_edit_cash_receipt, name="lr_edit_cash_receipt"),
     path('get_serial_number_cr/', views.get_serial_number_cr, name='get_serial_number_cr'),
     path('cr_report_search/', views.cr_report_search, name='cr_report_search'),
+    path('cr_search/', views.cr_search, name='cr_search'),
+    path("cr_edit/<int:cr_id>/", views.cr_edit, name="cr_edit"),
+    path("cr_delete_search/", views.cr_delete_search, name="cr_delete_search"),
+    path("cr_delete/<int:cr_id>/", views.cr_delete, name="cr_delete"),
 
     path("despatch_send/", views.despatch_send, name="despatch_send"),
     path("despatch_memo/", views.despatch_memo, name="despatch_memo"),

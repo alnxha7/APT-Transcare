@@ -504,13 +504,13 @@ th, td {
                 <select name="series" id="series" class="form-control" required style="padding: 3px 4px; font-size: 13px; height: 30px;">
                     <option value="">Select Series</option>
                     {% for voucher in vouchers %}
-                        <option value="{{ voucher.id }}">{{ voucher.series }}</option>
+                        <option value="{{ voucher.id }}" {% if lr.series.id == voucher.id %} selected {% endif %}>{{ voucher.series }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="field-pair">
                 <label>Receipt No</label>
-                <input type="text" name="entry_number" id="entry_number" class="form-control" readonly required>
+                <input type="text" name="entry_number" id="entry_number" class="form-control" value="{{ lr.receipt_no }}" readonly required>
             </div>
             <div class="field-pair">
             <label>Date</label>
@@ -549,12 +549,7 @@ th, td {
                 <option value="CREDIT" {% if lr.payment == "CREDIT" %} selected {% endif %}>CREDIT</option>
             </select>
         </div>
-
-        <div class="form-row">
-            <label>Delivery Type</label>
-            <input type="text" name="vehicle_no" id="vehicle_no" class="form-control" value="{{ lr.vehicle_no }}">
-        </div>
-
+        
         <div class="form-row">
             <label>Remarks</label>
             <input type="text" class="form-control" id="remarks" name="remarks" value="{{ lr.remarks }}">
@@ -1026,7 +1021,7 @@ th, td {
     Swal.fire({
         icon: 'success',
         title: 'Success',
-        text: 'LR Saved Successfully',
+        text: 'Cash Receipt Saved Successfully',
         confirmButtonText: 'Print Invoice'
     }).then((result) => {
         if (result.isConfirmed) {
@@ -1043,7 +1038,7 @@ th, td {
     Swal.fire({
         icon: 'success',
         title: 'Success',
-        text: 'LR Saved Successfully',
+        text: 'Cash Receipt Saved Successfully',
         confirmButtonText: 'OK',
     }).then((result) => {
         if (result.isConfirmed) {
@@ -1059,7 +1054,7 @@ th, td {
     Swal.fire({
         icon: 'success',
         title: 'Success',
-        text: 'LR Saved Successfully',
+        text: 'Cash Receipt Saved Successfully',
         confirmButtonText: 'OK',
     }).then((result) => {
         if (result.isConfirmed) {
@@ -1075,7 +1070,7 @@ th, td {
     Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'Error Saving the LR....Please Try Again.....!!! {{error|escapejs}}',
+        text: 'Error Saving the Cash Receipt....Please Try Again.....!!! {{error|escapejs}}',
         confirmButtonText: 'OK'
     }).then((result) => {
         if (result.isConfirmed) {
@@ -1430,7 +1425,7 @@ function printInvoice() {
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = "{% url 'main:lr_delete' lr_id=lr.id %}";
+                window.location.href = "{% url 'main:cr_delete' cr_id=lr.id %}";
             }
         });
     }

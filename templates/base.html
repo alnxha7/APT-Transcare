@@ -99,6 +99,7 @@
 
                            {% if request.user.is_authenticated %}
                         <h4 style="color:#e38c00;">Branch: {{ request.user.branch.branch_name }}</h4>
+                        <a href="{% url 'main:lr_check_status' %}" style="color:white;border-radius: 5px; border:1px solid white;padding:8px; background:#e38c00; position: relative; left: 220px;">LR Status</a>
                         <a href="{% url 'main:driver_logout' %}" style="color:white;border-radius: 5px; border:1px solid white;padding:8px; background:#e38c00;">Logout</a>
                     {% else %}
                         <!-- User is not logged in -->
