@@ -354,15 +354,15 @@
                         <th style="text-align: left;">LR No</th>
                         <th style="text-align: left;">LR Date</th>
                         <th style="text-align: left;">Art</th>
-                        <th style="text-align: left;">To</th>
-                        <th style="text-align: left;">Payment</th>
-                        <th style="text-align: left;">Inv No</th>
-                        <th style="text-align: left;">Inv Amt</th>
-                        <th style="text-align: left;">Item</th>
                         <th style="text-align: left;">Weight</th>
-                        <th style="text-align: left;">Rate</th>
-                        <th style="text-align: left;">Pkg</th>
-                        <th style="text-align: left;">Freight</th>
+                        <th style="text-align: left;">To-Pay</th>
+                        <th style="text-align: left;">Hamali</th>
+                        <th style="text-align: left;">Statutory</th>
+                        <th style="text-align: left;">Risk Ch</th>
+                        <th style="text-align: left;">Door Dl/Cl</th>
+                        <th style="text-align: left;">Payment</th>
+                        <th style="text-align: left;">Total</th>
+                        <th style="text-align: left;">Exe</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -376,28 +376,39 @@
                                     <td style="text-align: center;">{{ cr.master.receipt_date }}</td>
                                     <td style="text-align: center;">{{ cr.master.lr.lr_no }}</td>
                                     <td style="text-align: center;">{{ cr.master.lr.lr_date }}</td>
-                                    <td style="text-align: left;">{{ cr.load_from }}</td>
-                                    <td style="text-align: left;"> {{ cr.load_to }} </td>
-                                    <td style="text-align: center;">{{ cr.payment }}</td>
-                                    <td style="text-align: center;">{{ cr.inv_no }}</td>
-                                    <td style="text-align: center;">{{ cr.inv_amount }}</td>
-                                    <td style="text-align: left;">{{ cr.item }}</td>
-                                    <td style="text-align: center;">{{ cr.weight }}</td>
-                                    <td style="text-align: center;">{{ cr.rate }}</td>
-                                    <td style="text-align: center;">{{ cr.pkg }}</td>
-                                    <td style="text-align: center;">{{ cr.freight }}</td>
+                                    <td style="text-align: center;">{{ cr.numbers }}</td>
+                                    <td style="text-align: center;"> {{ cr.charged_weight }}</td>
+                                    <td style="text-align: center;">{{ cr.to_pay }}</td>
+                                    <td style="text-align: center;">{{ cr.master.cr_hamali }}</td>
+                                    <td style="text-align: center;">{{ cr.master.statutory_charge }}</td>
+                                    <td style="text-align: left;">{{ cr.master.cr_risk_charge }}</td>
+                                    <td style="text-align: center;">{{ cr.master.cr_door_cl_dl }}</td>
+                                    <td style="text-align: center;">{{ cr.master.payment }}</td>
+                                    <td style="text-align: center;">{{ cr.master.grand_total }}</td>
+                                    <td style="text-align: center;">{{ cr.master.employee.employee_name }}</td>
                                 </tr>
                         {% endfor %}
-                        <tr style="font-weight: bold; background-color: #f0f0f0;">
-                            <td colspan="13" style="text-align: right;">Grand Total: </td>
-                            <td style="text-align: center;">{{ grand_value }}</td>
-                        </tr>
                     {% else %}
                     <tr>
                         <td colspan="11" style="text-align: center;">No LR found please try again</td>
                     </tr>
                     {% endif %}
                 </tbody>
+                <tfoot>
+                    <tr style="font-weight:bold; background:#f0f0f0;">
+                        <td colspan="6" style="text-align:right;">TOTAL</td>
+                        <td id="total-art"></td>
+                        <td id="total-weight"></td>
+                        <td id="total-topay"></td>
+                        <td id="total-hamali"></td>
+                        <td id="total-statutory"></td>
+                        <td id="total-risk"></td>
+                        <td id="total-door"></td>
+                        <td></td>
+                        <td id="total-grand"></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
 
@@ -429,7 +440,7 @@
         <!-- Company Header -->
         <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;">
             <div style="display: flex; align-items: center;">
-                <img src="{% static 'images/icon/bullet_logo.png' %}" alt="Company Logo" style="height: 70px; margin-right: 15px;">
+                <img src="{% static 'images/icon/apt_logo.png' %}" alt="Company Logo" style="height: 70px; margin-right: 15px;">
                 <div>
                     <h2 style="margin: 0; font-size: 22px;">{{ company.companyname }}</h2>
                     <p style="margin: 2px 0; font-size: 13px;">
@@ -453,43 +464,46 @@
             <table style="width: 100%; border-collapse: collapse; font-size: 11px;" border="1">
                 <thead style="background-color: #f2f2f2;">
                     <tr>
-                        <th>Sl.no</th>
-                        <th>LR Date</th>
-                        <th>LR No</th>
-                        <th>Customer</th>
-                        <th>From</th>
-                        <th>To</th>
-                        <th>Payment</th>
-                        <th>Inv No</th>
-                        <th>Inv Amt</th>
-                        <th>Item</th>
-                        <th>Weight</th>
-                        <th>Rate</th>
-                        <th>Freight</th>
+                        <th style="text-align: left;">Sl.no</th>
+                        <th style="text-align: left;">CR No</th>
+                        <th style="text-align: left;">Consignee</th>
+                        <th style="text-align: left;">CR Date</th>
+                        <th style="text-align: left;">LR No</th>
+                        <th style="text-align: left;">LR Date</th>
+                        <th style="text-align: left;">Art</th>
+                        <th style="text-align: left;">Weight</th>
+                        <th style="text-align: left;">To-Pay</th>
+                        <th style="text-align: left;">Hamali</th>
+                        <th style="text-align: left;">Statutory</th>
+                        <th style="text-align: left;">Risk Ch</th>
+                        <th style="text-align: left;">Door Dl/Cl</th>
+                        <th style="text-align: left;">Payment</th>
+                        <th style="text-align: left;">Total</th>
+                        <th style="text-align: left;">Exe</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for lr in lrs %}
+                    {% for cr in crs %}
                         <tr>
                             <td style="text-align: center;">{{ forloop.counter }}</td>
-                            <td style="text-align: center;">{{ lr.lr_date }}</td>
-                            <td style="text-align: center;">{{ lr.lr_no }}</td>
-                            <td style="text-align: left;">{{ lr.customer }}</td>
-                            <td style="text-align: left;">{{ lr.load_from }}</td>
-                            <td style="text-align: left;">{{ lr.load_to }}</td>
-                            <td style="text-align: center;">{{ lr.payment }}</td>
-                            <td style="text-align: center;">{{ lr.inv_no }}</td>
-                            <td style="text-align: center;">{{ lr.inv_amount }}</td>
-                            <td style="text-align: left;">{{ lr.item }}</td>
-                            <td style="text-align: center;">{{ lr.weight }}</td>
-                            <td style="text-align: center;">{{ lr.rate }}</td>
-                            <td style="text-align: center;">{{ lr.freight }}</td>
+                            <td style="text-align: center;">{{ cr.master.receipt_no }}</td>
+                            <td style="text-align: left;">{{ cr.master.consignee_name }}</td>
+                            <td style="text-align: center;">{{ cr.master.receipt_date }}</td>
+                            <td style="text-align: center;">{{ cr.master.lr.lr_no }}</td>
+                            <td style="text-align: center;">{{ cr.master.lr.lr_date }}</td>
+                            <td style="text-align: center;">{{ cr.numbers }}</td>
+                            <td style="text-align: center;"> {{ cr.charged_weight }}</td>
+                            <td style="text-align: center;">{{ cr.to_pay }}</td>
+                            <td style="text-align: center;">{{ cr.master.cr_hamali }}</td>
+                            <td style="text-align: center;">{{ cr.master.statutory_charge }}</td>
+                            <td style="text-align: left;">{{ cr.master.cr_risk_charge }}</td>
+                            <td style="text-align: center;">{{ cr.master.cr_door_cl_dl }}</td>
+                            <td style="text-align: center;">{{ cr.master.payment }}</td>
+                            <td style="text-align: center;">{{ cr.master.grand_total }}</td>
+                            <td style="text-align: center;">{{ cr.master.employee.employee_name }}</td>
+
                         </tr>
                     {% endfor %}
-                    <tr style="font-weight: bold; background-color: #e6e6e6;">
-                        <td colspan="12" style="text-align: right;">Grand Total:</td>
-                        <td style="text-align: right;">{{ grand_value }}</td>
-                    </tr>
                 </tbody>
             </table>
         </div>
@@ -537,12 +551,42 @@
 document.getElementById("print-button").addEventListener("click", function () {
 
     let updatedRows = "";
-    let grandTotal = 0;
     let counter = 1;
 
+    let totals = {
+        art: 0,
+        weight: 0,
+        topay: 0,
+        hamali: 0,
+        statutory: 0,
+        risk: 0,
+        door: 0,
+        grand: 0
+    };
+
     let filterHTML = document.getElementById("print-filters").innerHTML;
+
     document.querySelectorAll("tr[data-lr-id]").forEach(row => {
         let cells = row.querySelectorAll("td");
+
+        let art = parseFloat(cells[6].innerText) || 0;
+        let weight = parseFloat(cells[7].innerText) || 0;
+        let topay = parseFloat(cells[8].innerText) || 0;
+        let hamali = parseFloat(cells[9].innerText) || 0;
+        let statutory = parseFloat(cells[10].innerText) || 0;
+        let risk = parseFloat(cells[11].innerText) || 0;
+        let door = parseFloat(cells[12].innerText) || 0;
+        let grand = parseFloat(cells[14].innerText) || 0;
+
+        totals.art += art;
+        totals.weight += weight;
+        totals.topay += topay;
+        totals.hamali += hamali;
+        totals.statutory += statutory;
+        totals.risk += risk;
+        totals.door += door;
+        totals.grand += grand;
+
         updatedRows += `
             <tr>
                 <td>${counter++}</td>
@@ -551,18 +595,36 @@ document.getElementById("print-button").addEventListener("click", function () {
                 <td>${cells[3].innerText}</td>  
                 <td>${cells[4].innerText}</td>
                 <td>${cells[5].innerText}</td>
-                <td>${cells[6].innerText}</td>
-                <td>${cells[7].innerText}</td>
-                <td>${cells[8].innerText}</td>
-                <td>${cells[9].innerText}</td>
-                <td>${cells[10].innerText}</td>
-                <td>${cells[11].innerText}</td>
+                <td>${art}</td>
+                <td>${weight}</td>
+                <td>${topay.toFixed(2)}</td>
+                <td>${hamali.toFixed(2)}</td>
+                <td>${statutory.toFixed(2)}</td>
+                <td>${risk.toFixed(2)}</td>
+                <td>${door.toFixed(2)}</td>
                 <td>${cells[13].innerText}</td>
+                <td>${grand.toFixed(2)}</td>
+                <td>${cells[15].innerText}</td>
             </tr>
         `;
-
-        grandTotal += parseFloat(cells[13].innerText) || 0;
     });
+
+    // 🔹 SINGLE TOTAL ROW (PRINT ONLY)
+    let totalRow = `
+        <tr style="font-weight:bold;background:#e6e6e6;">
+            <td colspan="6" style="text-align:right;">TOTAL</td>
+            <td>${totals.art}</td>
+            <td>${totals.weight}</td>
+            <td>${totals.topay.toFixed(2)}</td>
+            <td>${totals.hamali.toFixed(2)}</td>
+            <td>${totals.statutory.toFixed(2)}</td>
+            <td>${totals.risk.toFixed(2)}</td>
+            <td>${totals.door.toFixed(2)}</td>
+            <td></td>
+            <td>${totals.grand.toFixed(2)}</td>
+            <td></td>
+        </tr>
+    `;
 
     let printHTML = `
         <html>
@@ -584,30 +646,55 @@ document.getElementById("print-button").addEventListener("click", function () {
                 filterHTML
             ).replace(
                 /<tbody>[\s\S]*<\/tbody>/,
-                `<tbody>${updatedRows}
-                    <tr style="font-weight:bold;background:#e6e6e6;">
-                        <td colspan="12" style="text-align:right;">Grand Total:</td>
-                        <td>${grandTotal.toFixed(2)}</td>
-                    </tr>
-                </tbody>`
+                `<tbody>${updatedRows}${totalRow}</tbody>`
             )}
         </body>
         </html>
     `;
 
-    // 🔹 Open print window
     let printWindow = window.open("", "", "width=900,height=650");
     printWindow.document.write(printHTML);
     printWindow.document.close();
     printWindow.print();
 });
-function formatDate(d) {
-    if (!d) return "";
-    const parts = d.split("-");
-    return `${parts[2]}-${parts[1]}-${parts[0]}`; // dd-mm-yyyy
-}
-
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
 
+    let totals = {
+        art: 0,
+        weight: 0,
+        topay: 0,
+        hamali: 0,
+        statutory: 0,
+        risk: 0,
+        door: 0,
+        grand: 0
+    };
+
+    document.querySelectorAll("#billTable tbody tr").forEach(row => {
+        let cells = row.querySelectorAll("td");
+
+        totals.art += parseFloat(cells[6]?.innerText) || 0;
+        totals.weight += parseFloat(cells[7]?.innerText) || 0;
+        totals.topay += parseFloat(cells[8]?.innerText) || 0;
+        totals.hamali += parseFloat(cells[9]?.innerText) || 0;
+        totals.statutory += parseFloat(cells[10]?.innerText) || 0;
+        totals.risk += parseFloat(cells[11]?.innerText) || 0;
+        totals.door += parseFloat(cells[12]?.innerText) || 0;
+        totals.grand += parseFloat(cells[14]?.innerText) || 0;
+    });
+
+    document.getElementById("total-art").innerText = totals.art.toFixed(2);
+    document.getElementById("total-weight").innerText = totals.weight.toFixed(2);
+    document.getElementById("total-topay").innerText = totals.topay.toFixed(2);
+    document.getElementById("total-hamali").innerText = totals.hamali.toFixed(2);
+    document.getElementById("total-statutory").innerText = totals.statutory.toFixed(2);
+    document.getElementById("total-risk").innerText = totals.risk.toFixed(2);
+    document.getElementById("total-door").innerText = totals.door.toFixed(2);
+    document.getElementById("total-grand").innerText = totals.grand.toFixed(2);
+
+});
+</script>
 
 {% endblock %}

@@ -8620,6 +8620,13 @@ def cr_report_search(request):
         date_to = request.POST.get('date_to')
         crs = CashReceiptItems.objects.filter(master__receipt_date__range=[date_from, date_to],
                                         master__company__company_id=request.session.get('co_id'),
-                                        master__branch__branch_name=request.session.get('branch'))
-        return render(request, 'reports/cash_receipt/cr_report.html', {'crs': crs, 'date_from': date_from, 'date_to': date_to})
+                                        master__branch__branch_name=request.session.get('branch'),
+                                        master__payment='TO_PAY')
+        crs.to_pay = 0
+        for cr in crs:
+            cr.to_pay = cr.master.grand_total - cr.master.cr_hamali - cr.master.cr_door_cl_dl - cr.master.cr_risk_charge - cr.master.cr_statutory_charge
+        grand_value = sum(cr.master.grand_total for cr in crs)
+        return render(request, 'reports/cash_receipt/cr_report.html', {'crs': crs, 'date_from': date_from, 
+                                                                       'company': Table_Companydetailsmaster.objects.get(company_id=request.session.get('co_id')),
+                                                                       'date_to': date_to, 'grand_value': grand_value})
     return render(request, 'reports/cash_receipt/search.html')
