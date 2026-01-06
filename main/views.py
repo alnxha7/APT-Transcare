@@ -8125,9 +8125,9 @@ def lr_edit_cash_receipt(request, lr_id):
     employees = Employee_master.objects.filter(co_id=request.session.get('co_id'), branch_id=request.session.get('branch'))
     if request.method == 'POST':
         try:
-            # existing_cr = CashReceipt.objects.filter(lr=lr).first()
-            # if existing_cr:
-            #     return render(request, "lorry_receipt/lr_edit.html", {'error': 'Cash Receipt already exists for this LR'})
+            existing_cr = CashReceipt.objects.filter(lr=lr).first()
+            if existing_cr:
+                return render(request, "lorry_receipt/lr_edit.html", {'error': 'Cash Receipt already exists for this LR'})
             series_id = request.POST.get('series')
             voucher_config = VoucherConfiguration.objects.get(id=series_id, category='Cash Receipt')
             serial_no = voucher_config.serial_no
