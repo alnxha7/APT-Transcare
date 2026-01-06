@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modify GDM</title>
+
+<link href="{% static 'vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+<link href="{% static 'vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all">
+<link href="{% static 'vendor/select2/select2.min.css' %}" rel="stylesheet" media="all">
+<link href="{% static 'css/theme.css' %}" rel="stylesheet" media="all">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: "Poppins", sans-serif;
+    }
+
+    .main_content {
+        margin-top: 80px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    .bill-form-container {
+        width: 40%;
+        background-color: #FEF3E2;
+        padding: 25px 40px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+    }
+
+    .bill-form-container:hover {
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+        text-align: center;
+        font-weight: 600;
+        color: #2e3a59;
+        margin-bottom: 25px;
+    }
+
+    label {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    select, input[type="number"], input[type="text"] {
+        width: 100%;
+        padding: 4px 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        background-color: #fafafa;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+    }
+
+    select:focus, input:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
+        background-color: #fff;
+        outline: none;
+    }
+
+    .btn {
+        border: none;
+        padding: 10px 20px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    .save-btn {
+        background-color: #28a745;
+        color: #fff;
+    }
+
+    .back-btn {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    .btn:hover {
+        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    }
+
+    .btn-group {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 25px;
+    }
+
+    .error-text {
+        color: #d9534f;
+        text-align: center;
+        margin-top: 15px;
+        font-weight: 500;
+    }
+
+    @media only screen and (max-width: 600px) {
+        .bill-form-container {
+            padding: 25px 20px;
+            width: 90%;
+        }
+    }
+</style>
+
+<div class="main_content">
+    <div class="bill-form-container">
+        <h2>Modify GDM</h2>
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="series">Series</label>
+                <select name="series" id="series" class="form-control" required>
+                    <option value="">Select Series</option>
+                    {% for s in series %}
+                        <option value="{{ s.id }}">{{ s.series }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="entry_number">GDM Number</label>
+                <input type="number" name="entry_number" id="entry_number" class="form-control" required>
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" class="btn save-btn">
+                    <i class="fa fa-check-circle"></i> OK
+                </button>
+                <a href="{% url 'main:index' %}" class="btn back-btn">
+                    <i class="fa fa-arrow-left"></i> Back
+                </a>
+            </div>
+        </form>
+
+        {% if error %}
+            <p class="error-text">{{ error }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<script src="{% static 'vendor/jquery-3.2.1.min.js' %}"></script>
+<script src="{% static 'vendor/bootstrap-4.1/bootstrap.min.js' %}"></script>
+<script src="{% static 'vendor/select2/select2.min.js' %}"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#series').select2({
+            placeholder: "Select Series",
+            allowClear: true,
+            width: '100%'
+        });
+    });
+</script>
+{% if success %}
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: '{{ success }}',
+        confirmButtonText: 'OK',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = "{% url 'main:despatch_search' %}"
+        }
+        else {
+            window.location.href = "{% url 'main:despatch_search' %}"
+        }
+    });
+</script>
+{% endif %}
+{% endblock %}

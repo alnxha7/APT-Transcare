@@ -40,7 +40,7 @@
                 </div>
                 <div class="box">
                     <label for="series">Series &nbsp;&nbsp;&nbsp;&nbsp; :</label>
-                    <input type="text" id="series" name="series" required><br>
+                    <input type="text" id="series" name="series" oninput="this.value = this.value.toUpperCase();" required><br>
                 </div>
                 <span id="series-error" style="color: red; display: none;">This combination of category and series already exists.</span>
                 <div class="box">

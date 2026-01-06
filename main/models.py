@@ -785,6 +785,7 @@ class LorryReceiptMaster(models.Model):
     consignee_name = models.CharField(max_length=200)
     consignee_code = models.IntegerField()
     consignee_account = models.ForeignKey(Table_Accountsmaster,on_delete=models.CASCADE, related_name='consignee_accounts')
+    consignee_phone = models.CharField(max_length=30, null=True, blank=True)
 
     eway_billno = models.CharField(max_length=100, null=True, blank=True)
     payment = models.CharField(max_length=50)
@@ -896,6 +897,7 @@ class GDMChild(models.Model):
     inv_amount = models.FloatField()
     item = models.CharField(max_length=255)
     weight = models.FloatField()
+    charged_weight = models.FloatField(default=0.00)
     rate = models.FloatField()
     pkg = models.CharField(max_length=155)
     freight = models.FloatField()

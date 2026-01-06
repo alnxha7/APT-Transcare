@@ -7644,6 +7644,7 @@ def lorry_receipt(request):
                 consignee_account=Table_Accountsmaster.objects.get(company__company_id=request.session.get('co_id'),
                                                     branch__branch_name=request.session.get('branch'), 
                                                     account_code=request.POST.get('consignee_code')),
+                consignee_phone=request.POST.get('consignee_phone'),
 
                 eway_billno=request.POST.get('eway_billno') or None,
                 payment=request.POST.get('payment_method'),
@@ -8318,6 +8319,8 @@ def despatch_memo(request):
         lr.refresh_from_db(fields=['send'])
         
     grand_value = sum(lr.freight for lr in lrs)
+    total_ac_wt = sum(lr.weight for lr in lrs)
+    total_ch_wt = sum(lr.charged_weight for lr in lrs)
 
     if request.method == 'POST':
         try:
@@ -8350,6 +8353,7 @@ def despatch_memo(request):
                     inv_amount=lr.inv_amount,
                     item=lr.item,
                     weight=lr.weight,
+                    charged_weight=lr.charged_weight,
                     rate=lr.rate,
                     pkg=lr.pkg,
                     freight=lr.freight
@@ -8359,6 +8363,8 @@ def despatch_memo(request):
             series.serial_no = series.serial_no + 1
             series.save()
             child = GDMChild.objects.filter(master=master)
+            print_ac_wt = sum(ch.weight for ch in child)
+            print_ch_wt = sum(ch.charged_weight for ch in child)
             context = {
                 'gdm': master,
                 'child': child,
@@ -8369,6 +8375,8 @@ def despatch_memo(request):
                 'series': VoucherConfiguration.objects.filter(company=company, branch__branch_name=branch, category='GDM'),
                 'branch_to': branch_to,
                 'grand_child': sum(ch.freight for ch in child),
+                'total_ac_wt': print_ac_wt, 
+                'total_ch_wt': print_ch_wt,
                 'success': True
             }
             return render(request, 'despatch_memo/despatch_memo.html', context)
@@ -8386,6 +8394,8 @@ def despatch_memo(request):
         'series': VoucherConfiguration.objects.filter(company=company, branch__branch_name=branch, category='GDM'),
         'branch_to': branch_to,
         'grand_value': grand_value,
+        'total_ac_wt': total_ac_wt,
+        'total_ch_wt': total_ch_wt, 
     }
     return render(request, 'despatch_memo/despatch_memo.html', context)
 
@@ -8408,6 +8418,39 @@ def get_serial_number_gdm(request):
         return JsonResponse({'serial_no': voucher.serial_no})
     except VoucherConfiguration.DoesNotExist:
         return JsonResponse({'error': 'Invalid series selected'}, status=400)
+
+
+def despatch_search(request):
+    series = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'), category='GDM')
+    if request.method == "POST":
+        try:
+            gdm = GoodsDespatchMemo.objects.get(company__company_id=request.session.get('co_id'),
+                                   branch__branch_name=request.session.get('branch'),
+                                   series=VoucherConfiguration.objects.get(id=request.POST.get("series")),
+                                   gdm_no=request.POST.get("entry_number"))
+            return redirect("main:gdm_edit", gdm_id=gdm.id)
+        except Exception as e:
+            print(e)
+            return render(request, 'despatch_memo/despatch_search.html', {'series': series, 'error': e})
+    return render(request, 'despatch_memo/despatch_search.html', {'series': series})
+
+def gdm_edit(request, gdm_id):
+    gdm = GoodsDespatchMemo.objects.get(id=gdm_id)
+    lrs = LorryReceiptItems.objects.filter(id__in=GDMChild.objects.filter(master=gdm).values('lr_fk'))
+    series = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'), category='GDM')
+    drivers = Employee_master.objects.filter(co_id=request.session.get('co_id'), branch_id=request.session.get('branch'))
+    vehicles = Vehicle_master.objects.filter(co_id=request.session.get('co_id'), branch_id=request.session.get('branch'))
+    grand_value = sum(lr.freight for lr in lrs)
+    if request.method == "POST":
+        try:
+            gdm.delete()
+            return render(request, 'despatch_memo/despatch_search.html', {'success': 'Despatch Memo Deleted successfully'})
+        except Exception as e:
+            print(e)
+            return render(request, 'despatch_memo/despatch_memo.html', {'gdm': gdm, 'lrs': lrs, 'series': series, 'grand_value': grand_value,
+                                                                        'error': e, 'drivers': drivers, 'vehicles': vehicles})
+    return render(request, 'despatch_memo/despatch_memo.html', {'gdm': gdm, 'lrs': lrs, 'series': series, 'grand_value': grand_value,
+                                                                 'drivers': drivers, 'vehicles': vehicles})
 
 def lorry_hire(request):
     series = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'), 
@@ -8587,6 +8630,8 @@ def lr_check_status(request):
             cash_obj = CashReceipt.objects.filter(lr=lr).first()
             delivery_done = bool(cash_obj)
             cash_no = cash_obj.receipt_no if cash_obj else ""
+            delivery_date = cash_obj.receipt_date.strftime('%d-%m-%Y') if cash_obj else ""
+            print(delivery_date)
 
             # Auto mark GDM if later stages exist
             if delivery_done and received_done:
@@ -8599,6 +8644,7 @@ def lr_check_status(request):
                 f"&delivery={int(delivery_done)}"
                 f"&gdm_no={gdm_no}"
                 f"&cash_no={cash_no}"
+                f"&delivery_date={delivery_date}"
             )
 
         except Exception as e:
@@ -8657,6 +8703,13 @@ def cr_edit(request, cr_id):
     employees = Employee_master.objects.filter(co_id=request.session.get('co_id'), branch_id=request.session.get('branch'))
     if request.method == 'POST':
         try:
+            cr.lr.payment = request.POST.get('payment_method')
+            cr.lr.remarks = request.POST.get('remarks') or ''
+            cr.lr.gross_amount = request.POST.get('gross_amount')
+            cr.lr.total_charges = request.POST.get('total_charges')
+            cr.lr.grand_total = request.POST.get('grand_total')
+            cr.lr.save()
+
             cr.payment = request.POST.get('payment_method')
             cr.employee = Employee_master.objects.filter(id=request.POST.get('employee')).first() or None
             cr.remarks = request.POST.get('remarks') or ''
@@ -8692,6 +8745,22 @@ def cr_edit(request, cr_id):
                 request.POST.getlist('pkg[]'),  # or 'pkg[]' if renamed
             ):
                 if item_code.strip():  # skip empty rows
+
+                    LorryReceiptItems.objects.create(
+                        master=cr.lr,
+                        item_code=item_code,
+                        item=item,
+                        inv_no=inv_no,
+                        inv_amount=inv_amount,
+                        weight=float(weight) if weight else 0,
+                        charged_weight=float(charged_weight) if charged_weight else 0,
+                        numbers=int(numbers) if numbers else 0,
+                        rate=float(rate) if rate else 0,
+                        freight=float(freight) if freight else 0,
+                        pkg=pkg,
+                        checked=True
+                    )
+
                     CashReceiptItems.objects.create(
                         master=cr,
                         item_code=item_code,

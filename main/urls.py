@@ -212,6 +212,8 @@ urlpatterns = [
 
     path("despatch_send/", views.despatch_send, name="despatch_send"),
     path("despatch_memo/", views.despatch_memo, name="despatch_memo"),
+    path('despatch_search/', views.despatch_search, name='despatch_search'),
+    path("gdm_edit/<int:gdm_id>/", views.gdm_edit, name="gdm_edit"),
     path("update_despatch_check_status/", views.update_despatch_check_status, name="update_despatch_check_status"),
     path("get_serial_number_gdm/", views.get_serial_number_gdm, name="get_serial_number_gdm"),
 

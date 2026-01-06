@@ -352,7 +352,7 @@
             <select name="series" id="series" class="form-control" required>
                 <option value="">--SELECT--</option>
                 {% for series in series %}
-                    <option value="{{ series.id }}">{{ series.series }}</option>
+                    <option value="{{ series.id }}" {% if gdm.series.id == series.id %}selected{% endif %}>{{ series.series }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -360,7 +360,7 @@
         <!-- Serial No-->
         <div class="col-md-2">
             <label for="entry_number" style="font-size:13px;">GDM No</label>
-            <input type="number" name="entry_number" id="entry_number" class="form-control" readonly>
+            <input type="number" name="entry_number" id="entry_number" class="form-control" readonly value="{{ gdm.gdm_no }}">
         </div>
 
         <!-- Date -->
@@ -368,12 +368,12 @@
             <label for="date" style="font-size:13px;">Date</label>
             <input type="date" name="date" id="date"
                    class="form-control"
-                   value="{% now 'Y-m-d' %}">
+                   value="{% if gdm.date %}{{ gdm.date|date:"Y-m-d" }}{% else %}{% now "Y-m-d" %}{% endif %}">
         </div>
 
         <div class="col-md-2">
             <label style="font-size:13px;">Branch To</label>
-            <input type="text" name="branch_to" id="branch_to" class="form-control" value="{{ branch_to }}">
+            <input type="text" name="branch_to" id="branch_to" class="form-control" value="{% if gdm.branch_to %}{{ gdm.branch_to }}{% else %}{{ branch_to }}{% endif %}">
         </div>
 
         <!-- Vehicle No -->
@@ -382,7 +382,7 @@
             <select name="vehicle_no" class="form-control">
                 {% for v in vehicles %}
                     <option value="{{ v.registration_number }}"
-                    {% if request.GET.vehicle_no == v.registration_number %}selected{% endif %}>
+                    {% if gdm.vehicle_no == v.registration_number %}selected{% endif %}>
                         {{ v.registration_number }}
                     </option>
                 {% endfor %}
@@ -395,7 +395,7 @@
             <select name="driver_name" class="form-control">
                 {% for d in drivers %}
                     <option value="{{ d.employee_name }}"
-                    {% if request.GET.driver_name == d.employee_name %}selected{% endif %}>
+                    {% if gdm.driver_name == d.employee_name %}selected{% endif %}>
                         {{ d.employee_name }}
                     </option>
                 {% endfor %}
@@ -419,7 +419,8 @@
                         <th style="text-align: left;">Inv No</th>
                         <th style="text-align: left;">Inv Amt</th>
                         <th style="text-align: left;">Item</th>
-                        <th style="text-align: left;">Weight</th>
+                        <th style="text-align: left;">AC Wt</th>
+                        <th style="text-align: left;">CH Wt</th>
                         <th style="text-align: left;">Rate</th>
                         <th style="text-align: left;">Pkg</th>
                         <th style="text-align: left;">Freight</th>
@@ -441,17 +442,30 @@
                                     <td style="text-align: center;">{{ lr.inv_amount }}</td>
                                     <td style="text-align: left;">{{ lr.item }}</td>
                                     <td style="text-align: center;">{{ lr.weight }}</td>
+                                    <td style="text-align: center;">{{ lr.charged_weight }}</td>
                                     <td style="text-align: center;">{{ lr.rate }}</td>
                                     <td style="text-align: center;">{{ lr.pkg }}</td>
                                     <td style="text-align: center;">{{ lr.freight }}</td>
                                     <td style="text-align:center;">
+                                        {% if not gdm.id %}
                                         <input type="checkbox" class="circle-checkbox lr-check" data-id="{{ lr.id }}" {% if lr.send %}checked{% endif %}>
+                                        {% endif %}
                                     </td>
                                 </tr>
                         {% endfor %}
                         <tr style="font-weight: bold; background-color: #f0f0f0;">
-                            <td colspan="12" style="text-align: right;">Grand Total: </td>
+                            <td colspan="9" style="text-align: right;">Grand Total: </td>
+                            
+                            <td style="text-align: center;">{{ total_ac_wt }}</td>
+                            
+                            <td style="text-align: center;">{{ total_ch_wt }}</td>
+                            
+                            <td></td>
+                            <td></td>
+                            
                             <td style="text-align: center;">{{ grand_value }}</td>
+                            
+                            <td></td>
                         </tr>
                     {% else %}
                     <tr>
@@ -467,7 +481,11 @@
     <div class="bottom-section">
         <div class="col-sm-12 text-end">
             <a href="{% url 'main:lr_report_search' %}" id="" class="btn btn-danger btn-sm">Exit</a>
-            <button type="submit" class="btn btn-success">Save</button>
+            {% if gdm.id %}
+                <button type="button" class="btn btn-warning" onclick="confirmDelete(event, this)">Delete</button>
+            {% else %}
+                <button type="submit" class="btn btn-success">Save</button>
+            {% endif %}
         </div>
     </div>
     
@@ -503,7 +521,7 @@
                 </div>
             </div>
             <div style="text-align: right;">
-                <h3 style="margin: 0; font-size: 18px;">DESPATCH MEMO</h3>
+                <h3 style="margin: 0; font-size: 18px;">GOODS DESPATCH MEMO</h3>
             </div>
         </div>
 
@@ -530,7 +548,8 @@
                         <th>Inv No</th>
                         <th>Inv Amt</th>
                         <th>Item</th>
-                        <th>Weight</th>
+                        <th>AC Wt</th>
+                        <th>CH Wt</th>
                         <th>Rate</th>
                         <th>Freight</th>
                     </tr>
@@ -548,14 +567,22 @@
                             <td style="text-align: center;">{{ item.inv_amount }}</td>
                             <td style="text-align: left;">{{ item.item }}</td>
                             <td style="text-align: center;">{{ item.weight }}</td>
+                            <td style="text-align: center;">{{ item.charged_weight }}</td>
                             <td style="text-align: center;">{{ item.rate }}</td>
                             <td style="text-align: center;">{{ item.freight }}</td>
                         </tr>
                     {% endfor %}
                     <tr style="font-weight: bold; background-color: #e6e6e6;">
-                        <td colspan="11" style="text-align: right;">Grand Total:</td>
-                        <td style="text-align: right;">{{ grand_child }}</td>
-                    </tr>
+    <td colspan="9" style="text-align: right;">Grand Total:</td>
+    
+    <td style="text-align: center;">{{ total_ac_wt }}</td>
+    
+    <td style="text-align: center;">{{ total_ch_wt }}</td>
+    
+    <td></td>
+    
+    <td style="text-align: right;">{{ grand_child }}</td>
+</tr>
                 </tbody>
             </table>
         </div>
@@ -719,7 +746,31 @@ function triggerPrint(callback) {
     };
 }
 </script>
+{% if gdm.id %}
+<script>
+function confirmDelete(event, button) {
+    event.preventDefault();
+    
+    const targetForm = button.form || button.closest('form');
 
-
-
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ffc107',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            if (targetForm) {
+                targetForm.submit(); // This will work now
+            } else {
+                console.error("Could not find the form to submit.");
+            }
+        }
+    });
+}
+</script>
+{% endif %}
 {% endblock %}

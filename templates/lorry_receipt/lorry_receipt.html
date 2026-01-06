@@ -27,20 +27,6 @@
     <link href="{% static 'css/theme.css' %}" rel="stylesheet" media="all">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
-    @media print {
-        body {
-            width: 210mm;
-            height: 297mm;
-            margin: 0;
-            padding: 0;
-        }
-        table {
-            width: 100%;
-        }
-        #print-button {
-            display: none;
-        }
-    }
         .form-control {
         padding: 0px 8px;
         font-size: 14px;
@@ -572,25 +558,47 @@
 
 </style>
 <!-- /* --------------------------- INVOICE STYLE ----------------------------- */ -->
-
 <style>
+#print-area { display: none; }
+
 @media print {
   @page {
-    size: landscape;
-    margin: 10mm;
+    size: A4 portrait;
+    margin: 5mm; /* Minimal margins to maximize space */
   }
-  #print-header {
-    display: block !important;
-  }
-  body *:not(#print-header):not(#print-header *) {
-    visibility: hidden;
-  }
-  #print-header {
+
+  body * { visibility: hidden; }
+
+  #print-area, #print-area * { visibility: visible; }
+
+  #print-area {
+    display: flex;
+    flex-direction: column;
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
+    height: 100%; /* Fill the whole A4 */
   }
+
+  /* Each bill must be exactly 1/4th of the page */
+  .lr-copy {
+    height: 24.5%; 
+    width: 100%;
+    border-bottom: 1px dashed #000;
+    overflow: hidden; /* Prevents content from spilling to next page */
+    padding: 2px 0;
+    box-sizing: border-box;
+    display: block !important;
+  }
+
+  /* Reduce gaps that eat up space */
+  .lr-copy div { margin-top: 2px !important; gap: 4px !important; }
+  
+  /* Scale the table for printing */
+  table { margin-top: 4px !important; }
+  
+  #print-template { display: none; }
 }
 </style>
 
@@ -638,7 +646,7 @@
                 <input type="text" style="max-width: 50% !important;" id="consigner_code" name="consigner_code" class="form-control" value="{{ lr.consigner_code }}" readonly required>
             </div>
             <div class="field-pair" style="max-width: 335px; display: flex; align-items: center;">
-                <label style="margin-right: 8px; white-space: nowrap;">Consigner Name</label>
+                <label style="margin-right: 8px; white-space: nowrap;">Consignor Name</label>
                 <input type="text" id="consigner_name" name="consigner_name" class="form-control" value="{{ lr.consigner_name }}" autocomplete="off" required>
             </div>
         </div>
@@ -655,7 +663,7 @@
     <div class="column" style="position: relative; top: 75px;">
         <div class="form-row">
             <label>E-Way Bill No</label>
-            <input type="text" class="form-control" id="eway_billno" name="eway_billno" value="{{ lr.eway_billno|default_if_none:'' }}" readonly>
+            <input type="text" class="form-control" id="eway_billno" name="eway_billno" value="{{ lr.eway_billno|default_if_none:'' }}">
         </div>
 
         <div class="form-row">
@@ -702,7 +710,7 @@
         <div class="form-row"><label>Address 2</label><input type="text" name="consignee_address2" id="consignee_address2" class="form-control" value="{{ lr.consignee_account.address2 }}"></div>
         <div class="form-row"><label>Address 3</label><input type="text" name="consignee_address3" id="consignee_address3" class="form-control" value="{{ lr.consignee_account.address3 }}"></div>
         <div class="form-row"><label>GST No</label><input type="text" name="consignee_gstno" id="consignee_gstno" class="form-control" value="{{ lr.consignee_account.gstno }}"></div>
-        <div class="form-row"><label>Phone</label><input type="text" name="consignee_phone" id="consignee_phone" class="form-control" value="{{ lr.consignee_account.mobile }}" required></div>
+        <div class="form-row"><label>Phone</label><input type="text" name="consignee_phone" id="consignee_phone" class="form-control" value="{{ lr.consignee_phone }}" required></div>
         </div>
     </div>
 </div>
@@ -722,7 +730,7 @@
                     <th>Nos</th>
                     <th>Rate</th>
                     <th>Freight</th>
-                    <th>Pkg</th>
+                    <th>Pkg Type</th>
                     <th>Delete</th>
                 </tr>
             </thead>
@@ -955,6 +963,9 @@
                     Delivered
                     {% if request.GET.cash_no %}
                         <span class="doc-no">Receipt: {{ request.GET.cash_no }}</span>
+                        {% if request.GET.delivery_date %}
+                            <span class="doc-no">Date: {{ request.GET.delivery_date }}</span>
+                        {% endif %}
                     {% endif %}
                 {% else %}
                     Pending
@@ -972,319 +983,132 @@
 
 
 
+<!-- --------------------------------------------- INVOICE PRINT TEMPLATE -------------------------------------------------- -->
 
-
-
-
-<!-- --------------------------------------------------- INVOICE ----------------------------------------------------->
-
-<div id="print-header" 
-     style="display:none; width:100%; padding:10px 30px; box-sizing:border-box; background:white;">
-
-  <!-- ========================= HEADER ROW ========================= -->
-  <div style="display:flex; width:100%;">
-
-    <!-- LEFT: Logo -->
-    <div style="flex:1; display:flex; align-items:flex-start;">
-      <img src="{% static 'images/icon/apt_logo.png' %}" 
-           alt="Company Logo"
-           style="width:140px; height:auto; margin-top:10px;">
-    </div>
-
-    <!-- CENTER -->
-    <div style="flex:2; text-align:center;">
-
-      <div style="font-size:10px; margin-bottom:5px; font-weight:600;">
-        Goods consignment under this note is at owner's risk subjected to Coimbatore jurisdiction only
+<div id="print-area">
+  <div id="print-template" style="height: 24.5%; overflow: hidden; border-bottom: 1px dashed #000; padding: 2px 0; margin-bottom: 2px;">
+    
+    <div style="display:flex; width:100%; align-items: center;">
+      <div style="flex:1;">
+        <img src="{% static 'images/icon/apt_logo.png' %}" style="width:60px; height:auto;">
       </div>
 
-      <div style="font-size:36px; font-weight:800; text-transform:uppercase; color: green;">
-        {{ lr.company.companyname }}
+      <div style="flex:2; text-align:center;">
+        <div style="font-size:4px; font-weight:600;">Goods consignment at owner's risk - Coimbatore jurisdiction</div>
+        <div style="font-size:15px; font-weight:800; text-transform:uppercase; line-height:1;">
+          {{ lr.company.companyname }}
+        </div>
+        <div style="font-size:7px; font-weight:600;">Goods and Transport Agency</div>
+        <div style="font-size:6.5px; line-height:1.2;">
+          {{ lr.company.address1 }}, {{ lr.company.address2 }}<br>
+          Ph: {{ lr.company.phoneno }} | Mob: {{ lr.company.mobile }}
+        </div>
       </div>
 
-      <div style="font-size:14px; margin-top:3px; font-weight:600;">
-        Goods and Transport Agency
-      </div>
-
-      <div style="font-size:12px; margin-top:6px; line-height:1.4;">
-        {{ lr.company.address1 }}<br>
-        {{ lr.company.address2 }} {{ lr.company.address3 }}<br>
-        Phone: {{ lr.company.phoneno }} | Mobile: {{ lr.company.mobile }}
-      </div>
-
-    </div>
-
-    <!-- RIGHT: Booking Office -->
-    <div style="flex:1; display:flex; justify-content:flex-end;">
-      <div style="border:1px solid #000; padding:10px; width:180px; font-size:12px;">
-        <div style="font-weight:bold; margin-bottom:5px;">Booking Office:</div>
+      <div style="flex:1; display:flex; justify-content:flex-end;">
+        <div style="border:1px solid #000; padding:2px 5px; width:110px; font-size:7px;">
+          <strong>Booking Office:</strong><br>{{ lr.branch.branch_name }}
+        </div>
       </div>
     </div>
 
-  </div> <!-- END HEADER ROW -->
-
-
-  <!-- ========================= SECTION 2 ========================= -->
-  <div style="display:flex; width:100%; margin-top:10px; gap:10px;">
-
-    <!-- LEFT HALF -->
-    <div style="flex:1;">
-
-      <!-- GST No -->
-      <div style="font-size:20px; font-weight:700; margin-bottom:8px;">
-        GST No: {{ lr.company.gst }}
-      </div>
-
-      <!-- 3 BOXES HORIZONTAL -->
-      <div style="display:flex; gap:10px; margin-bottom:10px;">
-
-        <!-- BOX 1 -->
-        <div style="flex:1; border:1px solid #000; padding:8px; font-size:12px; line-height:1.4;">
-          <div><strong>Consignee Copy</strong></div>
-          <div>CONSIGNMENT</div>
-          <div style="margin-top:6px; display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
-            <label style="display:flex; align-items:center; gap:6px;">
-              <input type="checkbox" style="width:14px; height:14px;">
-              <span>Insured</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:6px;">
-              <input type="checkbox" style="width:14px; height:14px;">
-              <span>Not Insured</span>
-            </label>
+    <div style="display:flex; width:100%; margin-top:4px; gap:5px;">
+      <div style="flex:1.5;">
+        <div style="font-size:8px; font-weight:700; margin-bottom:2px;">GST: {{ lr.company.gst }}</div>
+        <div style="font-size:7px; font-weight:500; margin-bottom:2px;">E-Way: {% if lr.eway_billno %}{{ lr.eway_billno }}{% else %}Not Applicable{% endif %}</div>
+        <div style="display:flex; gap:4px; margin-bottom:4px;">
+          <div style="flex:1; border:1px solid #000; padding:3px; font-size:6.5px;">
+            <strong>Consignee Copy</strong><br>
+            <input type="checkbox" style="transform: scale(0.7);"> Insured 
+            <input type="checkbox" style="transform: scale(0.7);"> Not Insured
+          </div>
+          <div style="flex:1; border:1px solid #000; padding:3px; font-size:6.5px;">
+            <strong>Inv/Tax No:</strong><br>{{ lr.sales_tax_no }}
+          </div>
+          <div style="flex:1; border:1px solid #000; padding:3px; font-size:6.5px;">
+            <strong>Delivery Addr:</strong><br>{{ lr.delivery_address|truncatechars:30 }}
           </div>
         </div>
-
-        <!-- BOX 2 -->
-        <div style="flex:1; border:1px solid #000; padding:8px; font-size:12px;">
-          <strong>Invoice / Sales Tax Permit No:</strong>
-          <div style="margin-top:4px;">{{ lr.sales_tax_no }}</div>
+        <div style="font-size:7px; line-height:1.2;">
+          <strong>Consignor:</strong> {{ lr.consigner_name }} | <strong>GST:</strong> {{ lr.consigner_account.gstno }}<br>
+          <strong>Consignee:</strong> {{ lr.consignee_name }} | <strong>GST:</strong> {{ lr.consignee_account.gstno }}
         </div>
-
-        <!-- BOX 3 -->
-        <div style="flex:1; border:1px solid #000; padding:8px; font-size:12px;">
-          <strong>At Owner's Risk</strong>
-          <div style="margin-top:4px;"><strong>Delivery Address:</strong></div>
-          <div>{{ lr.delivery_address }}</div>
-        </div>
-
       </div>
 
-      <!-- CONSIGNOR / CONSIGNEE INFO -->
-      <div style="margin-top:10px; font-size:13px; line-height:1.5;">
-        <div><strong>Consignor:</strong> {{ lr.consigner_name }}</div>
-        <div><strong>GST No:</strong> {{ lr.consigner_account.gstno }}</div>
-        <div style="margin-top:6px;"><strong>Consignee:</strong> {{ lr.consignee_name }}</div>
-        <div><strong>GST No:</strong> {{ lr.consignee_account.gstno }}</div>
+      <div style="flex:1;">
+        <div style="border:1px solid #000; padding:3px; font-size:7px; margin-bottom:2px;">
+          <strong>No:</strong> {{ lr.lr_no }} | <strong>Date:</strong> {{ lr.lr_date }}<br>
+          <strong>From:</strong> {{ lr.load_from }} | <strong>To:</strong> {{ lr.load_to }}
+        </div>
+        <div style="border:1px solid #000; padding:2px; font-size:6px; text-align:center;">
+          <strong>RCM Liability (5%)</strong>
+          <div style="display:flex; justify-content: space-around; margin-top:1px;">
+            <span><input type="checkbox" style="transform: scale(0.6);"> Consignor</span>
+            <span><input type="checkbox" style="transform: scale(0.6);"> Consignee</span>
+          </div>
+        </div>
       </div>
+    </div>
 
-    </div> <!-- END LEFT HALF -->
-
-
-
-    <!-- RIGHT HALF -->
-    <div style="flex:1; display:flex; flex-direction:column; gap:10px;">
-
-      <!-- CONSIGNMENT NOTE -->
-      <div style="border:1px solid #000; padding:8px; font-size:13px;">
-        <div style="font-weight:700; text-align:center; margin-bottom:6px;">
-          CONSIGNMENT NOTE
-        </div>
-
-        <div><strong>No:</strong> {{ lr.lr_no }}</div>
-        <div><strong>Date:</strong> {{ lr.lr_date }}</div>
-        <div style="margin-top:6px;"><strong>From:</strong> {{ lr.load_from }}</div>
-        <div><strong>To:</strong> {{ lr.load_to }}</div>
-      </div>
-
-      <!-- LIABILITY BOX -->
-      <div style="border:1px solid #000; padding:8px; font-size:13px;">
-
-        <div style="font-weight:700; text-align:center; margin-bottom:6px;">
-          Person Liable to Pay @ 5%<br>
-          (Subject to Reverse Charge Mechanism)
-        </div>
-
-        <!-- Two rows -->
-        <div style="display:flex; flex-direction:column; gap:6px;">
-
-          <!-- ROW 1 -->
-          <div style="display:flex; align-items:center;">
-            <div style="flex:0.4; display:flex; gap:6px; align-items:center;">
-              <input type="checkbox" style="width:16px; height:16px;">
-              <span style="font-size:12px;">Consignor</span>
-            </div>
-            <div style="flex:0.6;">
-              <div style="border:1px solid #000; height:22px;"></div>
-            </div>
-          </div>
-
-          <!-- ROW 2 -->
-          <div style="display:flex; align-items:center;">
-            <div style="flex:0.4; display:flex; gap:6px; align-items:center;">
-              <input type="checkbox" style="width:16px; height:16px;">
-              <span style="font-size:12px;">Consignee</span>
-            </div>
-            <div style="flex:0.6;">
-              <div style="border:1px solid #000; height:22px;"></div>
-            </div>
-          </div>
-
-          <!-- ROW 3 -->
-          <div style="display:flex; align-items:center;">
-            <div style="flex:0.4; display:flex; gap:6px; align-items:center;">
-              <input type="checkbox" style="width:16px; height:16px;">
-              <span style="font-size:12px;">Transport</span>
-            </div>
-            <div style="flex:0.6;">
-              <div style="border:1px solid #000; height:22px;"></div>
-            </div>
-          </div>
-
-        </div>
-
-      </div> <!-- END LIABILITY BOX -->
-
-    </div> <!-- END RIGHT HALF -->
-
-  </div> <!-- END SECTION 2 -->
-
-  <!-- ===================== ITEM TABLE ====================== -->
-
-<table border="1" style="width:100%; border-collapse:collapse; margin-top:10px; font-size:12px; text-align:center;">
-    <thead>
-        <tr style="font-weight:600; background:#f2f2f2;">
-            <th style="width:5%;">Sl.No</th>
-            <th style="width:30%;">Item</th>
-            <th style="width:12%;">Inv Amt</th>
-            <th style="width:12%;">Actual Weight</th>
-            <th style="width:12%;">Charged Weight</th>
-            <th style="width:12%;">Nos</th>
-            <th style="width:12%;">Rate</th>
-            <th style="width:12%;">Freight</th>
-            <th style="width:10%;">Pkg</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        {% if lr_items %}
-            {% for item in lr_items %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-
-                <!-- Item (Commodity) -->
-                <td style="text-align:left; padding-left:6px;">
-                    {{ item.item }}
-                </td>
-
-                <!-- Invoice Amount -->
-                <td>{{ item.inv_amount }}</td>
-
-                <!-- Weight -->
-                <td>{{ item.weight }}</td>
-
-                <!-- Charged Weight -->
-                <td>{{ item.charged_weight }}</td>
-
-                <!-- Nos -->
-                <td>{{ item.numbers }}</td>
-
-                <!-- Rate -->
-                <td>{{ item.rate }}</td>
-
-                <!-- Freight -->
-                <td>{{ item.freight }}</td>
-
-                <!-- Pkg -->
-                <td>{{ item.pkg }}</td>
-            </tr>
-            {% endfor %}
-        {% else %}
-            <tr>
-                <td>1</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-        {% endif %}
-    </tbody>
+    <table border="1" style="width:100%; border-collapse:collapse; margin-top:5px; font-size:6.5px; text-align:center;">
+  <thead>
+    <tr style="background:#f2f2f2; font-weight:bold;">
+      <th style="width:5%;">Sl</th>
+      <th style="width:35%;">Item</th>
+      <th style="width:10%;">Inv.Amt</th>
+      <th style="width:10%;">Wt</th>
+      <th style="width:10%;">Ch.Wt</th>
+      <th style="width:8%;">Nos</th>
+      <th style="width:10%;">Rate</th>
+      <th style="width:12%;">Freight</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if lr_items %}
+      {% for item in lr_items|slice:":3" %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td style="text-align:left; padding-left:2px;">{{ item.item }}</td>
+        <td>{{ item.inv_amount }}</td>
+        <td>{{ item.weight }}</td>
+        <td>{{ item.charged_weight }}</td>
+        <td>{{ item.numbers }}</td>
+        <td>{{ item.rate }}</td>
+        <td>{{ item.freight }}</td>
+      </tr>
+      {% endfor %}
+    {% endif %}
+  </tbody>
 </table>
 
-<!-- ===================================================== -->
-<!-- LEFT SIDE : DECLARATION ONLY                         -->
-<!-- ===================================================== -->
-<div style="display:flex; width:100%; margin-top:10px; gap:25px;">
+<div style="display:flex; width:100%; margin-top:3px; border-top: 1px solid #000; padding-top:2px;">
+  
+  <div style="flex:1.5; font-size:6px; line-height:1.2; padding-right:10px;">
+    <strong>Declaration:</strong><br>
+    1. Carrier not responsible for breakage/leakage.<br>
+    2. Goods accepted as per terms overleaf.
+    <div style="margin-top:10px; font-weight:bold;">Receiver's Signature</div>
+  </div>
 
-    <div style="flex:1; min-width:260px;">
-
-        <div style="border:1px solid #000; padding:10px; font-size:12px; line-height:1.5;">
-            <div style="margin-bottom:6px;"><strong>Declaration:</strong></div>
-            <div style="margin-bottom:4px;">1) Carrier are not responsible for breakage and leakage in transit.</div>
-            <div>2) Goods as per details above are accepted for carriage on the terms and conditions as stated overleaf.</div>
-        </div>
-
+  <div style="flex:1; font-size:7px; line-height:1.3; border-left: 1px solid #000; padding-left:8px;">
+    <div style="display:flex; justify-content:space-between;"><span>Gross Amt</span><span>{{ lr.gross_amount|default:'0.00' }}</span></div>
+    <div style="display:flex; justify-content:space-between;"><span>Hamali</span><span>{{ lr.hamali|default:'0.00' }}</span></div>
+    <div style="display:flex; justify-content:space-between;"><span>Door CL/DL</span><span>{{ lr.door_cl_dl|default:'0.00' }}</span></div>
+    <div style="display:flex; justify-content:space-between;"><span>Risk Chg</span><span>{{ lr.risk_charge|default:'0.00' }}</span></div>
+    <div style="display:flex; justify-content:space-between;"><span>Statutory</span><span>{{ lr.statutory_charge|default:'0.00' }}</span></div>
+    
+    <div style="display:flex; justify-content:space-between; font-weight:bold; border-top:1px solid #000; margin-top:2px; padding-top:1px;">
+      <span style="font-size:9px;">GRAND TOTAL</span>
+      <span style="font-size:9px;">{{ lr.grand_total|default:'0.00' }}</span>
     </div>
+  </div>
+</div>
 
-<!-- RIGHT SIDE : COMPACT BILL CHARGES -->
-<div style="min-width:180px; font-size:12px; line-height:1.5;">
-
-    <!-- GROSS AMOUNT -->
-    <div style="display:flex; justify-content:space-between;">
-        <label>Gross Amount</label>
-        <span>{{ lr.gross_amount|default:'0.00' }}</span>
-    </div>
-
-    <!-- HAMALI -->
-    <div style="display:flex; justify-content:space-between;">
-        <label>Hamali</label>
-        <span>{{ lr.hamali|default:'0.00' }}</span>
-    </div>
-
-    <!-- DOOR CL/DL -->
-    <div style="display:flex; justify-content:space-between;">
-        <label>Door CL/DL</label>
-        <span>{{ lr.door_cl_dl|default:'0.00' }}</span>
-    </div>
-
-    <!-- RISK CHARGE -->
-    <div style="display:flex; justify-content:space-between;">
-        <label>Risk Charge</label>
-        <span>{{ lr.risk_charge|default:'0.00' }}</span>
-    </div>
-
-    <!-- STATUTORY CHARGE -->
-    <div style="display:flex; justify-content:space-between;">
-        <label>Statutory</label>
-        <span>{{ lr.statutory_charge|default:'0.00' }}</span>
-    </div>
-
-    <!-- TOTAL CHARGES -->
-    <div style="display:flex; justify-content:space-between; font-weight:bold;">
-        <label>Total Charges</label>
-        <span>{{ lr.total_charges|default:'0.00' }}</span>
-    </div>
-
-    <!-- GRAND TOTAL (COMPACT DISPLAY) -->
-    <div style="display:flex; justify-content:space-between; margin-top:2px;">
-        <label style="font-weight:bold; font-size:16px;">Grand Total</label>
-        <span style="font-size:16px; font-weight:bold; color: green;">
-            {{ lr.grand_total|default:'0.00' }}
-        </span>
-    </div>
-
+  </div>
 </div>
 
 
-</div>
-
-</div>
-
-<!-- --------------------------------------------------- INVOICE END ----------------------------------------------------- -->
-
-
-
+<!-- --------------------------------------------- INVOICE PRINT TEMPLATE -------------------------------------------------- -->
 
 
 
@@ -1625,30 +1449,51 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 {% endif %}
-
 <script>
 function printInvoice() {
-    const printContents = document.getElementById("print-header").innerHTML;
-    const printWindow = window.open('', '', 'width=900,height=650');
+    const template = document.getElementById("print-template").innerHTML;
+    
+    // Create the 4 copies string
+    let fullContent = "";
+    for (let i = 1; i <= 4; i++) {
+        fullContent += `<div class="lr-copy">${template}</div>`;
+    }
+
+    // Create a new temporary window/iframe
+    const printWindow = window.open('', '_blank', 'height=600,width=800');
+
+    printWindow.document.write('<html><head><title>Print Invoice</title>');
+    
+    // Add the CSS specifically for the print window
     printWindow.document.write(`
-        <html>
-        <head>
-            <title>Invoice</title>
-            <style>
-                @media print {
-                    body { -webkit-print-color-adjust: exact; }
-                    table, th, td { border-collapse: collapse; }
-                    th, td { border: 1px solid black; padding: 4px; }
-                }
-            </style>
-        </head>
-        <body>${printContents}</body>
-        </html>
+        <style>
+            body { font-family: sans-serif; margin: 0; padding: 0; }
+            .lr-copy { 
+                width: 100%; 
+                padding: 1mm; 
+                box-sizing: border-box;
+                border-bottom: 1px dashed #000; 
+                page-break-inside: avoid;
+            }
+            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+            th, td { border: 1px solid black; padding: 5px; text-align: center; }
+            /* Force images to load */
+            img { width: 140px; height: auto; }
+        </style>
     `);
+    
+    printWindow.document.write('</head><body>');
+    printWindow.document.write(fullContent);
+    printWindow.document.write('</body></html>');
+
     printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
+
+    // Wait for images/styles to load then print
+    printWindow.onload = function() {
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+    };
 }
 </script>
 {% if lr.id %}
@@ -1676,9 +1521,9 @@ function toggleEwayBill() {
     const grandTotal = parseFloat($("#grand_total").val()) || 0;
 
     if (grandTotal >= 50000) {
-        $("#eway_billno").prop("readonly", false).prop("required", true);
+        $("#eway_billno").prop("required", true);
     } else {
-        $("#eway_billno").prop("readonly", true).val("").prop("required", false).val("");
+        $("#eway_billno").prop("required", false).val("");
     }
 }
 
