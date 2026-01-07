@@ -7650,6 +7650,8 @@ def lorry_receipt(request):
                 payment=request.POST.get('payment_method'),
                 vehicle_no=request.POST.get('vehicle_no') or None,
                 remarks=request.POST.get('remarks'),
+                invoice_no=request.POST.get('invoice_no'),
+                invoice_amount=request.POST.get('invoice_amount'),
 
                 load_from=request.POST.get('load_from'),
                 load_to=request.POST.get('load_to'),
@@ -7823,6 +7825,8 @@ def lr_edit(request, lr_id):
             lr.payment = request.POST.get('payment_method')
             lr.vehicle_no = request.POST.get('vehicle_no') or None
             lr.remarks = request.POST.get('remarks') or ''
+            lr.invoice_no = request.POST.get('invoice_no') or ''
+            lr.invoice_amount = request.POST.get('invoice_amount') or None
             lr.load_from = request.POST.get('load_from')
             lr.load_to = request.POST.get('load_to')
             lr.branch_to = request.POST.get('branch')
@@ -7934,8 +7938,9 @@ def lr_report_search(request):
                                                   branch_to=request.session.get('branch')).values('series__series', 'branch__branch_name', 'series__id').distinct()
     gdms = GoodsDespatchMemo.objects.filter(
         company__company_id=request.session.get('co_id'),
-        branch_to=request.session.get('branch')
-    ).order_by('gdm_no')
+        branch_to=request.session.get('branch'),
+        gdmchild__lr_fk__checked=False  
+    ).distinct().order_by('gdm_no')
 
     if request.method == 'POST':
         location = request.POST.get('location')
@@ -8012,11 +8017,15 @@ def lr_report(request):
 
     # Grand total
     grand_value = sum(lr.freight for lr in lrs)
+    total_ac_wt = sum(lr.weight for lr in lrs)
+    total_ch_wt = sum(lr.charged_weight for lr in lrs)
 
     context = {
         'lrs': lrs,
         'company': company,
         'grand_value': grand_value,
+        'total_ac_wt': total_ac_wt,
+        'total_ch_wt': total_ch_wt
     }
 
     return render(request, 'reports/lorry_receipt/lr_report.html', context)
@@ -8421,7 +8430,8 @@ def get_serial_number_gdm(request):
 
 
 def despatch_search(request):
-    series = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'), category='GDM')
+    series = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'), 
+                                                 branch__branch_name=request.session.get('branch'), category='GDM')
     if request.method == "POST":
         try:
             gdm = GoodsDespatchMemo.objects.get(company__company_id=request.session.get('co_id'),
@@ -8437,7 +8447,7 @@ def despatch_search(request):
 def gdm_edit(request, gdm_id):
     gdm = GoodsDespatchMemo.objects.get(id=gdm_id)
     lrs = LorryReceiptItems.objects.filter(id__in=GDMChild.objects.filter(master=gdm).values('lr_fk'))
-    series = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'), category='GDM')
+    series = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch'), category='GDM')
     drivers = Employee_master.objects.filter(co_id=request.session.get('co_id'), branch_id=request.session.get('branch'))
     vehicles = Vehicle_master.objects.filter(co_id=request.session.get('co_id'), branch_id=request.session.get('branch'))
     grand_value = sum(lr.freight for lr in lrs)

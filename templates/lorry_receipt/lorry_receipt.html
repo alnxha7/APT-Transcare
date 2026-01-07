@@ -688,6 +688,10 @@
             <label>Remarks</label>
             <input type="text" class="form-control" id="remarks" name="remarks" value="{{ lr.remarks }}">
         </div>
+        <div class="form-row">
+            <label>Invoice Amt</label>
+            <input type="number" step="0.01" class="form-control" id="invoice_amount" name="invoice_amount" value="{{ lr.invoice_amount }}">
+        </div>
         <input type="hidden" name="ajax_rate" step="0.01" id="ajax_rate">
     </div>
 
@@ -711,6 +715,7 @@
         <div class="form-row"><label>Address 3</label><input type="text" name="consignee_address3" id="consignee_address3" class="form-control" value="{{ lr.consignee_account.address3 }}"></div>
         <div class="form-row"><label>GST No</label><input type="text" name="consignee_gstno" id="consignee_gstno" class="form-control" value="{{ lr.consignee_account.gstno }}"></div>
         <div class="form-row"><label>Phone</label><input type="text" name="consignee_phone" id="consignee_phone" class="form-control" value="{{ lr.consignee_phone }}" required></div>
+        <div class="form-row"><label>Invoice No</label><input type="text" name="invoice_no" id="invoice_no" class="form-control" value="{{ lr.invoice_no }}"></div>
         </div>
     </div>
 </div>
@@ -723,14 +728,14 @@
                     <th>Sl.no</th>
                     <th style="width: 6%;">Item Code</th>
                     <th style="width: 25%;">Commodity/Item</th>
+                    <th>Pkg Type</th>
                     <th>Inv No</th>
-                    <th>Inv Amt</th>
+                    <th style="width: 9%;">Inv Amt</th>
                     <th>Actual Weight</th>
                     <th style="width: 10%;">Charged Weight</th>
                     <th>Nos</th>
                     <th>Rate</th>
                     <th>Freight</th>
-                    <th>Pkg Type</th>
                     <th>Delete</th>
                 </tr>
             </thead>
@@ -741,6 +746,7 @@
                         <td class="slno">{{ forloop.counter }}</td>
                         <td><input type="text" name="item_code[]" class="item_code form-control" value="{{ item.item_code }}"></td>
                         <td><input type="text" name="commodity[]" class="commodity form-control" value="{{ item.item }}"></td>
+                        <td><input type="text" name="pkg[]" class="pkg form-control" value="{{ item.pkg }}"></td>
                         <td><input type="text" name="inv_no[]" class="inv_no form-control" value="{{ item.inv_no }}"></td>
                         <td><input type="number" name="inv_amount[]" class="inv_amount form-control" value="{{ item.inv_amount }}"></td>
                         <td><input type="number" name="weight[]" class="weight form-control" value="{{ item.weight }}"></td>
@@ -748,7 +754,6 @@
                         <td><input type="number" name="numbers[]" class="numbers form-control" value="{{ item.numbers }}"></td>
                         <td><input type="number" name="rate[]" class="rate form-control" step="0.01" value="{{ item.rate }}"></td>
                         <td><input type="number" name="freight[]" class="freight form-control" value="{{ item.freight }}"></td>
-                        <td><input type="text" name="pkg[]" class="pkg form-control" value="{{ item.pkg }}"></td>
                         <td><span class="delete-row" style="cursor:pointer; color:red;">
                             <svg xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 640 640">
                                 <path fill="#ff0000" d="M232.7 69.9L224 96L128 96C110.3 96 96 110.3 96 128C96 145.7 110.3 160 128 160L512 160C529.7 160 544 145.7 544 128C544 110.3 529.7 96 512 96L416 96L407.3 69.9C402.9 56.8 390.7 48 376.9 48L263.1 48C249.3 48 237.1 56.8 232.7 69.9zM512 208L128 208L149.1 531.1C150.7 556.4 171.7 576 197 576L443 576C468.3 576 489.3 556.4 490.9 531.1L512 208z"/>
@@ -761,6 +766,7 @@
                         <td class="slno">1</td>
                         <td><input type="text" name="item_code[]" class="item_code form-control"></td>
                         <td><input type="text" name="commodity[]" class="commodity form-control"></td>
+                        <td><input type="text" name="pkg[]" class="pkg form-control"></td>
                         <td><input type="text" name="inv_no[]" class="inv_no form-control"></td>
                         <td><input type="number" name="inv_amount[]" class="inv_amount form-control"></td>
                         <td><input type="number" name="weight[]" class="weight form-control"></td>
@@ -768,7 +774,6 @@
                         <td><input type="number" name="numbers[]" class="numbers form-control"></td>
                         <td><input type="number" name="rate[]" step="0.01" class="rate form-control"></td>
                         <td><input type="number" name="freight[]" class="freight form-control"></td>
-                        <td><input type="text" name="pkg[]" class="pkg form-control"></td>
                         <td><span class="delete-row" style="cursor:pointer; color:red;">
                             <svg xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 640 640">
                                 <path fill="#ff0000" d="M232.7 69.9L224 96L128 96C110.3 96 96 110.3 96 128C96 145.7 110.3 160 128 160L512 160C529.7 160 544 145.7 544 128C544 110.3 529.7 96 512 96L416 96L407.3 69.9C402.9 56.8 390.7 48 376.9 48L263.1 48C249.3 48 237.1 56.8 232.7 69.9zM512 208L128 208L149.1 531.1C150.7 556.4 171.7 576 197 576L443 576C468.3 576 489.3 556.4 490.9 531.1L512 208z"/>
@@ -1015,7 +1020,7 @@
     <div style="display:flex; width:100%; margin-top:4px; gap:5px;">
       <div style="flex:1.5;">
         <div style="font-size:8px; font-weight:700; margin-bottom:2px;">GST: {{ lr.company.gst }}</div>
-        <div style="font-size:7px; font-weight:500; margin-bottom:2px;">E-Way: {% if lr.eway_billno %}{{ lr.eway_billno }}{% else %}Not Applicable{% endif %}</div>
+        <div style="font-size:7px; font-weight:700; margin-bottom:2px;">E-Way: {% if lr.eway_billno %}{{ lr.eway_billno }}{% else %}Not Applicable{% endif %}</div>
         <div style="display:flex; gap:4px; margin-bottom:4px;">
           <div style="flex:1; border:1px solid #000; padding:3px; font-size:6.5px;">
             <strong>Consignee Copy</strong><br>
@@ -1023,21 +1028,24 @@
             <input type="checkbox" style="transform: scale(0.7);"> Not Insured
           </div>
           <div style="flex:1; border:1px solid #000; padding:3px; font-size:6.5px;">
-            <strong>Inv/Tax No:</strong><br>{{ lr.sales_tax_no }}
+            <strong>Inv/Tax No:</strong><br>{{ lr.invoice_no }}
           </div>
           <div style="flex:1; border:1px solid #000; padding:3px; font-size:6.5px;">
-            <strong>Delivery Addr:</strong><br>{{ lr.delivery_address|truncatechars:30 }}
+            <strong>Destination Branch:</strong><br>{{ lr.branch_to }}
           </div>
         </div>
         <div style="font-size:7px; line-height:1.2;">
-          <strong>Consignor:</strong> {{ lr.consigner_name }} | <strong>GST:</strong> {{ lr.consigner_account.gstno }}<br>
+          <strong>Consignor:</strong> {{ lr.consigner_name }} | <strong>GST:</strong> {{ lr.consigner_account.gstno }}
+           | <strong>Place:</strong> {{ lr.consigner_account.address1 }} | <strong>Phone:</strong> {{ lr.consigner_account.mobile }}<br>
+
           <strong>Consignee:</strong> {{ lr.consignee_name }} | <strong>GST:</strong> {{ lr.consignee_account.gstno }}
+          | <strong>Place:</strong> {{ lr.consignee_account.address1 }} | <strong>Phone:</strong> {{ lr.consignee_account.mobile }}
         </div>
       </div>
 
       <div style="flex:1;">
         <div style="border:1px solid #000; padding:3px; font-size:7px; margin-bottom:2px;">
-          <strong>No:</strong> {{ lr.lr_no }} | <strong>Date:</strong> {{ lr.lr_date }}<br>
+          <strong><p style="margin: 0px; font-size: 9px;">LR No:  {{ lr.series.series }}{{ lr.lr_no }}</strong></p> <strong>Date:</strong> {{ lr.lr_date }}<br>
           <strong>From:</strong> {{ lr.load_from }} | <strong>To:</strong> {{ lr.load_to }}
         </div>
         <div style="border:1px solid #000; padding:2px; font-size:6px; text-align:center;">
@@ -1309,6 +1317,7 @@ $(document).ready(function() {
             <td class="slno">${rowCount}</td>
             <td><input type="text" name="item_code[]" class="item_code form-control"></td>
             <td><input type="text" name="commodity[]" class="commodity form-control"></td>
+            <td><input type="text" name="pkg[]" class="pkg form-control"></td>
             <td><input type="text" name="inv_no[]" class="inv_no form-control"></td>
             <td><input type="number" name="inv_amount[]" class="inv_amount form-control"></td>
             <td><input type="number" name="weight[]" class="weight form-control"></td>
@@ -1319,7 +1328,6 @@ $(document).ready(function() {
             <td><input type="number" name="rate[]" class="rate form-control"></td>
 
             <td><input type="number" name="freight[]" class="freight form-control"></td>
-            <td><input type="text" name="pkg[]" class="pkg form-control"></td>
             <td><span class="delete-row" style="cursor:pointer; color:red;">
                 <svg xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 640 640">
                     <path fill="#ff0000" d="M232.7 69.9L224 96L128 96C110.3 96 96 110.3 96 128C96 145.7 110.3 160 128 160L512 160C529.7 160 544 145.7 544 128C544 110.3 529.7 96 512 96L416 96L407.3 69.9C402.9 56.8 390.7 48 376.9 48L263.1 48C249.3 48 237.1 56.8 232.7 69.9zM512 208L128 208L149.1 531.1C150.7 556.4 171.7 576 197 576L443 576C468.3 576 489.3 556.4 490.9 531.1L512 208z"/>
@@ -1518,7 +1526,7 @@ function printInvoice() {
 
 <script>
 function toggleEwayBill() {
-    const grandTotal = parseFloat($("#grand_total").val()) || 0;
+    const grandTotal = parseFloat($("#invoice_amount").val()) || 0;
 
     if (grandTotal >= 50000) {
         $("#eway_billno").prop("required", true);
@@ -1548,5 +1556,38 @@ $(document).ready(function () {
     });
 </script>
 {% endif %}
+<script>
+document.addEventListener('input', function (e) {
+    if (e.target.classList.contains('inv_no')) {
+
+        // Get first row inv_no only
+        const firstInvNoInput = document.querySelector('#tripTable tbody tr:first-child .inv_no');
+
+        // If the edited field IS the first row
+        if (e.target === firstInvNoInput) {
+            document.getElementById('invoice_no').value = e.target.value;
+        }
+    }
+});
+</script>
+<script>
+function calculateInvoiceAmount() {
+    let total = 0;
+    document.querySelectorAll('.inv_amount').forEach(input => {
+        total += parseFloat(input.value) || 0;
+    });
+    document.getElementById('invoice_amount').value = total.toFixed(2);
+}
+
+// Listen for changes
+document.addEventListener('input', function (e) {
+    if (e.target.classList.contains('inv_amount')) {
+        calculateInvoiceAmount();
+    }
+});
+
+// Initial calculation (for edit page)
+calculateInvoiceAmount();
+</script>
 
 {% endblock %}

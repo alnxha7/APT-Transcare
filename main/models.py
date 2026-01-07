@@ -791,6 +791,8 @@ class LorryReceiptMaster(models.Model):
     payment = models.CharField(max_length=50)
     vehicle_no = models.CharField(max_length=80, null=True, blank=True)
     remarks = models.CharField(max_length=255, null=True, blank=True)
+    invoice_amount = models.FloatField(null=True, blank=True)
+    invoice_no = models.CharField(max_length=55, null=True, blank=True)
 
     load_from = models.CharField(max_length=100)
     load_to = models.CharField(max_length=100)

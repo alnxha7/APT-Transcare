@@ -855,9 +855,9 @@ th, td {
     <!-- LEFT COLUMN -->
     <div style="flex:1; line-height:1.8;">
 
-        <div><strong>CR No:</strong> {{ lr.receipt_no }}</div>
+        <div><strong>CR No:</strong> {{ lr.series.series }}{{ lr.receipt_no }}</div>
         <div><strong>CR Date:</strong> {{ lr.receipt_date }}</div>
-        <div><strong>LR No:</strong> {{ lr.lr.lr_no }}</div>
+        <div><strong>LR No:</strong> {{ lr.lr.series.series }}{{ lr.lr.lr_no }}</div>
         <div><strong>LR Date:</strong> {{ lr.lr.lr_date }}</div>
         <div><strong>Consignor:</strong> {{ lr.consigner_name }}</div>
         

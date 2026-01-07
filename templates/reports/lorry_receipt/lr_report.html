@@ -349,7 +349,7 @@
 
         <!-- 🔹 Table Section -->
         <div class="table-container">
-            <p>LR Report Details</p>
+            <p>GDM Report Details</p>
             <table id="billTable">
                 <thead>
                     <tr>
@@ -362,7 +362,8 @@
                         <th style="text-align: left;">Inv No</th>
                         <th style="text-align: left;">Inv Amt</th>
                         <th style="text-align: left;">Item</th>
-                        <th style="text-align: left;">Weight</th>
+                        <th style="text-align: left;">AC Weight</th>
+                        <th style="text-align: left;">CH Weight</th>
                         <th style="text-align: left;">Rate</th>
                         <th style="text-align: left;">Pkg</th>
                         <th style="text-align: left;">Freight</th>
@@ -384,6 +385,7 @@
                                     <td style="text-align: center;">{{ lr.inv_amount }}</td>
                                     <td style="text-align: left;">{{ lr.item }}</td>
                                     <td style="text-align: center;">{{ lr.weight }}</td>
+                                    <td style="text-align: center;">{{ lr.charged_weight }}</td>
                                     <td style="text-align: center;">{{ lr.rate }}</td>
                                     <td style="text-align: center;">{{ lr.pkg }}</td>
                                     <td style="text-align: center;">{{ lr.freight }}</td>
@@ -393,7 +395,11 @@
                                 </tr>
                         {% endfor %}
                         <tr style="font-weight: bold; background-color: #f0f0f0;">
-                            <td colspan="12" style="text-align: right;">Grand Total: </td>
+                            <td colspan="9" style="text-align: right;">Grand Total: </td>
+                            <td style="text-align: center;">{{ total_ac_wt }}</td>
+                            <td style="text-align: center;">{{ total_ch_wt }}</td>
+                            <td></td>
+                            <td></td>
                             <td style="text-align: center;">{{ grand_value }}</td>
                         </tr>
                     {% else %}
@@ -404,13 +410,17 @@
                 </tbody>
             </table>
         </div>
-
+        <div class="col-md-6 d-flex align-items-center" style="margin-top: 15px;">
+            <label class="form-label me-2 mb-0" style="width: 100px; font-weight: bold;">Remarks:</label>
+            <input type="text" id="remarks" name="remarks" placeholder="Enter Remarks here..." class="form-control" style="height: 30px !important; border: 1px solid #ccc;">
+        </div>
+        
     </div>
 
     <div class="bottom-section">
-        <div class="col-sm-12 text-end">
+        <div class="col-sm-12 text-end" style="margin-top: 25px;">
             <a href="{% url 'main:lr_report_search' %}" id="" class="btn btn-danger btn-sm">Exit</a>
-            <button type="button" id="print-button" class="btn btn-secondary btn-sm print-button">Print</button>
+            <button type="button" id="print-button" class="btn btn-secondary btn-sm print-button">Receive & Print</button>
         </div>
     </div>
 
@@ -444,7 +454,7 @@
                 </div>
             </div>
             <div style="text-align: right;">
-                <h3 style="margin: 0; font-size: 18px;">LR REPORT</h3>
+                <h3 style="margin: 0; font-size: 18px;">GDM RECEIVE</h3>
             </div>
         </div>
 
@@ -462,7 +472,8 @@
                         <th>Inv No</th>
                         <th>Inv Amt</th>
                         <th>Item</th>
-                        <th>Weight</th>
+                        <th>AC Weight</th>
+                        <th>CH Weight</th>
                         <th>Rate</th>
                         <th>Freight</th>
                     </tr>
@@ -481,20 +492,28 @@
                             <td style="text-align: center;">{{ lr.inv_amount }}</td>
                             <td style="text-align: left;">{{ lr.item }}</td>
                             <td style="text-align: center;">{{ lr.weight }}</td>
+                            <td style="text-align: center;">{{ lr.charged_weight }}</td>
                             <td style="text-align: center;">{{ lr.rate }}</td>
                             <td style="text-align: center;">{{ lr.freight }}</td>
                         </tr>
                     {% endif %}
                     {% endfor %}
                     <tr style="font-weight: bold; background-color: #e6e6e6;">
-                        <td colspan="10" style="text-align: right;">Grand Total:</td>
-                        <td style="text-align: right;">{{ grand_value }}</td>
+                        <td colspan="9" style="text-align: right;">Grand Total: </td>
+                        <td style="text-align: center;">{{ total_ac_wt }}</td>
+                        <td style="text-align: center;">{{ total_ch_wt }}</td>
+                        <td></td>
+                        <td></td>
+                        <td style="text-align: center;">{{ grand_value }}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
         <!-- Footer -->
+         <div style="margin-top: 20px; font-size: 13px; padding-left: 5px;">
+            <strong>Remarks:</strong> <span id="print-remarks-text"></span>
+        </div>
         <div style="margin-top: 40px; display: flex; justify-content: space-between; font-size: 13px;">
             <div>
                 <strong>Prepared By:</strong> _______________________
@@ -566,20 +585,23 @@ document.querySelectorAll(".lr-check").forEach(cb => {
 <!-- Main JS-->
 <script src="{% static 'js/main.js' %}"></script>
 <!-- 🖨️ PRINT SCRIPT -->
+
 <script>
 document.getElementById("print-button").addEventListener("click", function () {
+    // 1. Get the current value from the Remarks input box
+    let remarksValue = document.getElementById("remarks").value;
 
-    // 🔹 READ updated checkboxes from the table
+    // 2. Filter and build table rows (Your existing logic)
     let updatedRows = "";
     let grandTotal = 0;
+    let ac_weight = 0;
+    let ch_weight = 0;
     let counter = 1;
 
     document.querySelectorAll("tr[data-lr-id]").forEach(row => {
         let cb = row.querySelector(".lr-check");
-
         if (cb && cb.checked) {
             let cells = row.querySelectorAll("td");
-
             updatedRows += `
                 <tr>
                     <td>${counter++}</td>
@@ -593,50 +615,58 @@ document.getElementById("print-button").addEventListener("click", function () {
                     <td>${cells[8].innerText}</td>
                     <td>${cells[9].innerText}</td>
                     <td>${cells[10].innerText}</td>
-                    <td>${cells[12].innerText}</td>
-                </tr>
-            `;
-
-            grandTotal += parseFloat(cells[12].innerText) || 0;
+                    <td>${cells[11].innerText}</td>
+                    <td>${cells[13].innerText}</td>
+                </tr>`;
+            grandTotal += parseFloat(cells[13].innerText) || 0;
+            ac_weight += parseFloat(cells[9].innerText) || 0;
+            ch_weight += parseFloat(cells[10].innerText) || 0;
         }
     });
 
-    // 🔹 Build updated print HTML
-    let printHTML = `
+    // 3. Clone the hidden print div
+    let invoiceClone = document.getElementById("invoice-div").cloneNode(true);
+
+    // 4. Inject the Remarks into the span we created in Step 1
+    let printRemarksSpan = invoiceClone.querySelector("#print-remarks-text");
+    if (printRemarksSpan) {
+        printRemarksSpan.innerText = remarksValue;
+    }
+
+    // 5. Inject the updated Table rows and Total
+    let tbody = invoiceClone.querySelector("tbody");
+    if (tbody) {
+        tbody.innerHTML = updatedRows + `
+            <tr style="font-weight:bold;background:#e6e6e6;">
+                <td colspan="9" style="text-align:right;">Grand Total:</td>
+                <td>${ac_weight.toFixed(2)}</td>
+                <td>${ch_weight.toFixed(2)}</td>
+                <td></td>
+                <td>${grandTotal.toFixed(2)}</td>
+            </tr>`;
+    }
+
+    // 6. Open and Print
+    let printWindow = window.open("", "", "width=900,height=650");
+    printWindow.document.write(`
         <html>
         <head>
-            <title>LR Report</title>
+            <title>GDM</title>
             <style>
-                table, th, td {
-                    border: 1px solid black;
-                    border-collapse: collapse;
-                    font-size: 11px;
-                }
+                table, th, td { border: 1px solid black; border-collapse: collapse; font-size: 11px; }
                 th, td { padding: 4px; }
                 th { background-color: #f2f2f2; }
+                body { font-family: Arial, sans-serif; padding: 20px; }
             </style>
         </head>
         <body>
-            ${document.getElementById("invoice-div").innerHTML.replace(
-                /<tbody>[\s\S]*<\/tbody>/,
-                `<tbody>${updatedRows}
-                    <tr style="font-weight:bold;background:#e6e6e6;">
-                        <td colspan="11" style="text-align:right;">Grand Total:</td>
-                        <td>${grandTotal.toFixed(2)}</td>
-                    </tr>
-                </tbody>`
-            )}
+            ${invoiceClone.innerHTML}
         </body>
         </html>
-    `;
-
-    // 🔹 Open print window
-    let printWindow = window.open("", "", "width=900,height=650");
-    printWindow.document.write(printHTML);
+    `);
     printWindow.document.close();
     printWindow.print();
 });
-
 </script>
 
 
