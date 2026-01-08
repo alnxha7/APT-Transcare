@@ -8640,6 +8640,7 @@ def lr_check_status(request):
             cash_obj = CashReceipt.objects.filter(lr=lr).first()
             delivery_done = bool(cash_obj)
             cash_no = cash_obj.receipt_no if cash_obj else ""
+            series = cash_obj.series.series if cash_obj else ""
             delivery_date = cash_obj.receipt_date.strftime('%d-%m-%Y') if cash_obj else ""
             print(delivery_date)
 
@@ -8654,6 +8655,7 @@ def lr_check_status(request):
                 f"&delivery={int(delivery_done)}"
                 f"&gdm_no={gdm_no}"
                 f"&cash_no={cash_no}"
+                f"&series={series}"
                 f"&delivery_date={delivery_date}"
             )
 
@@ -8711,6 +8713,7 @@ def cr_edit(request, cr_id):
     vouchers = VoucherConfiguration.objects.filter(company__company_id=request.session.get('co_id'), branch__branch_name=request.session.get('branch'), 
                                                    category='Cash Receipt')
     employees = Employee_master.objects.filter(co_id=request.session.get('co_id'), branch_id=request.session.get('branch'))
+    lr_items = LorryReceiptItems.objects.filter(master=cr.lr)
     if request.method == 'POST':
         try:
             cr.lr.payment = request.POST.get('payment_method')
@@ -8742,6 +8745,7 @@ def cr_edit(request, cr_id):
             cr.grand_total = request.POST.get('grand_total')
             cr.save()
             cr_items.delete()
+            lr_items.delete()
             for item_code, item, weight, charged_weight, numbers, rate, inv_no, inv_amount, freight, pkg in zip(
                 request.POST.getlist('item_code[]'),
                 request.POST.getlist('commodity[]'),

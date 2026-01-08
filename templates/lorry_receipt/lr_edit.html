@@ -585,7 +585,7 @@ th, td {
         <div class="form-row"><label>Address 2</label><input type="text" name="consignee_address2" id="consignee_address2" class="form-control" value="{{ lr.consignee_account.address2 }}"></div>
         <div class="form-row"><label>Address 3</label><input type="text" name="consignee_address3" id="consignee_address3" class="form-control" value="{{ lr.consignee_account.address3 }}"></div>
         <div class="form-row"><label>GST No</label><input type="text" name="consignee_gstno" id="consignee_gstno" class="form-control" value="{{ lr.consignee_account.gstno }}"></div>
-        <div class="form-row"><label>Phone</label><input type="text" name="consignee_phone" id="consignee_phone" class="form-control" value="{{ lr.consignee_account.mobile }}"></div>
+        <div class="form-row"><label>Phone</label><input type="text" name="consignee_phone" id="consignee_phone" class="form-control" value="{% if lr.consignee_phone %}{{ lr.consignee_phone }}{% else %}{{ lr.consignee_account.mobile }}{% endif %}"></div>
         </div>
     </div>
 </div>

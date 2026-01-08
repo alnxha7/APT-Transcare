@@ -690,7 +690,7 @@
         </div>
         <div class="form-row">
             <label>Invoice Amt</label>
-            <input type="number" step="0.01" class="form-control" id="invoice_amount" name="invoice_amount" value="{{ lr.invoice_amount }}">
+            <input type="number" step="0.01" class="form-control" id="invoice_amount" name="invoice_amount" value="{{ lr.invoice_amount }}" required>
         </div>
         <input type="hidden" name="ajax_rate" step="0.01" id="ajax_rate">
     </div>
@@ -715,7 +715,7 @@
         <div class="form-row"><label>Address 3</label><input type="text" name="consignee_address3" id="consignee_address3" class="form-control" value="{{ lr.consignee_account.address3 }}"></div>
         <div class="form-row"><label>GST No</label><input type="text" name="consignee_gstno" id="consignee_gstno" class="form-control" value="{{ lr.consignee_account.gstno }}"></div>
         <div class="form-row"><label>Phone</label><input type="text" name="consignee_phone" id="consignee_phone" class="form-control" value="{{ lr.consignee_phone }}" required></div>
-        <div class="form-row"><label>Invoice No</label><input type="text" name="invoice_no" id="invoice_no" class="form-control" value="{{ lr.invoice_no }}"></div>
+        <div class="form-row"><label>Invoice No</label><input type="text" name="invoice_no" id="invoice_no" class="form-control" value="{{ lr.invoice_no }}" required></div>
         </div>
     </div>
 </div>
@@ -822,7 +822,7 @@
     </div>
 
     <div class="d-flex align-items-center" style="margin-bottom:8px;">
-      <label for="branch" style="width:90px;">Deliver Branch</label>
+      <label for="branch" style="width:90px;">Delivery Branch</label>
       <select name="branch" id="branch"
               class="form-control"
               style="width:230px;height:25px;padding:0 4px;" required>
@@ -869,7 +869,7 @@
     </div>
 
     <div class="d-flex align-items-center">
-      <label for="statutory" style="width:120px;">Statutory Charge</label>
+      <label for="statutory" style="width:120px;">Stationary Charge</label>
       <input type="number" class="form-control"
              name="statutory" id="statutory"
              value="{{ lr.statutory_charge|default:'0.00' }}"
@@ -935,7 +935,7 @@
 {% if request.GET.action == 'check_status' %}
 <div class="lr-status-card">
     <div class="lr-status-header">
-        🚚 LR Status Tracker
+         LR Status Tracker
     </div>
 
     <div class="lr-status-body">
@@ -967,7 +967,7 @@
                 {% if request.GET.delivery == '1' %}
                     Delivered
                     {% if request.GET.cash_no %}
-                        <span class="doc-no">Receipt: {{ request.GET.cash_no }}</span>
+                        <span class="doc-no">Receipt: {{ request.GET.series }}{{ request.GET.cash_no }}</span>
                         {% if request.GET.delivery_date %}
                             <span class="doc-no">Date: {{ request.GET.delivery_date }}</span>
                         {% endif %}
@@ -1103,7 +1103,7 @@
     <div style="display:flex; justify-content:space-between;"><span>Hamali</span><span>{{ lr.hamali|default:'0.00' }}</span></div>
     <div style="display:flex; justify-content:space-between;"><span>Door CL/DL</span><span>{{ lr.door_cl_dl|default:'0.00' }}</span></div>
     <div style="display:flex; justify-content:space-between;"><span>Risk Chg</span><span>{{ lr.risk_charge|default:'0.00' }}</span></div>
-    <div style="display:flex; justify-content:space-between;"><span>Statutory</span><span>{{ lr.statutory_charge|default:'0.00' }}</span></div>
+    <div style="display:flex; justify-content:space-between;"><span>Stationary</span><span>{{ lr.statutory_charge|default:'0.00' }}</span></div>
     
     <div style="display:flex; justify-content:space-between; font-weight:bold; border-top:1px solid #000; margin-top:2px; padding-top:1px;">
       <span style="font-size:9px;">GRAND TOTAL</span>
