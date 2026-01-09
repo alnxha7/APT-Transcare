@@ -5606,26 +5606,40 @@ class LedgerView(LoginRequiredMixin, View):
             branch__branch_name=request.session.get('branch'),
             fy_code=request.session.get('fycode')
         )
+        branch_to = Table_Accountsmaster.objects.filter(account_code=account_code).first()
+        gdm = GDMChild.objects.filter(
+            payment="TO_PAY",
+            master__branch_to=branch_to.head,
+            master__date__range=[start_date, end_date],
+            master__company=company_details,
+            master__branch__branch_name=request.session.get('branch'),
+            master__fy_code=request.session.get('fycode')
+        )
 
 
 
         def get_entry_date(entry):
-            raw_date = (
-                getattr(entry, 'Vdate', None) or 
-                getattr(entry, 'ndate', None) or 
-                getattr(entry, 'vdate', None) or 
-                getattr(entry, 'date', None)
-            )
-            if isinstance(raw_date, datetime):
-                return raw_date.date()
-            return raw_date
+            if hasattr(entry, 'Vdate') and entry.Vdate:
+                return entry.Vdate
+            elif hasattr(entry, 'ndate') and entry.ndate:
+                return entry.ndate
+            elif hasattr(entry, 'vdate') and entry.vdate:
+                return entry.vdate
+            elif isinstance(entry, Table_BillMaster):
+                return entry.bill_date
+            elif isinstance(entry, GDMChild):
+                return entry.master.date
+            else:
+                # Fallback – VERY IMPORTANT
+                return date.min
         
         combined_entries = sorted(
             list(voucher_entries) +
             list(drcr_entries) +
             list(journal_entries) +
             list(contra_entries) +
-            list(bill_entries),
+            list(bill_entries) +
+            list(gdm),
             key=get_entry_date
         )
 
@@ -5707,7 +5721,21 @@ class LedgerView(LoginRequiredMixin, View):
                     "debit": debit_amount,
                     "credit": credit_amount,
                     "is_bill_entry": True,
-                }            
+                }      
+            elif isinstance(entry, GDMChild):
+                debit_amount = Decimal(entry.freight) if entry.freight >= 0 else Decimal("0.00")
+                credit_amount = abs(Decimal(entry.freight)) if entry.freight < 0 else Decimal("0.00")
+                print(debit_amount)
+                print(credit_amount)
+
+                entry_dict = {
+                    "date": entry.master.date,
+                    "voucher_number": f"GDM No-{entry.master.gdm_no}",
+                    "narration": "GDM Issued",
+                    "debit": debit_amount,
+                    "credit": credit_amount,
+                    "is_gdm_entry": True,
+                }          
             # Safe to access entry_dict here
             closing_balance += entry_dict.get("debit", Decimal("0.00"))
             closing_balance -= entry_dict.get("credit", Decimal("0.00"))

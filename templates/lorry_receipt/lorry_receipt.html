@@ -752,7 +752,7 @@
                         <td><input type="number" name="weight[]" class="weight form-control" value="{{ item.weight }}"></td>
                         <td><input type="number" name="charged_weight[]" class="charged_weight form-control" value="{{ item.charged_weight }}"></td>
                         <td><input type="number" name="numbers[]" class="numbers form-control" value="{{ item.numbers }}"></td>
-                        <td><input type="number" name="rate[]" class="rate form-control" step="0.01" value="{{ item.rate }}"></td>
+                        <td><input type="number" name="rate[]" class="rate form-control" step="0.01" value="{% if item.rate %}{{ item.rate }}{% else %}0{% endif %}"></td>
                         <td><input type="number" name="freight[]" class="freight form-control" value="{{ item.freight }}"></td>
                         <td><span class="delete-row" style="cursor:pointer; color:red;">
                             <svg xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 640 640">
@@ -772,7 +772,7 @@
                         <td><input type="number" name="weight[]" class="weight form-control"></td>
                         <td><input type="number" name="charged_weight[]" class="charged_weight form-control"></td>
                         <td><input type="number" name="numbers[]" class="numbers form-control"></td>
-                        <td><input type="number" name="rate[]" step="0.01" class="rate form-control"></td>
+                        <td><input type="number" name="rate[]" step="0.01" class="rate form-control" value="0"></td>
                         <td><input type="number" name="freight[]" class="freight form-control"></td>
                         <td><span class="delete-row" style="cursor:pointer; color:red;">
                             <svg xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 640 640">
@@ -1067,7 +1067,6 @@
       <th style="width:10%;">Wt</th>
       <th style="width:10%;">Ch.Wt</th>
       <th style="width:8%;">Nos</th>
-      <th style="width:10%;">Rate</th>
       <th style="width:12%;">Freight</th>
     </tr>
   </thead>
@@ -1081,7 +1080,6 @@
         <td>{{ item.weight }}</td>
         <td>{{ item.charged_weight }}</td>
         <td>{{ item.numbers }}</td>
-        <td>{{ item.rate }}</td>
         <td>{{ item.freight }}</td>
       </tr>
       {% endfor %}
@@ -1325,7 +1323,7 @@ $(document).ready(function() {
             <td><input type="number" name="numbers[]" class="numbers form-control"></td>
 
             <!-- ?? auto-apply rate when creating row -->
-            <td><input type="number" name="rate[]" class="rate form-control"></td>
+            <td><input type="number" name="rate[]" class="rate form-control" value="0"></td>
 
             <td><input type="number" name="freight[]" class="freight form-control"></td>
             <td><span class="delete-row" style="cursor:pointer; color:red;">

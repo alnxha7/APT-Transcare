@@ -32,7 +32,7 @@ class Table_Companydetailsmaster(models.Model):
     address3 = models.CharField(max_length=50, blank=True, null=True)
     pinCode = models.IntegerField()
     phoneno = models.CharField(max_length=20, blank=True, null=True)
-    mobile = models.CharField(max_length=20, blank=True, null=True)
+    mobile = models.CharField(max_length=50, blank=True, null=True)
     email = models.EmailField(max_length=254, blank=True, null=True)
     gst = models.CharField(max_length=30, unique=True)
     pan = models.CharField(max_length=30, blank=True, null=True)

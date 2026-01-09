@@ -152,6 +152,8 @@
                     Journal
                 {% elif entry.is_contra_entry %}
                     Contra
+                {% elif entry.is_gdm_entry %}
+                    GDM
                 {% endif %}
             </td>
             <td>{{ entry.voucher_number }}</td>
