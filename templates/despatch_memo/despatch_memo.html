@@ -411,18 +411,17 @@
                 <thead>
                     <tr>
                         <th style="text-align: left;">Sl.no</th>
-                        <th style="text-align: left;">LR Date</th>
                         <th style="text-align: left;">LR No</th>
+                        <th style="text-align: left;">LR Date</th>
                         <th style="text-align: left;">From</th>
                         <th style="text-align: left;">To</th>
-                        <th style="text-align: left;">Payment</th>
-                        <th style="text-align: left;">Inv No</th>
-                        <th style="text-align: left;">Inv Amt</th>
+                        <th style="text-align: left;">Pkg</th>
                         <th style="text-align: left;">Item</th>
                         <th style="text-align: left;">AC Wt</th>
                         <th style="text-align: left;">CH Wt</th>
-                        <th style="text-align: left;">Rate</th>
-                        <th style="text-align: left;">Pkg</th>
+                        <th style="text-align: left;">Consignor</th>
+                        <th style="text-align: left;">Consignee</th>
+                        <th style="text-align: left;">Payment</th>
                         <th style="text-align: left;">Freight</th>
                         <th style="text-align:center;">Select</th>
                     </tr>
@@ -433,18 +432,17 @@
                                 <input type="hidden" name="lr_id[]" value="{{ lr.id }}">
                                 <tr data-lr-id="{{ lr.id }}">
                                     <td style="text-align: center;">{{ forloop.counter }}</td>
+                                    <td style="text-align: center;">{{ lr.master.series.series }}{{ lr.master.lr_no }}</td>
                                     <td style="text-align: center;">{{ lr.master.lr_date }}</td>
-                                    <td style="text-align: center;">{{ lr.master.lr_no }}</td>
                                     <td style="text-align: left;">{{ lr.master.load_from }}</td>
                                     <td style="text-align: left;"> {{ lr.master.load_to }} </td>
-                                    <td style="text-align: center;">{{ lr.master.payment }}</td>
-                                    <td style="text-align: center;">{{ lr.inv_no }}</td>
-                                    <td style="text-align: center;">{{ lr.inv_amount }}</td>
+                                    <td style="text-align: center;"> {{ lr.pkg }} </td>
                                     <td style="text-align: left;">{{ lr.item }}</td>
                                     <td style="text-align: center;">{{ lr.weight }}</td>
                                     <td style="text-align: center;">{{ lr.charged_weight }}</td>
-                                    <td style="text-align: center;">{{ lr.rate }}</td>
-                                    <td style="text-align: center;">{{ lr.pkg }}</td>
+                                    <td style="text-align: center;">{{ lr.master.consigner_name }}</td>
+                                    <td style="text-align: center;">{{ lr.master.consignee_name }}</td>
+                                    <td style="text-align: center;">{{ lr.master.payment }}</td>
                                     <td style="text-align: center;">{{ lr.freight }}</td>
                                     <td style="text-align:center;">
                                         {% if not gdm.id %}
@@ -454,12 +452,13 @@
                                 </tr>
                         {% endfor %}
                         <tr style="font-weight: bold; background-color: #f0f0f0;">
-                            <td colspan="9" style="text-align: right;">Grand Total: </td>
+                            <td colspan="7" style="text-align: right;">Grand Total: </td>
                             
                             <td style="text-align: center;">{{ total_ac_wt }}</td>
                             
                             <td style="text-align: center;">{{ total_ch_wt }}</td>
                             
+                            <td></td>
                             <td></td>
                             <td></td>
                             
@@ -521,15 +520,14 @@
                 </div>
             </div>
             <div style="text-align: right;">
-                <h3 style="margin: 0; font-size: 18px;">GOODS DESPATCH MEMO</h3>
+                <h3 style="margin: 0; font-size: 15px;">GOODS DESPATCH MEMO</h3>
             </div>
         </div>
 
         <div id="print-filters" style="font-size:14px; margin-bottom:15px;">
-            <strong>Series:</strong> {{ gdm.series.series }} &nbsp;&nbsp;&nbsp;
-            <strong>GDM No:</strong> {{ gdm.gdm_no }} &nbsp;&nbsp;&nbsp;
+            <strong>GDM No:</strong> {{ gdm.series.series }}{{ gdm.gdm_no }} &nbsp;&nbsp;&nbsp;
             <strong>Date:</strong> {{ gdm.date }} &nbsp;&nbsp;&nbsp;
-            <strong>Branch To:</strong> {{ gdm.branch_to }} &nbsp;&nbsp;&nbsp;
+            <strong>To:</strong> {{ gdm.branch_to }} &nbsp;&nbsp;&nbsp;
             <strong>Vehicle No:</strong> {{ gdm.vehicle_no }} &nbsp;&nbsp;&nbsp;
             <strong>Driver Name:</strong> {{ gdm.driver_name }} &nbsp;&nbsp;&nbsp;
         </div>
@@ -540,17 +538,17 @@
                 <thead style="background-color: #f2f2f2;">
                     <tr>
                         <th>Sl.no</th>
-                        <th>LR Date</th>
                         <th>LR No</th>
+                        <th>LR Date</th>
                         <th>From</th>
                         <th>To</th>
-                        <th>Payment</th>
-                        <th>Inv No</th>
-                        <th>Inv Amt</th>
+                        <th>Pkg</th>
                         <th>Item</th>
                         <th>AC Wt</th>
                         <th>CH Wt</th>
-                        <th>Rate</th>
+                        <th>Consignor</th>
+                        <th>Consignee</th>
+                        <th>Payment</th>
                         <th>Freight</th>
                     </tr>
                 </thead>
@@ -558,27 +556,29 @@
                     {% for item in child %}
                         <tr>
                             <td style="text-align: center;">{{ forloop.counter }}</td>
+                            <td style="text-align: center;">{{ item.lr_fk.master.series.series }}{{ item.lr_no }}</td>
                             <td style="text-align: center;">{{ item.lr_date }}</td>
-                            <td style="text-align: center;">{{ item.lr_no }}</td>
                             <td style="text-align: left;">{{ item.load_from }}</td>
                             <td style="text-align: left;">{{ item.load_to }}</td>
-                            <td style="text-align: center;">{{ item.payment }}</td>
-                            <td style="text-align: center;">{{ item.inv_no }}</td>
-                            <td style="text-align: center;">{{ item.inv_amount }}</td>
+                            <td style="text-align: left;">{{ item.pkg }}</td>
                             <td style="text-align: left;">{{ item.item }}</td>
                             <td style="text-align: center;">{{ item.weight }}</td>
                             <td style="text-align: center;">{{ item.charged_weight }}</td>
-                            <td style="text-align: center;">{{ item.rate }}</td>
+                            <td style="text-align: center;">{{ item.lr_fk.master.consigner_name }}</td>
+                            <td style="text-align: center;">{{ item.lr_fk.master.consignee_name }}</td>
+                            <td style="text-align: center;">{{ item.payment }}</td>
                             <td style="text-align: center;">{{ item.freight }}</td>
                         </tr>
                     {% endfor %}
                     <tr style="font-weight: bold; background-color: #e6e6e6;">
-    <td colspan="9" style="text-align: right;">Grand Total:</td>
+    <td colspan="7" style="text-align: right;">Grand Total:</td>
     
     <td style="text-align: center;">{{ total_ac_wt }}</td>
     
     <td style="text-align: center;">{{ total_ch_wt }}</td>
     
+    <td></td>
+    <td></td>
     <td></td>
     
     <td style="text-align: right;">{{ grand_child }}</td>
