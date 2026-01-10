@@ -8070,14 +8070,15 @@ def lr_report(request):
 
     # Grand total
     grand_value = sum(lr.freight for lr in lrs)
-    total_ac_wt = sum(lr.weight for lr in lrs)
+    total_numbers = sum(lr.numbers for lr in lrs)
     total_ch_wt = sum(lr.charged_weight for lr in lrs)
 
     context = {
         'lrs': lrs,
+        'gdm': gdm,
         'company': company,
         'grand_value': grand_value,
-        'total_ac_wt': total_ac_wt,
+        'total_numbers': total_numbers,
         'total_ch_wt': total_ch_wt
     }
 
@@ -8381,7 +8382,7 @@ def despatch_memo(request):
         lr.refresh_from_db(fields=['send'])
         
     grand_value = sum(lr.freight for lr in lrs)
-    total_ac_wt = sum(lr.weight for lr in lrs)
+    total_numbers = sum(lr.numbers for lr in lrs)
     total_ch_wt = sum(lr.charged_weight for lr in lrs)
 
     if request.method == 'POST':
@@ -8391,13 +8392,13 @@ def despatch_memo(request):
                 company=company,
                 branch=Branch_master.objects.get(branch_name=branch),
                 fy_code=request.session.get('fycode'),
-                
                 series=series,
                 gdm_no=series.serial_no,
                 date=request.POST.get('date'),
                 branch_to=request.POST.get('branch_to'),
                 vehicle_no=request.POST.get('vehicle_no'),
                 driver_name=request.POST.get('driver_name'),
+                driver_mobile=request.POST.get('driver_mobile'),
                 grand_total=grand_value
             )
             lr_ids = request.POST.getlist("lr_ids[]")
@@ -8425,7 +8426,7 @@ def despatch_memo(request):
             series.serial_no = series.serial_no + 1
             series.save()
             child = GDMChild.objects.filter(master=master)
-            print_ac_wt = sum(ch.weight for ch in child)
+            total_numbers = sum(ch.lr_fk.numbers for ch in child)
             print_ch_wt = sum(ch.charged_weight for ch in child)
             context = {
                 'gdm': master,
@@ -8437,7 +8438,7 @@ def despatch_memo(request):
                 'series': VoucherConfiguration.objects.filter(company=company, branch__branch_name=branch, category='GDM'),
                 'branch_to': branch_to,
                 'grand_child': sum(ch.freight for ch in child),
-                'total_ac_wt': print_ac_wt, 
+                'total_numbers': total_numbers,
                 'total_ch_wt': print_ch_wt,
                 'success': True
             }
@@ -8456,7 +8457,7 @@ def despatch_memo(request):
         'series': VoucherConfiguration.objects.filter(company=company, branch__branch_name=branch, category='GDM'),
         'branch_to': branch_to,
         'grand_value': grand_value,
-        'total_ac_wt': total_ac_wt,
+        'total_numbers': total_numbers,
         'total_ch_wt': total_ch_wt, 
     }
     return render(request, 'despatch_memo/despatch_memo.html', context)

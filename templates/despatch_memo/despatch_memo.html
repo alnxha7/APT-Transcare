@@ -402,6 +402,11 @@
             </select>
         </div>
 
+        <div class="col-md-2">
+            <label style="font-size:13px;">Driver Mob</label>
+            <input type="text" name="driver_mobile" id="driver_mobile" class="form-control" value="{% if gdm.driver_mobile %}{{ gdm.driver_mobile }}{% endif %}">
+        </div>
+
     </div>
 
         <!-- 🔹 Table Section -->
@@ -417,7 +422,7 @@
                         <th style="text-align: left;">To</th>
                         <th style="text-align: left;">Pkg</th>
                         <th style="text-align: left;">Item</th>
-                        <th style="text-align: left;">AC Wt</th>
+                        <th style="text-align: left;">Nos</th>
                         <th style="text-align: left;">CH Wt</th>
                         <th style="text-align: left;">Consignor</th>
                         <th style="text-align: left;">Consignee</th>
@@ -438,7 +443,7 @@
                                     <td style="text-align: left;"> {{ lr.master.load_to }} </td>
                                     <td style="text-align: center;"> {{ lr.pkg }} </td>
                                     <td style="text-align: left;">{{ lr.item }}</td>
-                                    <td style="text-align: center;">{{ lr.weight }}</td>
+                                    <td style="text-align: center;">{{ lr.numbers }}</td>
                                     <td style="text-align: center;">{{ lr.charged_weight }}</td>
                                     <td style="text-align: center;">{{ lr.master.consigner_name }}</td>
                                     <td style="text-align: center;">{{ lr.master.consignee_name }}</td>
@@ -454,7 +459,7 @@
                         <tr style="font-weight: bold; background-color: #f0f0f0;">
                             <td colspan="7" style="text-align: right;">Grand Total: </td>
                             
-                            <td style="text-align: center;">{{ total_ac_wt }}</td>
+                            <td style="text-align: center;">{{ total_numbers }}</td>
                             
                             <td style="text-align: center;">{{ total_ch_wt }}</td>
                             
@@ -515,6 +520,7 @@
                     <p style="margin: 2px 0; font-size: 13px;">
                         {{ company.address1 }} {{ company.address2 }}<br>
                         {{ company.address3 }} - {{ company.pinCode }}<br>
+                        MOB: {{ company.phoneno }}, {{ company.mobile }}<br>
                         GSTIN: {{ company.gst }}
                     </p>
                 </div>
@@ -530,6 +536,7 @@
             <strong>To:</strong> {{ gdm.branch_to }} &nbsp;&nbsp;&nbsp;
             <strong>Vehicle No:</strong> {{ gdm.vehicle_no }} &nbsp;&nbsp;&nbsp;
             <strong>Driver Name:</strong> {{ gdm.driver_name }} &nbsp;&nbsp;&nbsp;
+            <strong>Driver Mobile:</strong> {{ gdm.driver_mobile }} &nbsp;&nbsp;&nbsp;
         </div>
 
         <!-- Table Section -->
@@ -544,7 +551,7 @@
                         <th>To</th>
                         <th>Pkg</th>
                         <th>Item</th>
-                        <th>AC Wt</th>
+                        <th>Nos</th>
                         <th>CH Wt</th>
                         <th>Consignor</th>
                         <th>Consignee</th>
@@ -562,7 +569,7 @@
                             <td style="text-align: left;">{{ item.load_to }}</td>
                             <td style="text-align: left;">{{ item.pkg }}</td>
                             <td style="text-align: left;">{{ item.item }}</td>
-                            <td style="text-align: center;">{{ item.weight }}</td>
+                            <td style="text-align: center;">{{ item.lr_fk.numbers }}</td>
                             <td style="text-align: center;">{{ item.charged_weight }}</td>
                             <td style="text-align: center;">{{ item.lr_fk.master.consigner_name }}</td>
                             <td style="text-align: center;">{{ item.lr_fk.master.consignee_name }}</td>
@@ -573,7 +580,7 @@
                     <tr style="font-weight: bold; background-color: #e6e6e6;">
     <td colspan="7" style="text-align: right;">Grand Total:</td>
     
-    <td style="text-align: center;">{{ total_ac_wt }}</td>
+    <td style="text-align: center;">{{ total_numbers }}</td>
     
     <td style="text-align: center;">{{ total_ch_wt }}</td>
     

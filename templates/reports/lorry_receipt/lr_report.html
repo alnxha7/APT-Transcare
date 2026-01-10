@@ -362,7 +362,7 @@
                         <th style="text-align: left;">Inv No</th>
                         <th style="text-align: left;">Inv Amt</th>
                         <th style="text-align: left;">Item</th>
-                        <th style="text-align: left;">AC Weight</th>
+                        <th style="text-align: left;">Nos</th>
                         <th style="text-align: left;">CH Weight</th>
                         <th style="text-align: left;">Rate</th>
                         <th style="text-align: left;">Pkg</th>
@@ -384,7 +384,7 @@
                                     <td style="text-align: center;">{{ lr.inv_no }}</td>
                                     <td style="text-align: center;">{{ lr.inv_amount }}</td>
                                     <td style="text-align: left;">{{ lr.item }}</td>
-                                    <td style="text-align: center;">{{ lr.weight }}</td>
+                                    <td style="text-align: center;">{{ lr.numbers }}</td>
                                     <td style="text-align: center;">{{ lr.charged_weight }}</td>
                                     <td style="text-align: center;">{{ lr.rate }}</td>
                                     <td style="text-align: center;">{{ lr.pkg }}</td>
@@ -396,7 +396,7 @@
                         {% endfor %}
                         <tr style="font-weight: bold; background-color: #f0f0f0;">
                             <td colspan="9" style="text-align: right;">Grand Total: </td>
-                            <td style="text-align: center;">{{ total_ac_wt }}</td>
+                            <td style="text-align: center;">{{ total_numbers }}</td>
                             <td style="text-align: center;">{{ total_ch_wt }}</td>
                             <td></td>
                             <td></td>
@@ -449,6 +449,7 @@
                     <p style="margin: 2px 0; font-size: 13px;">
                         {{ company.address1 }} {{ company.address2 }}<br>
                         {{ company.address3 }} - {{ company.pinCode }}<br>
+                        MOB: {{ company.phoneno }}, {{ company.mobile }}<br>
                         GSTIN: {{ company.gst }}
                     </p>
                 </div>
@@ -456,6 +457,15 @@
             <div style="text-align: right;">
                 <h3 style="margin: 0; font-size: 18px;">GDM RECEIVE</h3>
             </div>
+        </div>
+
+        <div id="print-filters" style="font-size:14px; margin-bottom:15px;">
+            <strong>GDM No:</strong> {{ gdm.series.series }}{{ gdm.gdm_no }} &nbsp;&nbsp;&nbsp;
+            <strong>Date:</strong> {{ gdm.date }} &nbsp;&nbsp;&nbsp;
+            <strong>To:</strong> {{ gdm.branch_to }} &nbsp;&nbsp;&nbsp;
+            <strong>Vehicle No:</strong> {{ gdm.vehicle_no }} &nbsp;&nbsp;&nbsp;
+            <strong>Driver Name:</strong> {{ gdm.driver_name }} &nbsp;&nbsp;&nbsp;
+            <strong>Driver Mobile:</strong> {{ gdm.driver_mobile }} &nbsp;&nbsp;&nbsp;
         </div>
 
         <!-- Table Section -->
@@ -472,7 +482,7 @@
                         <th>Inv No</th>
                         <th>Inv Amt</th>
                         <th>Item</th>
-                        <th>AC Weight</th>
+                        <th>Nos</th>
                         <th>CH Weight</th>
                         <th>Rate</th>
                         <th>Freight</th>
@@ -491,7 +501,7 @@
                             <td style="text-align: center;">{{ lr.inv_no }}</td>
                             <td style="text-align: center;">{{ lr.inv_amount }}</td>
                             <td style="text-align: left;">{{ lr.item }}</td>
-                            <td style="text-align: center;">{{ lr.weight }}</td>
+                            <td style="text-align: center;">{{ lr.numbers }}</td>
                             <td style="text-align: center;">{{ lr.charged_weight }}</td>
                             <td style="text-align: center;">{{ lr.rate }}</td>
                             <td style="text-align: center;">{{ lr.freight }}</td>
@@ -500,7 +510,7 @@
                     {% endfor %}
                     <tr style="font-weight: bold; background-color: #e6e6e6;">
                         <td colspan="9" style="text-align: right;">Grand Total: </td>
-                        <td style="text-align: center;">{{ total_ac_wt }}</td>
+                        <td style="text-align: center;">{{ total_numbers }}</td>
                         <td style="text-align: center;">{{ total_ch_wt }}</td>
                         <td></td>
                         <td></td>
@@ -594,7 +604,7 @@ document.getElementById("print-button").addEventListener("click", function () {
     // 2. Filter and build table rows (Your existing logic)
     let updatedRows = "";
     let grandTotal = 0;
-    let ac_weight = 0;
+    let total_numbers = 0;
     let ch_weight = 0;
     let counter = 1;
 
@@ -619,7 +629,7 @@ document.getElementById("print-button").addEventListener("click", function () {
                     <td>${cells[13].innerText}</td>
                 </tr>`;
             grandTotal += parseFloat(cells[13].innerText) || 0;
-            ac_weight += parseFloat(cells[9].innerText) || 0;
+            total_numbers += parseFloat(cells[9].innerText) || 0;
             ch_weight += parseFloat(cells[10].innerText) || 0;
         }
     });
@@ -639,7 +649,7 @@ document.getElementById("print-button").addEventListener("click", function () {
         tbody.innerHTML = updatedRows + `
             <tr style="font-weight:bold;background:#e6e6e6;">
                 <td colspan="9" style="text-align:right;">Grand Total:</td>
-                <td>${ac_weight.toFixed(2)}</td>
+                <td>${total_numbers.toFixed(2)}</td>
                 <td>${ch_weight.toFixed(2)}</td>
                 <td></td>
                 <td>${grandTotal.toFixed(2)}</td>

@@ -885,6 +885,7 @@ class GoodsDespatchMemo(models.Model):
     branch_to = models.CharField(max_length=80)
     vehicle_no = models.CharField(max_length=25)
     driver_name = models.CharField(max_length=125)
+    driver_mobile = models.CharField(max_length=30, null=True, blank=True)
     grand_total = models.FloatField()
 
 class GDMChild(models.Model):
