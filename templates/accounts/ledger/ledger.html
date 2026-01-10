@@ -154,6 +154,8 @@
                     Contra
                 {% elif entry.is_gdm_entry %}
                     GDM
+                {% elif entry.is_gdm_receive_entry %}
+                    GDM
                 {% endif %}
             </td>
             <td>{{ entry.voucher_number }}</td>

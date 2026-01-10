@@ -5616,6 +5616,16 @@ class LedgerView(LoginRequiredMixin, View):
             master__fy_code=request.session.get('fycode')
         )
 
+        gdm_received = GDMChild.objects.filter(
+            lr_fk__send=True,
+            lr_fk__checked=True,
+            payment="TO_PAY",
+            master__branch__branch_name=branch_to.head,
+            master__date__range=[start_date, end_date],
+            master__company=company_details,
+            master__branch_to=request.session.get('branch'),
+            master__fy_code=request.session.get('fycode'),
+        )
 
 
         def get_entry_date(entry):
@@ -5639,7 +5649,8 @@ class LedgerView(LoginRequiredMixin, View):
             list(journal_entries) +
             list(contra_entries) +
             list(bill_entries) +
-            list(gdm),
+            list(gdm) +
+            list(gdm_received),
             key=get_entry_date
         )
 
@@ -5735,7 +5746,21 @@ class LedgerView(LoginRequiredMixin, View):
                     "debit": debit_amount,
                     "credit": credit_amount,
                     "is_gdm_entry": True,
-                }          
+                }    
+
+            elif isinstance(entry, GDMChild):
+                debit_amount = Decimal(entry.freight) if entry.freight >= 0 else Decimal("0.00")
+                credit_amount = abs(Decimal(entry.freight)) if entry.freight < 0 else Decimal("0.00")
+
+
+                entry_dict = {
+                    "date": entry.master.date,
+                    "voucher_number": f"GDM No-{entry.master.gdm_no}",
+                    "narration": "GDM Received",
+                    "debit": debit_amount,
+                    "credit": credit_amount,
+                    "is_gdm_receive_entry": True,
+                }         
             # Safe to access entry_dict here
             closing_balance += entry_dict.get("debit", Decimal("0.00"))
             closing_balance -= entry_dict.get("credit", Decimal("0.00"))
@@ -8481,6 +8506,9 @@ def gdm_edit(request, gdm_id):
     grand_value = sum(lr.freight for lr in lrs)
     if request.method == "POST":
         try:
+            for lr in lrs:
+                lr.send = False
+                lr.save()
             gdm.delete()
             return render(request, 'despatch_memo/despatch_search.html', {'success': 'Despatch Memo Deleted successfully'})
         except Exception as e:
