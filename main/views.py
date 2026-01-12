@@ -5606,7 +5606,7 @@ class LedgerView(LoginRequiredMixin, View):
             branch__branch_name=request.session.get('branch'),
             fy_code=request.session.get('fycode')
         )
-        branch_to = Table_Accountsmaster.objects.filter(account_code=account_code).first()
+        branch_to = Table_Accountsmaster.objects.filter(company=company_details, branch__branch_name=request.session.get('branch'), account_code=account_code).first()
         gdm = GDMChild.objects.filter(
             payment="TO_PAY",
             master__branch_to=branch_to.head,
@@ -5626,6 +5626,8 @@ class LedgerView(LoginRequiredMixin, View):
             master__branch_to=request.session.get('branch'),
             master__fy_code=request.session.get('fycode'),
         )
+        print('branch_head', branch_to.head)
+        print(gdm_received)
 
 
         def get_entry_date(entry):
@@ -5734,33 +5736,35 @@ class LedgerView(LoginRequiredMixin, View):
                     "is_bill_entry": True,
                 }      
             elif isinstance(entry, GDMChild):
-                debit_amount = Decimal(entry.freight) if entry.freight >= 0 else Decimal("0.00")
-                credit_amount = abs(Decimal(entry.freight)) if entry.freight < 0 else Decimal("0.00")
-                print(debit_amount)
-                print(credit_amount)
+                debit_amount = Decimal(entry.freight or "0.00") if entry.freight >= 0 else Decimal("0.00")
+                credit_amount = abs(Decimal(entry.freight or "0.00")) if entry.freight < 0 else Decimal("0.00")
 
-                entry_dict = {
-                    "date": entry.master.date,
-                    "voucher_number": f"GDM No-{entry.master.gdm_no}",
-                    "narration": "GDM Issued",
-                    "debit": debit_amount,
-                    "credit": credit_amount,
-                    "is_gdm_entry": True,
-                }    
+                is_received = (
+                    hasattr(entry, 'lr_fk') and
+                    entry.lr_fk and
+                    entry.lr_fk.send and
+                    entry.lr_fk.checked
+                )
+                print('is_received', is_received)
 
-            elif isinstance(entry, GDMChild):
-                debit_amount = Decimal(entry.freight) if entry.freight >= 0 else Decimal("0.00")
-                credit_amount = abs(Decimal(entry.freight)) if entry.freight < 0 else Decimal("0.00")
-
-
-                entry_dict = {
-                    "date": entry.master.date,
-                    "voucher_number": f"GDM No-{entry.master.gdm_no}",
-                    "narration": "GDM Received",
-                    "debit": debit_amount,
-                    "credit": credit_amount,
-                    "is_gdm_receive_entry": True,
-                }         
+                if is_received:
+                    entry_dict = {
+                        "date": entry.master.date,
+                        "voucher_number": f"GDM No-{entry.master.gdm_no}",
+                        "narration": "GDM Received",
+                        "debit": debit_amount,
+                        "credit": credit_amount,
+                        "is_gdm_receive_entry": True,
+                    }
+                else:
+                    entry_dict = {
+                        "date": entry.master.date,
+                        "voucher_number": f"GDM No-{entry.master.gdm_no}",
+                        "narration": "GDM Issued",
+                        "debit": debit_amount,
+                        "credit": credit_amount,
+                        "is_gdm_entry": True,
+                    }
             # Safe to access entry_dict here
             closing_balance += entry_dict.get("debit", Decimal("0.00"))
             closing_balance -= entry_dict.get("credit", Decimal("0.00"))
@@ -8189,8 +8193,9 @@ def lr_edit_cash_receipt(request, lr_id):
     if request.method == 'POST':
         try:
             existing_cr = CashReceipt.objects.filter(lr=lr).first()
-            if existing_cr:
-                return render(request, "lorry_receipt/lr_edit.html", {'error': 'Cash Receipt already exists for this LR'})
+            # if existing_cr:
+            #     return render(request, "lorry_receipt/lr_edit.html", {'error': 'Cash Receipt already exists for this LR'})
+            old_total = lr.grand_total
             series_id = request.POST.get('series')
             voucher_config = VoucherConfiguration.objects.get(id=series_id, category='Cash Receipt')
             serial_no = voucher_config.serial_no
@@ -8295,6 +8300,7 @@ def lr_edit_cash_receipt(request, lr_id):
                 'lr': cash_receipt,
                 'lr_items': LorryReceiptItems.objects.filter(master=lr),
                 'print': True if request.POST.get('action') == 'print' else False,
+                'old_total': old_total,
                 'success': 'Lorry Receipt Edited successfully.',
             }
             return render(request, "lorry_receipt/lr_edit.html", context)
@@ -8773,6 +8779,7 @@ def cr_edit(request, cr_id):
     lr_items = LorryReceiptItems.objects.filter(master=cr.lr)
     if request.method == 'POST':
         try:
+            old_total = cr.lr.gross_amount + cr.lr.hamali + cr.lr.door_cl_dl + cr.lr.risk_charge + cr.lr.statutory_charge
             cr.lr.payment = request.POST.get('payment_method')
             cr.lr.remarks = request.POST.get('remarks') or ''
             cr.lr.gross_amount = request.POST.get('gross_amount')
@@ -8854,6 +8861,7 @@ def cr_edit(request, cr_id):
                 'vouchers': vouchers,
                 'lr_items': CashReceiptItems.objects.filter(master=cr),
                 'print': True if request.POST.get('action') == 'print' else False,
+                'old_total': old_total,
                 'success': 'Cash Receipt Edited successfully.',
             }
             return render(request, "lorry_receipt/lr_edit.html", context)
